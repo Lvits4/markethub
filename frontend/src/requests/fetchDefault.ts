@@ -1,9 +1,18 @@
 import type { ApiResponse } from '../types/apiResponse';
 
+const defaultDevBase = 'http://localhost:3000/api';
+
 const baseUrl = () => {
-  const v = import.meta.env.VITE_API_BASE_URL as string | undefined;
-  if (!v) throw new Error('VITE_API_BASE_URL no está definida');
-  return v.endsWith('/') ? v.slice(0, -1) : v;
+  const v = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim();
+  const resolved =
+    v ||
+    (import.meta.env.DEV ? defaultDevBase : undefined);
+  if (!resolved) {
+    throw new Error(
+      'VITE_API_BASE_URL no está definida. Crea frontend/.env (copia .env.example) o define la variable al hacer build.',
+    );
+  }
+  return resolved.endsWith('/') ? resolved.slice(0, -1) : resolved;
 };
 
 export type FetchDefaultAuth = {
