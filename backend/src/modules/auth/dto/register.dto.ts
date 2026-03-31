@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
-  IsEnum,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -31,7 +31,7 @@ export class RegisterDto {
 
   @ApiPropertyOptional({ enum: [Role.CUSTOMER, Role.SELLER], default: Role.CUSTOMER })
   @IsOptional()
-  @IsEnum(Role, {
+  @IsIn([Role.CUSTOMER, Role.SELLER], {
     message: 'El rol debe ser CUSTOMER o SELLER',
   })
   role?: Role.CUSTOMER | Role.SELLER;

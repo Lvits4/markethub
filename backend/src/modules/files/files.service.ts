@@ -8,6 +8,13 @@ import { Readable } from 'stream';
 export class FilesService {
   constructor(private readonly storage: StorageService) {}
 
+  private assertPath(filePath: string | undefined): string {
+    if (filePath === undefined || filePath === null || String(filePath).trim() === '') {
+      throw new BadRequestException('El parámetro path es obligatorio');
+    }
+    return String(filePath).trim();
+  }
+
   async upload(
     file: Express.Multer.File,
     folder: string = 'general',
@@ -40,6 +47,7 @@ export class FilesService {
   }
 
   async download(filePath: string): Promise<Readable> {
+    filePath = this.assertPath(filePath);
     const exists = await this.storage.fileExists(filePath);
     if (!exists) {
       throw new NotFoundException('Archivo no encontrado');
@@ -49,6 +57,7 @@ export class FilesService {
   }
 
   async delete(filePath: string): Promise<void> {
+    filePath = this.assertPath(filePath);
     const exists = await this.storage.fileExists(filePath);
     if (!exists) {
       throw new NotFoundException('Archivo no encontrado');
@@ -57,6 +66,7 @@ export class FilesService {
   }
 
   async getMetadata(filePath: string) {
+    filePath = this.assertPath(filePath);
     const exists = await this.storage.fileExists(filePath);
     if (!exists) {
       throw new NotFoundException('Archivo no encontrado');

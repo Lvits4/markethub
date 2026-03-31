@@ -20,13 +20,17 @@ export class AuthService {
 
   async register(dto: RegisterDto) {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const role = dto.role ?? Role.CUSTOMER;
+    if (role !== Role.CUSTOMER && role !== Role.SELLER) {
+      throw new BadRequestException('El registro público solo permite CUSTOMER o SELLER');
+    }
 
     const user = await this.usersService.create({
       email: dto.email,
       password: hashedPassword,
       firstName: dto.firstName,
       lastName: dto.lastName,
-      role: dto.role || Role.CUSTOMER,
+      role,
     });
 
     const token = this.generateToken(user.id, user.email, user.role);
@@ -93,7 +97,9 @@ export class AuthService {
   async resetPassword(token: string, newPassword: string) {
     const user = await this.usersService.findByResetToken(token);
     if (!user) {
-      throw new BadRequestException('Token inválido o expirado');
+      throw new BadRequestException(
+        'Token de recuperación inválido o ya usado. Debe ser el valor `resetToken` devuelto por POST /auth/forgot-password, no el accessToken JWT de sesión.',
+      );
     }
 
     if (user.passwordResetExpires && user.passwordResetExpires < new Date()) {
