@@ -1,5 +1,4 @@
 import { useDeferredValue, useMemo, useState } from 'react';
-import { FiBell } from 'react-icons/fi';
 import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery';
 import { useProductsListQuery } from '../../queries/useProductsListQuery';
 import { CategoryPill } from '../../components/CategoryPill/CategoryPill';
@@ -76,13 +75,6 @@ export function CatalogPage() {
             {marketingCopy.catalogSubtitle}
           </p>
         </div>
-        <button
-          type="button"
-          className="hidden shrink-0 cursor-pointer rounded-2xl bg-white p-3 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/80 transition hover:ring-zinc-300 sm:flex dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:ring-zinc-700"
-          aria-label="Notificaciones"
-        >
-          <FiBell className="h-5 w-5 text-zinc-700 dark:text-zinc-200" />
-        </button>
       </header>
 
       <SearchInput value={search} onChange={setSearch} className="mb-5" />

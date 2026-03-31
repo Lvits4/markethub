@@ -17,6 +17,7 @@ export type AuthContextValue = {
   isAuthenticated: boolean;
   login: (data: LoginResult) => void;
   logout: () => void;
+  setUser: (user: AuthUser | null) => void;
 };
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
@@ -53,6 +54,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(USER_KEY);
   }, []);
 
+  const setUserPersist = useCallback((next: AuthUser | null) => {
+    setUser(next);
+    if (next) {
+      localStorage.setItem(USER_KEY, JSON.stringify(next));
+    } else {
+      localStorage.removeItem(USER_KEY);
+    }
+  }, []);
+
   const value = useMemo(
     () => ({
       user,
@@ -60,8 +70,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: Boolean(token),
       login,
       logout,
+      setUser: setUserPersist,
     }),
-    [user, token, login, logout],
+    [user, token, login, logout, setUserPersist],
   );
 
   return (

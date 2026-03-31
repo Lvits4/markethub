@@ -19,3 +19,7 @@ export const orderStatusLabel: Record<OrderStatusValue, string> = {
 export function isOrderStatusValue(v: string): v is OrderStatusValue {
   return (ORDER_STATUS_VALUES as readonly string[]).includes(v);
 }
+
+export function formatOrderStatus(status: string): string {
+  return isOrderStatusValue(status) ? orderStatusLabel[status] : status;
+}

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '../helpers/queryKeys';
 import { useAuth } from './useAuth';
-import { patchOrderStatus } from '../requests/adminRequests';
+import { patchOrderStatus } from '../requests/orderRequests';
 
 export function useAdminOrderStatus() {
   const { token } = useAuth();
@@ -20,6 +20,8 @@ export function useAdminOrderStatus() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.adminOrders });
+      queryClient.invalidateQueries({ queryKey: queryKeys.ordersStore });
+      queryClient.invalidateQueries({ queryKey: queryKeys.ordersMy });
       queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.adminSalesReport });
       queryClient.invalidateQueries({ queryKey: queryKeys.adminPlatformReport });

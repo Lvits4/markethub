@@ -108,3 +108,57 @@ export async function fetchDefault<T>(
 
   return wrapped.data as T;
 }
+
+export type FetchFormDataInit = FetchDefaultAuth & {
+  method?: string;
+  formData: FormData;
+};
+
+/** Multipart: no establecer Content-Type (boundary automático). Respuesta JSON con envoltorio `{ data }`. */
+export async function fetchFormData<T>(
+  path: string,
+  init: FetchFormDataInit,
+): Promise<T> {
+  const { token, method = 'POST', formData } = init;
+
+  const hdrs: Record<string, string> = {};
+  if (token) {
+    hdrs.Authorization = `Bearer ${token}`;
+  }
+
+  const res = await fetch(buildUrl(path), {
+    method,
+    headers: hdrs,
+    body: formData,
+  });
+
+  const text = await res.text();
+  let json: unknown = null;
+  if (text) {
+    try {
+      json = JSON.parse(text) as unknown;
+    } catch {
+      json = null;
+    }
+  }
+
+  if (!res.ok) {
+    const message = json ? parseBackendMessage(json) : res.statusText || 'Error de red';
+    throw new ApiError(message, res.status);
+  }
+
+  if (!text || json === null) {
+    return undefined as T;
+  }
+
+  if (typeof json !== 'object') {
+    throw new ApiError('Respuesta inválida', res.status);
+  }
+
+  const wrapped = json as ApiResponse<T>;
+  if (!('data' in wrapped)) {
+    throw new ApiError('Formato de respuesta inesperado', res.status);
+  }
+
+  return wrapped.data as T;
+}

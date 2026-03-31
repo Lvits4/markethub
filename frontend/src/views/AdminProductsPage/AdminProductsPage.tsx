@@ -1,5 +1,6 @@
 import { formatPrice } from '../../helpers/formatPrice';
 import { useAdminProductsQuery } from '../../queries/useAdminProductsQuery';
+import { AdminProductRowActions } from './AdminProductRowActions';
 
 function numPrice(v: string | number) {
   const n = typeof v === 'string' ? Number.parseFloat(v) : v;
@@ -47,6 +48,7 @@ export function AdminProductsPage() {
                 <th className="px-5 py-4">Precio</th>
                 <th className="px-5 py-4">Stock</th>
                 <th className="px-5 py-4">Activo</th>
+                <th className="px-5 py-4 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -81,6 +83,9 @@ export function AdminProductsPage() {
                     >
                       {p.isActive ? 'Sí' : 'No'}
                     </span>
+                  </td>
+                  <td className="px-5 py-4 text-right">
+                    <AdminProductRowActions productId={p.id} storeId={p.storeId} />
                   </td>
                 </tr>
               ))}

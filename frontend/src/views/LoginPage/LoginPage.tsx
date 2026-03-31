@@ -44,6 +44,10 @@ export function LoginPage() {
           navigate(routePaths.admin, { replace: true });
           return;
         }
+        if (data.user.role === 'SELLER') {
+          navigate(routePaths.seller, { replace: true });
+          return;
+        }
         navigate(from, { replace: true });
       },
       onError: (err) =>
@@ -90,6 +94,15 @@ export function LoginPage() {
           autoComplete="current-password"
           placeholder="Tu contraseña"
         />
+
+        <p className="text-right text-sm">
+          <Link
+            to={routePaths.forgotPassword}
+            className="font-medium text-auth-primary hover:underline"
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
+        </p>
 
         <button
           type="submit"

@@ -1,21 +1,27 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
 import { QuantitySelector } from '../../components/QuantitySelector/QuantitySelector';
 import { routePaths } from '../../config/routes';
 import { formatPrice } from '../../helpers/formatPrice';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { getPrimaryImageUrl } from '../../helpers/productImageUrl';
+import { useAuth } from '../../hooks/useAuth';
 import { useCartMutations } from '../../hooks/useCartMutations';
+import { useCreateOrderMutation } from '../../hooks/useCreateOrderMutation';
 import { useCartQuery } from '../../queries/useCartQuery';
 import { updateCartItemSchema } from '../../validations/updateCartItemSchema';
 
 export function CartPage() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { data: cart, isLoading, isError } = useCartQuery();
   const { updateItem, removeItem } = useCartMutations();
+  const createOrder = useCreateOrderMutation();
   const [coupon, setCoupon] = useState('');
   const [orderNote, setOrderNote] = useState('');
+  const [shippingAddress, setShippingAddress] = useState('');
 
   const items = cart?.items ?? [];
 
@@ -50,6 +56,34 @@ export function CartPage() {
 
   const shipping = 0;
   const total = subtotal + shipping;
+
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      toast.error('Inicia sesión para confirmar el pedido');
+      navigate(routePaths.login);
+      return;
+    }
+    const addr = shippingAddress.trim();
+    if (!addr) {
+      toast.error('Indica la dirección de envío');
+      return;
+    }
+    const note = orderNote.trim();
+    const fullAddress =
+      note.length > 0 ? `${addr}\n\nNota: ${note}` : addr;
+    createOrder.mutate(fullAddress, {
+      onSuccess: (orders) => {
+        toast.success('Pedido confirmado');
+        const first = orders[0];
+        if (first?.id) {
+          navigate(routePaths.orderDetail(first.id));
+        } else {
+          navigate(routePaths.orders);
+        }
+      },
+      onError: (e) => toast.error(getErrorMessage(e)),
+    });
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:pb-10 sm:pt-8 lg:pb-12">
@@ -160,12 +194,23 @@ export function CartPage() {
               </div>
 
               <label className="mt-5 block text-xs font-semibold uppercase tracking-wide text-zinc-400">
-                Nota para el pedido
+                Dirección de envío
+              </label>
+              <textarea
+                value={shippingAddress}
+                onChange={(e) => setShippingAddress(e.target.value)}
+                rows={3}
+                placeholder="Calle, número, ciudad, código postal…"
+                className="mt-2 w-full resize-none rounded-2xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-100 dark:focus:border-emerald-500"
+              />
+
+              <label className="mt-5 block text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                Nota para el pedido (opcional)
               </label>
               <textarea
                 value={orderNote}
                 onChange={(e) => setOrderNote(e.target.value)}
-                rows={3}
+                rows={2}
                 placeholder="Instrucciones de entrega, regalo, etc."
                 className="mt-2 w-full resize-none rounded-2xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-100 dark:focus:border-emerald-500"
               />
@@ -191,9 +236,18 @@ export function CartPage() {
                 </div>
               </dl>
 
-              <p className="mt-4 text-xs leading-relaxed text-zinc-400">
-                El checkout completo no está disponible en esta versión; aquí
-                puedes revisar artículos y cantidades.
+              <Button
+                type="button"
+                variant="primary"
+                className="mt-6 w-full justify-center py-3.5"
+                disabled={createOrder.isPending}
+                onClick={handleCheckout}
+              >
+                {createOrder.isPending ? 'Procesando…' : 'Confirmar pedido'}
+              </Button>
+              <p className="mt-3 text-xs leading-relaxed text-zinc-400">
+                Se creará un pedido por cada tienda del carrito. El pago se simula
+                en el servidor.
               </p>
             </div>
           </div>

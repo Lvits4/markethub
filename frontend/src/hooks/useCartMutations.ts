@@ -13,8 +13,10 @@ export function useCartMutations() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
 
-  const invalidate = () =>
+  const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: queryKeys.cart });
+    void queryClient.invalidateQueries({ queryKey: queryKeys.cartSummary });
+  };
 
   const addItem = useMutation({
     mutationFn: (body: AddToCartPayload) =>

@@ -1,11 +1,17 @@
 import { apiPaths } from '../config/apiPaths';
-import type { Cart } from '../types/cart';
+import type { Cart, CartSummary } from '../types/cart';
 import { fetchDefault, type FetchDefaultAuth } from './fetchDefault';
 import type { AddToCartPayload } from '../validations/addToCartSchema';
 import type { UpdateCartItemPayload } from '../validations/updateCartItemSchema';
 
 export async function fetchCart(auth: FetchDefaultAuth): Promise<Cart> {
   return fetchDefault<Cart>(apiPaths.cart, { token: auth.token });
+}
+
+export async function fetchCartSummary(
+  auth: FetchDefaultAuth,
+): Promise<CartSummary> {
+  return fetchDefault<CartSummary>(apiPaths.cartSummary, { token: auth.token });
 }
 
 export async function addCartItem(

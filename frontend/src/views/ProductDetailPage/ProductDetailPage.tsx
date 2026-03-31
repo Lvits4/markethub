@@ -20,7 +20,13 @@ import {
 import { useAuth } from '../../hooks/useAuth';
 import { useCartMutations } from '../../hooks/useCartMutations';
 import { useFavoriteToggle } from '../../hooks/useFavoriteToggle';
+import {
+  useCreateReviewMutation,
+  useDeleteReviewMutation,
+  useUpdateReviewMutation,
+} from '../../hooks/useReviewMutations';
 import { useProductByIdQuery } from '../../queries/useProductByIdQuery';
+import { useReviewsByProductQuery } from '../../queries/useReviewsByProductQuery';
 import { useFavoriteCheckQuery } from '../../queries/useFavoriteCheckQuery';
 import { addToCartSchema } from '../../validations/addToCartSchema';
 
@@ -359,6 +365,211 @@ export function ProductDetailPage() {
           </div>
         </div>
       </div>
+
+      {id ? (
+        <ProductReviewsSection productId={id} />
+      ) : null}
     </div>
+  );
+}
+
+function ProductReviewsSection({ productId }: { productId: string }) {
+  const { user, isAuthenticated } = useAuth();
+  const { data: reviews, isLoading } = useReviewsByProductQuery(productId);
+  const createMut = useCreateReviewMutation(productId);
+  const updateMut = useUpdateReviewMutation(productId);
+  const deleteMut = useDeleteReviewMutation(productId);
+
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editRating, setEditRating] = useState(5);
+  const [editComment, setEditComment] = useState('');
+
+  const myReview = reviews?.find((r) => r.userId === user?.id);
+
+  const submitNew = () => {
+    if (!isAuthenticated) {
+      toast.error('Inicia sesión para opinar');
+      return;
+    }
+    createMut.mutate(
+      { rating, comment: comment.trim() || undefined },
+      {
+        onSuccess: () => {
+          toast.success('Reseña publicada');
+          setComment('');
+          setRating(5);
+        },
+        onError: (e) => toast.error(getErrorMessage(e)),
+      },
+    );
+  };
+
+  return (
+    <section className="mt-14 border-t border-zinc-200 pt-10 dark:border-zinc-800">
+      <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+        Opiniones
+      </h2>
+
+      {isAuthenticated && !myReview ? (
+        <div className="mt-4 rounded-3xl bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:ring-zinc-800">
+          <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Valora este producto
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <label className="text-xs text-zinc-500">Puntuación</label>
+            <select
+              value={rating}
+              onChange={(e) => setRating(Number(e.target.value))}
+              className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            >
+              {[1, 2, 3, 4, 5].map((n) => (
+                <option key={n} value={n}>
+                  {n} estrellas
+                </option>
+              ))}
+            </select>
+          </div>
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            rows={3}
+            placeholder="Comentario (opcional)"
+            className="mt-3 w-full rounded-2xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+          />
+          <Button
+            type="button"
+            variant="primary"
+            className="mt-3"
+            disabled={createMut.isPending}
+            onClick={submitNew}
+          >
+            Publicar reseña
+          </Button>
+        </div>
+      ) : null}
+
+      {isLoading ? (
+        <p className="mt-6 text-sm text-zinc-500">Cargando opiniones…</p>
+      ) : !reviews?.length ? (
+        <p className="mt-6 text-sm text-zinc-500">Aún no hay opiniones.</p>
+      ) : (
+        <ul className="mt-6 space-y-4">
+          {reviews.map((r) => (
+            <li
+              key={r.id}
+              className="rounded-2xl border border-zinc-100 bg-white/80 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/80"
+            >
+              {editingId === r.id ? (
+                <div className="space-y-2">
+                  <select
+                    value={editRating}
+                    onChange={(e) => setEditRating(Number(e.target.value))}
+                    className="rounded-lg border border-zinc-200 px-2 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                  >
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                  <textarea
+                    value={editComment}
+                    onChange={(e) => setEditComment(e.target.value)}
+                    rows={2}
+                    className="w-full rounded-lg border border-zinc-200 px-2 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      className="text-xs"
+                      disabled={updateMut.isPending}
+                      onClick={() =>
+                        updateMut.mutate(
+                          {
+                            id: r.id,
+                            body: {
+                              rating: editRating,
+                              comment: editComment.trim() || undefined,
+                            },
+                          },
+                          {
+                            onSuccess: () => {
+                              toast.success('Reseña actualizada');
+                              setEditingId(null);
+                            },
+                            onError: (e) => toast.error(getErrorMessage(e)),
+                          },
+                        )
+                      }
+                    >
+                      Guardar
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="text-xs"
+                      onClick={() => setEditingId(null)}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                      {r.user
+                        ? `${r.user.firstName} ${r.user.lastName}`
+                        : 'Usuario'}
+                    </p>
+                    <span className="text-sm text-amber-600 dark:text-amber-400">
+                      {r.rating}/5
+                    </span>
+                  </div>
+                  {r.comment ? (
+                    <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                      {r.comment}
+                    </p>
+                  ) : null}
+                  {user?.id === r.userId ? (
+                    <div className="mt-2 flex gap-2">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="text-xs"
+                        onClick={() => {
+                          setEditingId(r.id);
+                          setEditRating(r.rating);
+                          setEditComment(r.comment ?? '');
+                        }}
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="text-xs text-red-600"
+                        disabled={deleteMut.isPending}
+                        onClick={() =>
+                          deleteMut.mutate(r.id, {
+                            onSuccess: () => toast.success('Reseña eliminada'),
+                            onError: (e) => toast.error(getErrorMessage(e)),
+                          })
+                        }
+                      >
+                        Eliminar
+                      </Button>
+                    </div>
+                  ) : null}
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }

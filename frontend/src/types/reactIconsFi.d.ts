@@ -7,6 +7,7 @@ declare module 'react-icons/fi' {
   export const FiChevronDown: I;
   export const FiChevronLeft: I;
   export const FiChevronRight: I;
+  export const FiChevronUp: I;
   export const FiEye: I;
   export const FiEyeOff: I;
   export const FiExternalLink: I;

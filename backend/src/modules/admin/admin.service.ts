@@ -6,6 +6,7 @@ import { Store } from '../stores/entities/store.entity';
 import { Product } from '../products/entities/product.entity';
 import { Order } from '../orders/entities/order.entity';
 import { Payment } from '../payments/entities/payment.entity';
+import { StoresService } from '../stores/stores.service';
 import { OrderStatus, PaymentStatus, Role } from '../../common/enums';
 
 @Injectable()
@@ -21,6 +22,7 @@ export class AdminService {
     private readonly ordersRepository: Repository<Order>,
     @InjectRepository(Payment)
     private readonly paymentsRepository: Repository<Payment>,
+    private readonly storesService: StoresService,
   ) {}
 
   async getDashboardStats() {
@@ -103,6 +105,10 @@ export class AdminService {
   async updateStoreCommission(storeId: string, commission: number) {
     await this.storesRepository.update(storeId, { commission });
     return this.storesRepository.findOne({ where: { id: storeId } });
+  }
+
+  async deleteStore(storeId: string, actor: User) {
+    await this.storesService.remove(storeId, actor);
   }
 
   async getSalesReport() {

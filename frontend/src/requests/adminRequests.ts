@@ -41,6 +41,13 @@ export function patchAdminStoreCommission(
   });
 }
 
+export function deleteAdminStore(token: string, storeId: string) {
+  return fetchDefault<{ message: string }>(apiPaths.adminStore(storeId), {
+    token,
+    method: 'DELETE',
+  });
+}
+
 export function fetchAdminProducts(token: string) {
   return fetchDefault<AdminProductRow[]>(apiPaths.adminProducts, { token });
 }
@@ -74,17 +81,5 @@ export function rejectStore(token: string, storeId: string) {
 export function fetchOrdersStoreReport(token: string) {
   return fetchDefault<AdminPlatformReport>(apiPaths.ordersStoreReport, {
     token,
-  });
-}
-
-export function patchOrderStatus(
-  token: string,
-  orderId: string,
-  status: string,
-) {
-  return fetchDefault<AdminOrderRow>(apiPaths.orderStatus(orderId), {
-    token,
-    method: 'PATCH',
-    body: { status },
   });
 }

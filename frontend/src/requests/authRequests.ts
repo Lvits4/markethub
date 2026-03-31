@@ -24,3 +24,22 @@ export async function registerRequest(body: RegisterApiBody): Promise<LoginResul
     body: payload,
   });
 }
+
+export type ForgotPasswordResult = {
+  message: string;
+  resetToken?: string;
+};
+
+export async function forgotPasswordRequest(email: string) {
+  return fetchDefault<ForgotPasswordResult>(apiPaths.forgotPassword, {
+    method: 'POST',
+    body: { email },
+  });
+}
+
+export async function resetPasswordRequest(token: string, newPassword: string) {
+  return fetchDefault<{ message: string }>(apiPaths.resetPassword, {
+    method: 'POST',
+    body: { token, newPassword },
+  });
+}

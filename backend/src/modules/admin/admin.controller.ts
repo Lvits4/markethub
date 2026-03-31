@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -8,8 +9,9 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
-import { Roles } from '../../common/decorators';
+import { CurrentUser, Roles } from '../../common/decorators';
 import { Role } from '../../common/enums';
+import { User } from '../users/entities/user.entity';
 import { UpdateCommissionDto } from './dto';
 
 @ApiTags('Admin')
@@ -50,6 +52,16 @@ export class AdminController {
     @Body() dto: UpdateCommissionDto,
   ) {
     return this.adminService.updateStoreCommission(id, dto.commission);
+  }
+
+  @Delete('stores/:id')
+  @ApiOperation({ summary: 'Eliminar una tienda (admin)' })
+  async deleteStore(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: User,
+  ) {
+    await this.adminService.deleteStore(id, user);
+    return { message: 'Tienda eliminada correctamente' };
   }
 
   @Get('products')

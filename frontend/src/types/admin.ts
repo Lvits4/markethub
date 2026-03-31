@@ -28,11 +28,14 @@ export type AdminStoreRow = {
   name: string;
   slug: string;
   description: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
   isApproved: boolean;
   isActive: boolean;
   commission: string | number;
   userId: string;
   user?: AdminStoreOwner;
+  createdAt?: string;
 };
 
 export type AdminProductRow = {

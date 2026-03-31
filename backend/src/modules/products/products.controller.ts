@@ -29,13 +29,6 @@ export class ProductsController {
   }
 
   @Public()
-  @Get(':id')
-  @ApiOperation({ summary: 'Obtener producto por ID' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.productsService.findById(id);
-  }
-
-  @Public()
   @Get('store/:storeId')
   @ApiOperation({ summary: 'Listar productos de una tienda' })
   findByStore(
@@ -43,6 +36,13 @@ export class ProductsController {
     @Query() filters: FilterProductDto,
   ) {
     return this.productsService.findByStore(storeId, filters);
+  }
+
+  @Public()
+  @Get(':id')
+  @ApiOperation({ summary: 'Obtener producto por ID' })
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.productsService.findById(id);
   }
 
   @Roles(Role.SELLER, Role.ADMIN)
