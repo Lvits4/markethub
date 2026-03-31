@@ -5,12 +5,12 @@ import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 import storageConfig from './config/storage.config';
-import { JwtAuthGuard } from './common/guards';
-import { RolesGuard } from './common/guards';
+import { JwtAuthGuard, RolesGuard } from './common/guards';
 import { HttpExceptionFilter } from './common/filters';
 import { TransformInterceptor } from './common/interceptors';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
+import { FilesModule } from './modules/files/files.module';
 
 @Module({
   imports: [
@@ -33,6 +33,7 @@ import { UsersModule } from './modules/users/users.module';
     }),
     AuthModule,
     UsersModule,
+    FilesModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
