@@ -4,6 +4,7 @@ declare module 'react-icons/fi' {
   export const FiArrowLeft: I;
   export const FiBarChart2: I;
   export const FiBell: I;
+  export const FiChevronDown: I;
   export const FiChevronLeft: I;
   export const FiChevronRight: I;
   export const FiEye: I;

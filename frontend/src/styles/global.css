@@ -87,20 +87,3 @@ html.dark body {
 .dark .admin-nav-link--active {
   @apply text-emerald-400;
 }
-
-.admin-rail-link {
-  @apply flex h-10 w-10 items-center justify-center rounded-xl text-zinc-500 transition-colors dark:text-zinc-400;
-}
-
-.admin-rail-link:hover {
-  @apply bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100;
-}
-
-.admin-rail-link--active {
-  background: var(--admin-primary-soft);
-  color: var(--admin-primary);
-}
-
-.dark .admin-rail-link--active {
-  @apply text-emerald-400;
-}

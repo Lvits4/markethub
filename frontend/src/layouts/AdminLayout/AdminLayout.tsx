@@ -2,7 +2,6 @@ import { useState, type ComponentType, type ReactNode } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
-  FiBarChart2,
   FiChevronLeft,
   FiChevronRight,
   FiExternalLink,
@@ -80,30 +79,6 @@ function SidebarNavItem({
   );
 }
 
-type RailItemProps = {
-  to: string;
-  end?: boolean;
-  icon: ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
-  label: string;
-};
-
-function RailLink({ to, end, icon: Icon, label }: RailItemProps) {
-  return (
-    <NavLink
-      to={to}
-      end={end}
-      title={label}
-      className={({ isActive }) =>
-        ['admin-rail-link', isActive ? 'admin-rail-link--active' : '']
-          .filter(Boolean)
-          .join(' ')
-      }
-    >
-      <Icon className="h-5 w-5" aria-hidden />
-    </NavLink>
-  );
-}
-
 function SectionLabel({
   collapsed,
   children,
@@ -155,38 +130,25 @@ export function AdminLayout() {
   return (
     <div className="admin-shell flex min-h-screen bg-[var(--admin-page-bg)] text-zinc-800 dark:text-zinc-100">
       <aside
-        className="flex w-[52px] shrink-0 flex-col items-center border-r border-[var(--admin-border)] bg-[var(--admin-card)] py-4 dark:bg-zinc-900"
-        aria-label="Accesos rápidos"
-      >
-        <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--admin-primary)] text-sm font-bold text-white">
-          M
-        </div>
-        <nav className="flex flex-col gap-1">
-          <RailLink
-            to={routePaths.admin}
-            end
-            icon={FiGrid}
-            label="Panel"
-          />
-          <RailLink to={routePaths.adminStores} icon={FiShoppingBag} label="Tiendas" />
-          <RailLink to={routePaths.adminOrders} icon={FiShoppingCart} label="Pedidos" />
-          <RailLink to={routePaths.adminUsers} icon={FiUsers} label="Clientes" />
-          <RailLink to={routePaths.adminSales} icon={FiBarChart2} label="Informes" />
-        </nav>
-      </aside>
-
-      <aside
         className={`flex shrink-0 flex-col border-r border-[var(--admin-border)] bg-[var(--admin-card)] transition-[width] duration-200 ease-out dark:bg-zinc-900 ${collapsed ? 'w-[72px]' : 'w-[248px]'}`}
         aria-label="Navegación del panel"
       >
         <div className="flex h-14 items-center justify-between gap-2 border-b border-[var(--admin-border)] px-3">
-          {!collapsed ? (
-            <span className="truncate text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-              MarketHub
-            </span>
-          ) : (
-            <span className="sr-only">MarketHub</span>
-          )}
+          <div className="flex min-w-0 items-center gap-2.5">
+            <div
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-primary)] text-sm font-bold text-white"
+              aria-hidden
+            >
+              M
+            </div>
+            {!collapsed ? (
+              <span className="truncate text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+                MarketHub
+              </span>
+            ) : (
+              <span className="sr-only">MarketHub</span>
+            )}
+          </div>
           <button
             type="button"
             onClick={() => setCollapsed((c) => !c)}

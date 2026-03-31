@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   Bar,
@@ -13,7 +13,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { FiPlus } from 'react-icons/fi';
+import { FiChevronDown, FiPlus } from 'react-icons/fi';
 import { routePaths } from '../../config/routes';
 import { formatPrice } from '../../helpers/formatPrice';
 import { useAdminDashboardQuery } from '../../queries/useAdminDashboardQuery';
@@ -30,43 +30,101 @@ const DONUT_COLORS = [
   '#64748b',
 ];
 
-function pctChange(cur: number, prev: number): { pct: number; up: boolean } | null {
-  if (!Number.isFinite(prev) || prev === 0) return null;
-  const raw = ((cur - prev) / prev) * 100;
-  return { pct: Math.abs(raw), up: raw >= 0 };
+const PERIOD_OPTIONS: { value: 3 | 6 | 12; label: string }[] = [
+  { value: 3, label: 'Últimos 3 meses' },
+  { value: 6, label: 'Últimos 6 meses' },
+  { value: 12, label: 'Últimos 12 meses' },
+];
+
+function ChartPeriodSelect({
+  value,
+  onChange,
+  labelledBy,
+}: {
+  value: 3 | 6 | 12;
+  onChange: (v: 3 | 6 | 12) => void;
+  labelledBy: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDocMouseDown = (e: MouseEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', onDocMouseDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDocMouseDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const selected =
+    PERIOD_OPTIONS.find((o) => o.value === value) ?? PERIOD_OPTIONS[2];
+
+  return (
+    <div className="relative w-full sm:w-auto" ref={wrapRef}>
+      <button
+        type="button"
+        id="admin-period-trigger"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-labelledby={labelledBy}
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full min-w-[min(100%,220px)] sm:min-w-[220px] items-center justify-between gap-3 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card)] px-4 py-2 text-left text-sm font-medium text-zinc-800 shadow-sm outline-none ring-[var(--admin-primary)]/0 transition hover:border-zinc-300 focus-visible:ring-2 dark:text-zinc-100 dark:hover:border-zinc-600"
+      >
+        <span className="truncate">{selected.label}</span>
+        <FiChevronDown
+          className={`h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          aria-hidden
+        />
+      </button>
+      {open ? (
+        <ul
+          role="listbox"
+          className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card)] py-0.5 shadow-lg ring-1 ring-black/5 dark:ring-white/10 sm:left-auto sm:right-0 sm:min-w-[220px]"
+        >
+          {PERIOD_OPTIONS.map((opt) => (
+            <li key={opt.value} role="presentation">
+              <button
+                type="button"
+                id={`period-opt-${opt.value}`}
+                role="option"
+                aria-selected={opt.value === value}
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+                className={
+                  opt.value === value
+                    ? 'w-full px-4 py-2 text-left text-sm font-semibold text-[var(--admin-primary)] bg-[var(--admin-primary-soft)] dark:text-emerald-400'
+                    : 'w-full px-4 py-2 text-left text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800/80'
+                }
+              >
+                {opt.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
 }
 
-function KpiCard({
-  label,
-  value,
-  hint,
-  trend,
-}: {
-  label: string;
-  value: string | number;
-  hint?: string;
-  trend?: { pct: number; up: boolean } | null;
-}) {
+function KpiCard({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card)] p-5 shadow-sm dark:shadow-none">
-      <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">{label}</p>
-      <p className="mt-2 text-3xl font-bold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-50">
+    <div className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card)] px-3 py-2.5 shadow-sm dark:shadow-none">
+      <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+        {label}
+      </p>
+      <p className="mt-0.5 text-2xl font-bold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-50">
         {value}
       </p>
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        {trend ? (
-          <span
-            className={`text-sm font-semibold ${trend.up ? 'text-[var(--admin-primary)]' : 'text-red-500'}`}
-          >
-            {trend.up ? '↑' : '↓'} {trend.pct.toFixed(1)}%
-          </span>
-        ) : (
-          <span className="text-sm text-zinc-400">—</span>
-        )}
-        {hint ? (
-          <span className="text-xs text-zinc-400 dark:text-zinc-500">{hint}</span>
-        ) : null}
-      </div>
     </div>
   );
 }
@@ -91,22 +149,6 @@ export function AdminDashboardPage() {
       pedidos: Number.parseInt(String(row.totalOrders), 10) || 0,
     }));
   }, [monthlyChrono, periodMonths]);
-
-  const revenueTrend = useMemo(() => {
-    const m = sales.data?.monthlySales ?? [];
-    if (m.length < 2) return null;
-    const cur = Number.parseFloat(String(m[0].totalRevenue)) || 0;
-    const prev = Number.parseFloat(String(m[1].totalRevenue)) || 0;
-    return pctChange(cur, prev);
-  }, [sales.data]);
-
-  const ordersTrend = useMemo(() => {
-    const m = sales.data?.monthlySales ?? [];
-    if (m.length < 2) return null;
-    const cur = Number.parseInt(String(m[0].totalOrders), 10) || 0;
-    const prev = Number.parseInt(String(m[1].totalOrders), 10) || 0;
-    return pctChange(cur, prev);
-  }, [sales.data]);
 
   const donutData = useMemo(() => {
     const rows = platform.data?.productSales ?? [];
@@ -156,81 +198,61 @@ export function AdminDashboardPage() {
 
   return (
     <div>
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 shrink">
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
             Panel
           </h1>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Resumen de MarketHub · datos en vivo de la API
+          <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+            Resumen de MarketHub
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <label htmlFor="admin-period" className="text-sm text-zinc-500">
-            Periodo gráficos
-          </label>
-          <select
-            id="admin-period"
-            value={periodMonths}
-            onChange={(e) =>
-              setPeriodMonths(Number(e.target.value) as 3 | 6 | 12)
-            }
-            className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-card)] px-3 py-2 text-sm font-medium text-zinc-800 shadow-sm dark:text-zinc-100"
-          >
-            <option value={3}>Últimos 3 meses</option>
-            <option value={6}>Últimos 6 meses</option>
-            <option value={12}>Últimos 12 meses</option>
-          </select>
+        <div className="flex w-full flex-col gap-1.5 sm:w-auto sm:max-w-md sm:items-stretch">
+          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-end sm:gap-3">
+            <span
+              id="admin-period-label"
+              className="shrink-0 text-sm font-medium leading-none text-zinc-600 dark:text-zinc-400"
+            >
+              Periodo gráficos
+            </span>
+            <ChartPeriodSelect
+              labelledBy="admin-period-label"
+              value={periodMonths}
+              onChange={setPeriodMonths}
+            />
+          </div>
         </div>
       </header>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        <KpiCard
-          label="Clientes"
-          value={data.users.customers}
-          hint="registrados"
-          trend={null}
-        />
+      <div className="mt-5 grid items-stretch gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <KpiCard label="Clientes" value={data.users.customers} />
         <KpiCard
           label="Ingresos cobrados"
           value={formatPrice(data.revenue.totalSales)}
-          hint="vs. mes anterior (informe)"
-          trend={revenueTrend}
         />
-        <KpiCard
-          label="Pedidos"
-          value={data.orders.total}
-          hint="vs. mes anterior"
-          trend={ordersTrend}
-        />
-        <KpiCard
-          label="Tiendas pendientes"
-          value={data.stores.pending}
-          hint="revisar moderación"
-          trend={null}
-        />
+        <KpiCard label="Pedidos" value={data.orders.total} />
+        <KpiCard label="Tiendas pendientes" value={data.stores.pending} />
         <NavLink
           to={routePaths.adminSales}
-          className="flex min-h-[140px] flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-zinc-300 bg-transparent p-5 text-center transition-colors hover:border-[var(--admin-primary)] hover:bg-[var(--admin-primary-soft)] dark:border-zinc-600"
+          className="flex flex-col items-center justify-center gap-1 self-stretch rounded-2xl border-2 border-dashed border-zinc-300 bg-transparent px-3 py-2.5 text-center transition-colors hover:border-[var(--admin-primary)] hover:bg-[var(--admin-primary-soft)] dark:border-zinc-600"
         >
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-            <FiPlus className="h-5 w-5" aria-hidden />
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+            <FiPlus className="h-4 w-4" aria-hidden />
           </span>
-          <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+          <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200">
             Informes detallados
           </span>
-          <span className="text-xs text-zinc-500">Ventas, rankings y más</span>
         </NavLink>
       </div>
 
-      <section className="mt-8 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card)] p-5 shadow-sm dark:shadow-none">
+      <section className="mt-5 rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card)] p-4 shadow-sm dark:shadow-none">
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
           Ventas por mes
         </h2>
         <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
           Ingresos (USD) y volumen de pedidos por mes
         </p>
-        <div className="mt-6 h-[320px] w-full min-w-0">
+        <div className="mt-4 h-[280px] w-full min-w-0">
           {chartBars.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
@@ -310,16 +332,16 @@ export function AdminDashboardPage() {
         </div>
       </section>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <section className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card)] p-5 shadow-sm dark:shadow-none">
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        <section className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card)] p-4 shadow-sm dark:shadow-none">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
             Ingresos por producto
           </h2>
           <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
             Participación según pedidos de la plataforma
           </p>
-          <div className="mt-4 flex flex-col items-center gap-4 lg:flex-row lg:items-center">
-            <div className="h-[260px] w-full max-w-[280px]">
+          <div className="mt-3 flex flex-col items-center gap-3 lg:flex-row lg:items-center">
+            <div className="h-[236px] w-full max-w-[280px]">
               {donutData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -327,8 +349,8 @@ export function AdminDashboardPage() {
                       data={donutData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={68}
-                      outerRadius={96}
+                      innerRadius={62}
+                      outerRadius={88}
                       paddingAngle={2}
                       dataKey="value"
                       nameKey="name"
@@ -353,7 +375,7 @@ export function AdminDashboardPage() {
               )}
             </div>
             {donutData.length > 0 ? (
-              <ul className="w-full max-w-sm flex-1 space-y-2 text-sm">
+              <ul className="w-full max-w-sm flex-1 space-y-1.5 text-sm">
                 {donutData.map((d, i) => {
                   const total = donutData.reduce((s, x) => s + x.value, 0);
                   const pct = total ? (d.value / total) * 100 : 0;
@@ -379,14 +401,14 @@ export function AdminDashboardPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card)] p-5 shadow-sm dark:shadow-none">
+        <section className="rounded-2xl border border-[var(--admin-border)] bg-[var(--admin-card)] p-4 shadow-sm dark:shadow-none">
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
             Ventas por tienda
           </h2>
           <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
             Reparto de ingresos entre las tiendas con más actividad
           </p>
-          <div className="mt-5 space-y-4">
+          <div className="mt-3 space-y-3">
             {storeShare.length > 0 ? (
               storeShare.slice(0, 8).map((s) => (
                 <div key={s.id}>
@@ -410,11 +432,11 @@ export function AdminDashboardPage() {
               <p className="text-sm text-zinc-500">Sin datos de tiendas aún</p>
             )}
           </div>
-          <div className="mt-6 rounded-xl bg-[var(--admin-primary-soft)] p-4 text-center">
+          <div className="mt-4 rounded-xl bg-[var(--admin-primary-soft)] p-3 text-center">
             <p className="text-xs font-medium uppercase tracking-wide text-[var(--admin-primary)]">
               Mapa / regiones
             </p>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-0.5 text-sm text-zinc-600 dark:text-zinc-400">
               Cuando tengas datos por país o región, podrás enlazarlos aquí. Por
               ahora el reparto por tienda sustituye esa vista.
             </p>
