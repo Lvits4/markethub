@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: markethub_db
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-markethub}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-markethub_secret}
+      POSTGRES_DB: ${DB_NAME:-markethub}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
