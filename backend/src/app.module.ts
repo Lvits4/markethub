@@ -11,6 +11,9 @@ import { TransformInterceptor } from './common/interceptors';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { FilesModule } from './modules/files/files.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { StoresModule } from './modules/stores/stores.module';
+import { ProductsModule } from './modules/products/products.module';
 
 @Module({
   imports: [
@@ -34,6 +37,9 @@ import { FilesModule } from './modules/files/files.module';
     AuthModule,
     UsersModule,
     FilesModule,
+    CategoriesModule,
+    StoresModule,
+    ProductsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
