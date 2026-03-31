@@ -1,4 +1,5 @@
 import {
+  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
@@ -14,6 +15,9 @@ import { CartItem } from './cart-item.entity';
 export class Cart {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ name: 'user_id', type: 'uuid' })
+  userId: string;
 
   @OneToOne(() => User)
   @JoinColumn({ name: 'user_id' })

@@ -28,14 +28,14 @@ export class Order {
   @Column({ name: 'shipping_address', type: 'text', nullable: true })
   shippingAddress: string;
 
-  @Column({ name: 'user_id' })
+  @Column({ name: 'user_id', type: 'uuid' })
   userId: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ name: 'store_id' })
+  @Column({ name: 'store_id', type: 'uuid' })
   storeId: string;
 
   @ManyToOne(() => Store)

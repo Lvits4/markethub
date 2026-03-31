@@ -27,7 +27,7 @@ export class Payment {
   @Column({ name: 'transaction_id', nullable: true })
   transactionId: string;
 
-  @Column({ name: 'order_id' })
+  @Column({ name: 'order_id', type: 'uuid' })
   orderId: string;
 
   @OneToOne(() => Order)

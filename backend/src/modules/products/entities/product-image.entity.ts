@@ -21,7 +21,7 @@ export class ProductImage {
   @Column({ name: 'sort_order', type: 'int', default: 0 })
   sortOrder: number;
 
-  @Column({ name: 'product_id' })
+  @Column({ name: 'product_id', type: 'uuid' })
   productId: string;
 
   @ManyToOne(() => Product, (product) => product.images, { onDelete: 'CASCADE' })

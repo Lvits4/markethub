@@ -19,14 +19,14 @@ export class OrderItem {
   @Column({ name: 'unit_price', type: 'decimal', precision: 10, scale: 2 })
   unitPrice: number;
 
-  @Column({ name: 'order_id' })
+  @Column({ name: 'order_id', type: 'uuid' })
   orderId: string;
 
   @ManyToOne(() => Order, (order) => order.items, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'order_id' })
   order: Order;
 
-  @Column({ name: 'product_id' })
+  @Column({ name: 'product_id', type: 'uuid' })
   productId: string;
 
   @ManyToOne(() => Product)

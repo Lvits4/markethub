@@ -38,7 +38,7 @@ export class Notification {
   @Column({ name: 'is_read', default: false })
   isRead: boolean;
 
-  @Column({ name: 'user_id' })
+  @Column({ name: 'user_id', type: 'uuid' })
   userId: string;
 
   @ManyToOne(() => User)

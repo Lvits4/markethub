@@ -29,7 +29,7 @@ export class Category {
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
-  @Column({ name: 'parent_id', nullable: true })
+  @Column({ name: 'parent_id', type: 'uuid', nullable: true })
   parentId: string;
 
   @ManyToOne(() => Category, (cat) => cat.children, { nullable: true, onDelete: 'SET NULL' })

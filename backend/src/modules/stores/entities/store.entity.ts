@@ -50,7 +50,7 @@ export class Store {
   @Column({ type: 'decimal', precision: 5, scale: 2, default: 5.0 })
   commission: number;
 
-  @Column({ name: 'user_id' })
+  @Column({ name: 'user_id', type: 'uuid' })
   userId: string;
 
   @ManyToOne(() => User)

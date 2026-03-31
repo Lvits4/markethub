@@ -38,6 +38,8 @@ import { AdminModule } from './modules/admin/admin.module';
         password: config.get<string>('database.password'),
         database: config.get<string>('database.database'),
         autoLoadEntities: true,
+        // synchronize: pasar FKs de varchar a uuid en Postgres puede fallar en BD existente;
+        // en ese caso usar migración manual (ALTER COLUMN ... USING ...::uuid).
         synchronize: config.get<string>('NODE_ENV') === 'development',
       }),
     }),

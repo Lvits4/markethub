@@ -16,14 +16,14 @@ export class CartItem {
   @Column({ type: 'int', default: 1 })
   quantity: number;
 
-  @Column({ name: 'cart_id' })
+  @Column({ name: 'cart_id', type: 'uuid' })
   cartId: string;
 
   @ManyToOne(() => Cart, (cart) => cart.items, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cart_id' })
   cart: Cart;
 
-  @Column({ name: 'product_id' })
+  @Column({ name: 'product_id', type: 'uuid' })
   productId: string;
 
   @ManyToOne(() => Product)

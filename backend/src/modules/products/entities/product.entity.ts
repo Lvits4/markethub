@@ -41,14 +41,14 @@ export class Product {
   @Column({ name: 'total_reviews', type: 'int', default: 0 })
   totalReviews: number;
 
-  @Column({ name: 'store_id' })
+  @Column({ name: 'store_id', type: 'uuid' })
   storeId: string;
 
   @ManyToOne(() => Store)
   @JoinColumn({ name: 'store_id' })
   store: Store;
 
-  @Column({ name: 'category_id', nullable: true })
+  @Column({ name: 'category_id', type: 'uuid', nullable: true })
   categoryId: string;
 
   @ManyToOne(() => Category)
