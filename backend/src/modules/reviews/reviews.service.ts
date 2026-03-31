@@ -4,6 +4,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Role } from '../../common/enums';
+import { User } from '../users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Review } from './entities/review.entity';
@@ -44,12 +46,12 @@ export class ReviewsService {
     });
   }
 
-  async update(id: string, dto: UpdateReviewDto, userId: string): Promise<Review> {
+  async update(id: string, dto: UpdateReviewDto, user: User): Promise<Review> {
     const review = await this.reviewsRepository.findOne({ where: { id } });
     if (!review) {
       throw new NotFoundException('Reseña no encontrada');
     }
-    if (review.userId !== userId) {
+    if (review.userId !== user.id && user.role !== Role.ADMIN) {
       throw new ForbiddenException('No puedes editar esta reseña');
     }
 
@@ -61,12 +63,12 @@ export class ReviewsService {
     return updated;
   }
 
-  async remove(id: string, userId: string): Promise<void> {
+  async remove(id: string, user: User): Promise<void> {
     const review = await this.reviewsRepository.findOne({ where: { id } });
     if (!review) {
       throw new NotFoundException('Reseña no encontrada');
     }
-    if (review.userId !== userId) {
+    if (review.userId !== user.id && user.role !== Role.ADMIN) {
       throw new ForbiddenException('No puedes eliminar esta reseña');
     }
 

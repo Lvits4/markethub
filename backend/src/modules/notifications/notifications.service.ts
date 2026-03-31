@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Role } from '../../common/enums';
+import { User } from '../users/entities/user.entity';
 import { Notification, NotificationType } from './entities/notification.entity';
 
 @Injectable()
@@ -39,15 +41,17 @@ export class NotificationsService {
     });
   }
 
-  async markAsRead(id: string, userId: string): Promise<Notification> {
+  async markAsRead(id: string, user: User): Promise<Notification> {
+    const where =
+      user.role === Role.ADMIN ? { id } : { id, userId: user.id };
     const notification = await this.notificationsRepository.findOne({
-      where: { id, userId },
+      where,
     });
-    if (notification) {
-      notification.isRead = true;
-      return this.notificationsRepository.save(notification);
+    if (!notification) {
+      throw new NotFoundException('Notificación no encontrada');
     }
-    return notification!;
+    notification.isRead = true;
+    return this.notificationsRepository.save(notification);
   }
 
   async markAllAsRead(userId: string): Promise<void> {

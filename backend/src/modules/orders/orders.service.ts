@@ -90,6 +90,14 @@ export class OrdersService {
     });
   }
 
+  /** Listado global de pedidos (solo uso con rol ADMIN). */
+  async findAllOrdersAdmin(): Promise<Order[]> {
+    return this.ordersRepository.find({
+      relations: ['items', 'items.product', 'user', 'store'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   async findById(id: string): Promise<Order> {
     const order = await this.ordersRepository.findOne({
       where: { id },
@@ -126,7 +134,18 @@ export class OrdersService {
       where: { storeId },
       relations: ['items', 'items.product'],
     });
+    return this.buildSalesReport(orders);
+  }
 
+  /** Reporte agregado de todas las tiendas (solo uso con rol ADMIN). */
+  async getPlatformReport() {
+    const orders = await this.ordersRepository.find({
+      relations: ['items', 'items.product'],
+    });
+    return this.buildSalesReport(orders);
+  }
+
+  private buildSalesReport(orders: Order[]) {
     const totalSales = orders.reduce(
       (sum, o) => sum + Number(o.totalAmount),
       0,
@@ -136,7 +155,8 @@ export class OrdersService {
       (o) => o.status === OrderStatus.DELIVERED,
     ).length;
 
-    const productSales: Record<string, { name: string; quantity: number; revenue: number }> = {};
+    const productSales: Record<string, { name: string; quantity: number; revenue: number }> =
+      {};
     for (const order of orders) {
       for (const item of order.items) {
         const key = item.productId;

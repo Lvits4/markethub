@@ -34,7 +34,7 @@ export class NotificationsController {
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: User,
   ) {
-    return this.notificationsService.markAsRead(id, user.id);
+    return this.notificationsService.markAsRead(id, user);
   }
 
   @Patch('read-all')

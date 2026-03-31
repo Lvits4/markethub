@@ -40,18 +40,18 @@ export class StoresController {
     return this.storesService.findBySlug(slug);
   }
 
-  @Roles(Role.SELLER)
+  @Roles(Role.SELLER, Role.ADMIN)
   @ApiBearerAuth('access-token')
   @Get('my/store')
-  @ApiOperation({ summary: 'Obtener mi tienda (Vendedor)' })
+  @ApiOperation({ summary: 'Obtener mi tienda (vendedor o admin)' })
   getMyStore(@CurrentUser() user: User) {
     return this.storesService.findByUserId(user.id);
   }
 
-  @Roles(Role.SELLER)
+  @Roles(Role.SELLER, Role.ADMIN)
   @ApiBearerAuth('access-token')
   @Post()
-  @ApiOperation({ summary: 'Crear tienda (Vendedor)' })
+  @ApiOperation({ summary: 'Crear tienda (vendedor o administrador)' })
   create(@Body() dto: CreateStoreDto, @CurrentUser() user: User) {
     return this.storesService.create(dto, user);
   }

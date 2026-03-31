@@ -19,8 +19,10 @@ export class StoresService {
   ) {}
 
   async create(dto: CreateStoreDto, user: User): Promise<Store> {
-    if (user.role !== Role.SELLER) {
-      throw new ForbiddenException('Solo los vendedores pueden crear tiendas');
+    if (user.role !== Role.SELLER && user.role !== Role.ADMIN) {
+      throw new ForbiddenException(
+        'Solo vendedores o administradores pueden crear tiendas',
+      );
     }
 
     const existingStore = await this.storesRepository.findOne({

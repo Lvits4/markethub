@@ -20,9 +20,17 @@ export class AuthService {
 
   async register(dto: RegisterDto) {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const role = dto.role ?? Role.CUSTOMER;
-    if (role !== Role.CUSTOMER && role !== Role.SELLER) {
-      throw new BadRequestException('El registro público solo permite CUSTOMER o SELLER');
+
+    let role: Role;
+    if ((await this.usersService.count()) === 0) {
+      role = Role.ADMIN;
+    } else {
+      role = dto.role ?? Role.CUSTOMER;
+      if (role !== Role.CUSTOMER && role !== Role.SELLER) {
+        throw new BadRequestException(
+          'El registro público solo permite CUSTOMER o SELLER',
+        );
+      }
     }
 
     const user = await this.usersService.create({

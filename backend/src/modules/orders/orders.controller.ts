@@ -36,18 +36,30 @@ export class OrdersController {
     return this.ordersService.findByUserId(user.id);
   }
 
-  @Roles(Role.SELLER)
+  @Roles(Role.SELLER, Role.ADMIN)
   @Get('store')
-  @ApiOperation({ summary: 'Pedidos recibidos en mi tienda (Vendedor)' })
+  @ApiOperation({
+    summary:
+      'Pedidos de tienda: vendedor ve los de su tienda; admin ve todos los pedidos',
+  })
   async getStoreOrders(@CurrentUser() user: User) {
+    if (user.role === Role.ADMIN) {
+      return this.ordersService.findAllOrdersAdmin();
+    }
     const store = await this.storesService.findByUserId(user.id);
     return this.ordersService.findByStoreId(store.id);
   }
 
-  @Roles(Role.SELLER)
+  @Roles(Role.SELLER, Role.ADMIN)
   @Get('store/report')
-  @ApiOperation({ summary: 'Reporte de ventas de mi tienda (Vendedor)' })
+  @ApiOperation({
+    summary:
+      'Reporte de ventas: vendedor el de su tienda; admin el agregado de la plataforma',
+  })
   async getStoreReport(@CurrentUser() user: User) {
+    if (user.role === Role.ADMIN) {
+      return this.ordersService.getPlatformReport();
+    }
     const store = await this.storesService.findByUserId(user.id);
     return this.ordersService.getSellerReport(store.id);
   }

@@ -45,10 +45,10 @@ export class ProductsController {
     return this.productsService.findByStore(storeId, filters);
   }
 
-  @Roles(Role.SELLER)
+  @Roles(Role.SELLER, Role.ADMIN)
   @ApiBearerAuth('access-token')
   @Post()
-  @ApiOperation({ summary: 'Crear producto (Vendedor)' })
+  @ApiOperation({ summary: 'Crear producto (vendedor o administrador)' })
   create(@Body() dto: CreateProductDto, @CurrentUser() user: User) {
     return this.productsService.create(dto, user);
   }

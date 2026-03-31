@@ -41,7 +41,7 @@ export class ReviewsController {
     @Body() dto: UpdateReviewDto,
     @CurrentUser() user: User,
   ) {
-    return this.reviewsService.update(id, dto, user.id);
+    return this.reviewsService.update(id, dto, user);
   }
 
   @ApiBearerAuth('access-token')
@@ -51,6 +51,6 @@ export class ReviewsController {
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: User,
   ) {
-    return this.reviewsService.remove(id, user.id);
+    return this.reviewsService.remove(id, user);
   }
 }
