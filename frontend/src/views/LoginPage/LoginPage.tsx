@@ -1,11 +1,14 @@
 import { useState, type FormEvent } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button } from '../../components/Button/Button';
+import { AuthPasswordField } from '../../components/AuthPasswordField/AuthPasswordField';
 import { routePaths } from '../../config/routes';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useLogin } from '../../hooks/useLogin';
 import { loginSchema } from '../../validations/loginSchema';
+
+const inputClass =
+  'mt-1 w-full rounded-xl border border-zinc-200/90 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-auth-primary focus:bg-white focus:ring-2 focus:ring-auth-primary/18 dark:border-zinc-600 dark:bg-zinc-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:bg-zinc-950';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -45,69 +48,59 @@ export function LoginPage() {
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+    <div className="w-full">
+      <h1 className="text-3xl font-bold tracking-tight text-balance text-zinc-900 dark:text-zinc-50">
         Iniciar sesión
       </h1>
-      <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-        Accede a tu carrito y favoritos.
+      <p className="mt-1.5 text-[15px] leading-relaxed text-pretty text-zinc-500 dark:text-zinc-400">
+        Accede a tu carrito, favoritos y pedidos.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+      <form onSubmit={handleSubmit} className="mt-3 flex flex-col gap-2">
         <div>
           <label
             htmlFor="email"
-            className="block text-xs font-medium text-zinc-600 dark:text-zinc-300"
+            className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
           >
-            Correo
+            Correo electrónico
           </label>
           <input
             id="email"
             type="email"
             autoComplete="email"
+            placeholder="nombre@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none ring-zinc-900/10 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+            className={inputClass}
           />
           {fieldErrors.email ? (
             <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
           ) : null}
         </div>
-        <div>
-          <label
-            htmlFor="password"
-            className="block text-xs font-medium text-zinc-600 dark:text-zinc-300"
-          >
-            Contraseña
-          </label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-2xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none ring-zinc-900/10 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
-          />
-          {fieldErrors.password ? (
-            <p className="mt-1 text-xs text-red-600">{fieldErrors.password}</p>
-          ) : null}
-        </div>
+        <AuthPasswordField
+          id="password"
+          label="Contraseña"
+          value={password}
+          onChange={setPassword}
+          error={fieldErrors.password}
+          autoComplete="current-password"
+          placeholder="Tu contraseña"
+        />
 
-        <Button
+        <button
           type="submit"
-          variant="primary"
-          className="w-full justify-center py-3.5"
           disabled={loginMutation.isPending}
+          className="mt-3 w-full cursor-pointer rounded-xl bg-auth-primary py-3 text-sm font-semibold text-white shadow-md shadow-auth-primary/35 transition hover:bg-auth-primary-hover hover:shadow-lg hover:shadow-auth-primary/30 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50 disabled:active:translate-y-0"
         >
           {loginMutation.isPending ? 'Entrando…' : 'Entrar'}
-        </Button>
+        </button>
       </form>
 
       <p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
         ¿No tienes cuenta?{' '}
         <Link
           to={routePaths.register}
-          className="font-semibold text-[var(--color-forest)] dark:text-emerald-400"
+          className="font-semibold text-auth-primary hover:underline"
         >
           Regístrate
         </Link>

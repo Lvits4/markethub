@@ -78,7 +78,7 @@ export function CatalogPage() {
         </div>
         <button
           type="button"
-          className="rounded-full bg-white p-3 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800"
+          className="cursor-pointer rounded-md bg-white p-3 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800"
           aria-label="Notificaciones"
         >
           <FiBell className="h-5 w-5 text-zinc-700 dark:text-zinc-200" />

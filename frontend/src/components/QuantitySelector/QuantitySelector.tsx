@@ -21,7 +21,7 @@ export function QuantitySelector({
     onChange(max != null ? Math.min(max, value + 1) : value + 1);
 
   return (
-    <div className="inline-flex items-center gap-2 rounded-2xl bg-zinc-100 p-1 dark:bg-zinc-800">
+    <div className="inline-flex items-center gap-2 rounded-md bg-zinc-100 p-1 dark:bg-zinc-800">
       <Button
         variant="icon"
         type="button"

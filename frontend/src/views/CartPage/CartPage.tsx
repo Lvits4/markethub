@@ -76,9 +76,9 @@ export function CartPage() {
               return (
                 <li
                   key={it.id}
-                  className="flex gap-4 rounded-3xl bg-white p-3 shadow-sm ring-1 ring-zinc-200/80 dark:bg-zinc-900 dark:ring-zinc-800"
+                  className="flex gap-4 rounded-md bg-white p-3 shadow-sm ring-1 ring-zinc-200/80 dark:bg-zinc-900 dark:ring-zinc-800"
                 >
-                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800">
+                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-md bg-zinc-100 dark:bg-zinc-800">
                     {img ? (
                       <img
                         src={img}
@@ -124,7 +124,7 @@ export function CartPage() {
               );
             })}
           </ul>
-          <div className="mt-8 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-zinc-200/80 dark:bg-zinc-900 dark:ring-zinc-800">
+          <div className="mt-8 rounded-md bg-white p-5 shadow-sm ring-1 ring-zinc-200/80 dark:bg-zinc-900 dark:ring-zinc-800">
             <div className="flex items-center justify-between text-sm">
               <span className="text-zinc-500">Subtotal</span>
               <span className="font-semibold text-zinc-900 dark:text-zinc-100">

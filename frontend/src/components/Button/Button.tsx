@@ -14,14 +14,14 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const base =
-    'inline-flex items-center justify-center gap-2 font-medium transition active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none';
+    'inline-flex cursor-pointer items-center justify-center gap-2 font-medium transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:pointer-events-none';
 
   const styles: Record<ButtonVariant, string> = {
     primary:
-      'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 rounded-2xl px-5 py-3 shadow-sm hover:bg-zinc-800 dark:hover:bg-white',
+      'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 rounded-md px-5 py-3 shadow-sm hover:bg-zinc-800 dark:hover:bg-white',
     ghost:
-      'rounded-2xl px-4 py-2 text-zinc-800 dark:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800',
-    icon: 'rounded-full p-2.5 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800',
+      'rounded-md px-4 py-2 text-zinc-800 dark:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800',
+    icon: 'rounded-md p-2.5 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800',
   };
 
   return (

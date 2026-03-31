@@ -1,7 +1,7 @@
 import {
   createContext,
   useCallback,
-  useEffect,
+  useLayoutEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -21,38 +21,34 @@ export const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function applyDomTheme(mode: ThemeMode) {
   const root = document.documentElement;
-  if (mode === 'dark') root.classList.add('dark');
-  else root.classList.remove('dark');
+  root.classList.toggle('dark', mode === 'dark');
+}
+
+function readStoredTheme(): ThemeMode {
+  if (typeof window === 'undefined') return 'light';
+  const stored = localStorage.getItem(STORAGE_KEY) as ThemeMode | null;
+  if (stored === 'dark' || stored === 'light') return stored;
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'light';
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<ThemeMode>('light');
+  const [theme, setThemeState] = useState<ThemeMode>(readStoredTheme);
 
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY) as ThemeMode | null;
-    const prefersDark =
-      window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
-    const initial: ThemeMode =
-      stored === 'dark' || stored === 'light'
-        ? stored
-        : prefersDark
-          ? 'dark'
-          : 'light';
-    setThemeState(initial);
-    applyDomTheme(initial);
-  }, []);
+  useLayoutEffect(() => {
+    applyDomTheme(theme);
+  }, [theme]);
 
   const setTheme = useCallback((t: ThemeMode) => {
     setThemeState(t);
     localStorage.setItem(STORAGE_KEY, t);
-    applyDomTheme(t);
   }, []);
 
   const toggleTheme = useCallback(() => {
     setThemeState((prev) => {
       const next = prev === 'dark' ? 'light' : 'dark';
       localStorage.setItem(STORAGE_KEY, next);
-      applyDomTheme(next);
       return next;
     });
   }, []);

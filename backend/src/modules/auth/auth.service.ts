@@ -25,7 +25,7 @@ export class AuthService {
     if ((await this.usersService.count()) === 0) {
       role = Role.ADMIN;
     } else {
-      role = dto.role ?? Role.CUSTOMER;
+      role = dto.role;
       if (role !== Role.CUSTOMER && role !== Role.SELLER) {
         throw new BadRequestException(
           'El registro público solo permite CUSTOMER o SELLER',
@@ -33,11 +33,13 @@ export class AuthService {
       }
     }
 
+    const { firstName, lastName } = this.splitDisplayName(dto.name);
+
     const user = await this.usersService.create({
       email: dto.email,
       password: hashedPassword,
-      firstName: dto.firstName,
-      lastName: dto.lastName,
+      firstName,
+      lastName,
       role,
     });
 
@@ -123,5 +125,18 @@ export class AuthService {
   private generateToken(userId: string, email: string, role: Role): string {
     const payload = { sub: userId, email, role };
     return this.jwtService.sign(payload);
+  }
+
+  /** Guarda nombre completo en first/last para compatibilidad con el modelo existente. */
+  private splitDisplayName(name: string): { firstName: string; lastName: string } {
+    const trimmed = name.trim();
+    const space = trimmed.indexOf(' ');
+    if (space === -1) {
+      return { firstName: trimmed, lastName: '' };
+    }
+    return {
+      firstName: trimmed.slice(0, space),
+      lastName: trimmed.slice(space + 1).trim(),
+    };
   }
 }

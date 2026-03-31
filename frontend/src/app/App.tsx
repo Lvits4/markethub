@@ -28,7 +28,7 @@ function AppToaster() {
     <Toaster
       position="top-center"
       toastOptions={{
-        className: 'text-sm dark:bg-zinc-800 dark:text-zinc-100',
+        className: 'rounded-md text-sm dark:bg-zinc-800 dark:text-zinc-100',
         duration: 3200,
       }}
     />

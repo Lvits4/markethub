@@ -24,7 +24,7 @@ export function ProductCard({
   const img = getPrimaryImageUrl(product);
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-zinc-200/70 transition hover:shadow-md dark:bg-zinc-900 dark:ring-zinc-800">
+    <article className="group relative flex flex-col overflow-hidden rounded-md bg-white shadow-sm ring-1 ring-zinc-200/70 transition hover:shadow-md dark:bg-zinc-900 dark:ring-zinc-800">
       <Link
         to={routePaths.productDetail(product.id)}
         className="relative aspect-[4/5] w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800"
@@ -52,7 +52,7 @@ export function ProductCard({
             e.preventDefault();
             onToggleFavorite();
           }}
-          className="absolute right-3 top-3 rounded-full bg-white/90 p-2 text-zinc-900 shadow-sm backdrop-blur-sm transition hover:bg-white dark:bg-zinc-900/90 dark:text-zinc-100 dark:hover:bg-zinc-800"
+          className="absolute right-3 top-3 cursor-pointer rounded-md bg-white/90 p-2 text-zinc-900 shadow-sm backdrop-blur-sm transition hover:bg-white disabled:cursor-not-allowed dark:bg-zinc-900/90 dark:text-zinc-100 dark:hover:bg-zinc-800"
         >
           <FiHeart
             className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`}

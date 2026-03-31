@@ -1,12 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsEmail,
-  IsIn,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsIn, IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { Role } from '../../../common/enums';
 
 export class RegisterDto {
@@ -19,20 +12,14 @@ export class RegisterDto {
   @MinLength(6)
   password: string;
 
-  @ApiProperty({ example: 'Juan' })
+  @ApiProperty({ example: 'María García López', description: 'Nombre completo' })
   @IsString()
   @IsNotEmpty()
-  firstName: string;
+  name: string;
 
-  @ApiProperty({ example: 'Pérez' })
-  @IsString()
-  @IsNotEmpty()
-  lastName: string;
-
-  @ApiPropertyOptional({ enum: [Role.CUSTOMER, Role.SELLER], default: Role.CUSTOMER })
-  @IsOptional()
+  @ApiProperty({ enum: [Role.CUSTOMER, Role.SELLER], example: Role.CUSTOMER })
   @IsIn([Role.CUSTOMER, Role.SELLER], {
-    message: 'El rol debe ser CUSTOMER o SELLER',
+    message: 'El rol debe ser CUSTOMER (comprador) o SELLER (vendedor)',
   })
-  role?: Role.CUSTOMER | Role.SELLER;
+  role: Role.CUSTOMER | Role.SELLER;
 }

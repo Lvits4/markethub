@@ -91,7 +91,7 @@ export function ProductDetailPage() {
       <div className="relative aspect-[4/5] w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800">
         <Link
           to={routePaths.catalog}
-          className="absolute left-4 top-4 z-10 rounded-full bg-white/90 p-2.5 text-zinc-900 shadow-sm backdrop-blur-sm dark:bg-zinc-900/90 dark:text-zinc-100"
+          className="absolute left-4 top-4 z-10 rounded-md bg-white/90 p-2.5 text-zinc-900 shadow-sm backdrop-blur-sm dark:bg-zinc-900/90 dark:text-zinc-100"
           aria-label="Volver al catálogo"
         >
           <FiArrowLeft className="h-5 w-5" />
@@ -99,7 +99,7 @@ export function ProductDetailPage() {
         <button
           type="button"
           onClick={() => void handleFavorite()}
-          className="absolute right-4 top-4 z-10 rounded-full bg-white/90 p-2.5 text-zinc-900 shadow-sm backdrop-blur-sm dark:bg-zinc-900/90 dark:text-zinc-100"
+          className="absolute right-4 top-4 z-10 cursor-pointer rounded-md bg-white/90 p-2.5 text-zinc-900 shadow-sm backdrop-blur-sm dark:bg-zinc-900/90 dark:text-zinc-100"
           aria-label="Favorito"
         >
           <FiHeart
@@ -119,7 +119,7 @@ export function ProductDetailPage() {
         )}
       </div>
 
-      <div className="relative -mt-8 rounded-t-3xl bg-white px-5 pb-8 pt-6 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] dark:bg-zinc-900 dark:shadow-none dark:ring-1 dark:ring-zinc-800">
+      <div className="relative -mt-8 rounded-t-md bg-white px-5 pb-8 pt-6 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] dark:bg-zinc-900 dark:shadow-none dark:ring-1 dark:ring-zinc-800">
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
           {product.name}
         </h1>
@@ -150,7 +150,7 @@ export function ProductDetailPage() {
         <Button
           type="button"
           variant="primary"
-          className="mt-8 w-full justify-center rounded-2xl py-4 text-base"
+          className="mt-8 w-full justify-center rounded-md py-4 text-base"
           disabled={maxQty === 0 || addItem.isPending}
           onClick={() => void handleBuy()}
         >
