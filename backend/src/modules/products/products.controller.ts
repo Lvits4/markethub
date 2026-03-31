@@ -48,7 +48,10 @@ export class ProductsController {
   @Roles(Role.SELLER, Role.ADMIN)
   @ApiBearerAuth('access-token')
   @Post()
-  @ApiOperation({ summary: 'Crear producto (vendedor o administrador)' })
+  @ApiOperation({
+    summary:
+      'Crear producto (vendedor o administrador). Con varias tiendas, enviar storeId en el body.',
+  })
   create(@Body() dto: CreateProductDto, @CurrentUser() user: User) {
     return this.productsService.create(dto, user);
   }

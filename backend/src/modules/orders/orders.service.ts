@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CreateOrderDto, UpdateOrderStatusDto } from './dto';
@@ -90,6 +90,17 @@ export class OrdersService {
     });
   }
 
+  async findByStoreIds(storeIds: string[]): Promise<Order[]> {
+    if (storeIds.length === 0) {
+      return [];
+    }
+    return this.ordersRepository.find({
+      where: { storeId: In(storeIds) },
+      relations: ['items', 'items.product', 'user'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   /** Listado global de pedidos (solo uso con rol ADMIN). */
   async findAllOrdersAdmin(): Promise<Order[]> {
     return this.ordersRepository.find({
@@ -132,6 +143,17 @@ export class OrdersService {
   async getSellerReport(storeId: string) {
     const orders = await this.ordersRepository.find({
       where: { storeId },
+      relations: ['items', 'items.product'],
+    });
+    return this.buildSalesReport(orders);
+  }
+
+  async getSellerReportForStoreIds(storeIds: string[]) {
+    if (storeIds.length === 0) {
+      return this.buildSalesReport([]);
+    }
+    const orders = await this.ordersRepository.find({
+      where: { storeId: In(storeIds) },
       relations: ['items', 'items.product'],
     });
     return this.buildSalesReport(orders);

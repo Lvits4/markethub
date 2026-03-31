@@ -47,6 +47,14 @@ export class CreateProductDto {
   @Min(0)
   stock: number;
 
+  @ApiPropertyOptional({
+    description:
+      'Obligatorio si el vendedor/admin tiene más de una tienda; define en cuál se crea el producto',
+  })
+  @IsOptional()
+  @IsUUID()
+  storeId?: string;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsUUID()

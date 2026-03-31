@@ -24,7 +24,7 @@ export class ProductsService {
   ) {}
 
   async create(dto: CreateProductDto, user: User): Promise<Product> {
-    const store = await this.storesService.findByUserId(user.id);
+    const store = await this.storesService.resolveStoreForCreate(user, dto.storeId);
 
     const slug = this.generateSlug(dto.name);
 

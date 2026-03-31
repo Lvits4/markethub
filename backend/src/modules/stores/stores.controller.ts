@@ -48,27 +48,20 @@ export class StoresController {
   @Roles(Role.SELLER, Role.ADMIN)
   @ApiBearerAuth('access-token')
   @Get('my/store')
-  @ApiOperation({ summary: 'Obtener mi tienda (vendedor o admin)' })
+  @ApiOperation({ summary: 'Listar mis tiendas (todas las del usuario autenticado)' })
   getMyStore(@CurrentUser() user: User) {
-    return this.storesService.findByUserId(user.id);
+    return this.storesService.findStoresByUserId(user.id);
   }
 
-  @Public()
-  @Get('slug/:slug')
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth('access-token')
+  @Get('rejected')
   @ApiOperation({
-    summary: 'Obtener tienda por slug (solo activas; preferir GET .../lookup/:term)',
+    summary:
+      'Listar tiendas no aprobadas (pendientes o rechazadas). Aprobar con PATCH .../stores/:id/approve',
   })
-  findBySlug(@Param('slug') slug: string) {
-    return this.storesService.findBySlug(slug);
-  }
-
-  @Public()
-  @Get(':id')
-  @ApiOperation({
-    summary: 'Obtener tienda por ID UUID (preferir GET .../lookup/:term para id/slug/nombre)',
-  })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.storesService.findById(id);
+  listRejected() {
+    return this.storesService.findAllRejected();
   }
 
   @Roles(Role.SELLER, Role.ADMIN)

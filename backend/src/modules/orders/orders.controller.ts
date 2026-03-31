@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -46,8 +47,11 @@ export class OrdersController {
     if (user.role === Role.ADMIN) {
       return this.ordersService.findAllOrdersAdmin();
     }
-    const store = await this.storesService.findByUserId(user.id);
-    return this.ordersService.findByStoreId(store.id);
+    const stores = await this.storesService.findStoresByUserId(user.id);
+    if (stores.length === 0) {
+      throw new NotFoundException('No tienes tiendas registradas');
+    }
+    return this.ordersService.findByStoreIds(stores.map((s) => s.id));
   }
 
   @Roles(Role.SELLER, Role.ADMIN)
@@ -60,8 +64,11 @@ export class OrdersController {
     if (user.role === Role.ADMIN) {
       return this.ordersService.getPlatformReport();
     }
-    const store = await this.storesService.findByUserId(user.id);
-    return this.ordersService.getSellerReport(store.id);
+    const stores = await this.storesService.findStoresByUserId(user.id);
+    if (stores.length === 0) {
+      throw new NotFoundException('No tienes tiendas registradas');
+    }
+    return this.ordersService.getSellerReportForStoreIds(stores.map((s) => s.id));
   }
 
   @Get(':id')

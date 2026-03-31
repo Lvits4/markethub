@@ -38,13 +38,6 @@ export class StoresService {
       );
     }
 
-    const existingStore = await this.storesRepository.findOne({
-      where: { userId: user.id },
-    });
-    if (existingStore) {
-      throw new ConflictException('Ya tienes una tienda registrada');
-    }
-
     const slug = this.generateSlug(dto.name);
     const existingSlug = await this.storesRepository.findOne({ where: { slug } });
     if (existingSlug) {
@@ -64,6 +57,15 @@ export class StoresService {
     return this.storesRepository.find({
       where: { isActive: true, isApproved: true },
       order: { name: 'ASC' },
+    });
+  }
+
+  /** Pendientes o rechazadas (`isApproved: false`). Uso: listado admin. */
+  async findAllRejected(): Promise<Store[]> {
+    return this.storesRepository.find({
+      where: { isApproved: false },
+      relations: ['user'],
+      order: { createdAt: 'DESC' },
     });
   }
 
@@ -129,24 +131,53 @@ export class StoresService {
     throw new NotFoundException('Tienda no encontrada');
   }
 
-  async findBySlug(slug: string): Promise<Store> {
-    const store = await this.storesRepository.findOne({
-      where: { slug, isActive: true },
+  async findStoresByUserId(userId: string): Promise<Store[]> {
+    return this.storesRepository.find({
+      where: { userId },
+      order: { createdAt: 'ASC' },
     });
-    if (!store) {
-      throw new NotFoundException('Tienda no encontrada');
-    }
-    return store;
   }
 
-  async findByUserId(userId: string): Promise<Store> {
-    const store = await this.storesRepository.findOne({
-      where: { userId },
-    });
-    if (!store) {
+  /**
+   * Resuelve en qué tienda crear un producto: una sola tienda del usuario si no envían storeId;
+   * con varias tiendas, storeId es obligatorio. Un admin puede indicar cualquier tienda con storeId.
+   */
+  async resolveStoreForCreate(user: User, storeId?: string): Promise<Store> {
+    const myStores = await this.findStoresByUserId(user.id);
+
+    if (user.role === Role.ADMIN) {
+      if (storeId) {
+        return this.findById(storeId);
+      }
+      if (myStores.length === 1) {
+        return myStores[0];
+      }
+      if (myStores.length === 0) {
+        throw new BadRequestException(
+          'Indica storeId de la tienda o crea una tienda asociada a tu cuenta',
+        );
+      }
+      throw new BadRequestException(
+        'Tienes varias tiendas; indica storeId en el body para crear el producto',
+      );
+    }
+
+    if (myStores.length === 0) {
       throw new NotFoundException('No tienes una tienda registrada');
     }
-    return store;
+    if (storeId) {
+      const store = myStores.find((s) => s.id === storeId);
+      if (!store) {
+        throw new ForbiddenException('La tienda no existe o no te pertenece');
+      }
+      return store;
+    }
+    if (myStores.length > 1) {
+      throw new BadRequestException(
+        'Tienes varias tiendas; indica storeId en el body',
+      );
+    }
+    return myStores[0];
   }
 
   async update(id: string, dto: UpdateStoreDto, user: User): Promise<Store> {
