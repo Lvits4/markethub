@@ -17,6 +17,9 @@ import { ProductsModule } from './modules/products/products.module';
 import { CartModule } from './modules/cart/cart.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
+import { FavoritesModule } from './modules/favorites/favorites.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -46,6 +49,9 @@ import { PaymentsModule } from './modules/payments/payments.module';
     CartModule,
     OrdersModule,
     PaymentsModule,
+    ReviewsModule,
+    FavoritesModule,
+    NotificationsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
