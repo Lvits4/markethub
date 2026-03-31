@@ -1,5 +1,7 @@
 export const routePaths = {
   catalog: '/',
+  /** Catálogo sin redirección de admin (para revisar la tienda) */
+  browse: '/browse',
   product: '/product',
   productDetail: (id: string) => `/product/${id}`,
   login: '/auth/login',
@@ -7,4 +9,12 @@ export const routePaths = {
   favorites: '/favorites',
   cart: '/cart',
   settings: '/settings',
+  admin: '/admin',
+  adminUsers: '/admin/users',
+  adminStores: '/admin/stores',
+  adminModeration: '/admin/moderation',
+  adminProducts: '/admin/products',
+  adminOrders: '/admin/orders',
+  adminSales: '/admin/sales',
+  adminCategories: '/admin/categories',
 } as const;

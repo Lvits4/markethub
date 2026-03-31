@@ -66,19 +66,19 @@ export function CatalogPage() {
   const { data, isLoading, isError } = useProductsListQuery(filters);
 
   return (
-    <div className="mx-auto max-w-lg px-4 pt-10">
-      <header className="mb-6 flex items-start justify-between gap-4">
+    <div className="mx-auto max-w-6xl px-4 pt-6 sm:pt-8">
+      <header className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
             {marketingCopy.catalogTitle}
           </h1>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
             {marketingCopy.catalogSubtitle}
           </p>
         </div>
         <button
           type="button"
-          className="cursor-pointer rounded-md bg-white p-3 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800"
+          className="hidden shrink-0 cursor-pointer rounded-2xl bg-white p-3 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/80 transition hover:ring-zinc-300 sm:flex dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:ring-zinc-700"
           aria-label="Notificaciones"
         >
           <FiBell className="h-5 w-5 text-zinc-700 dark:text-zinc-200" />
@@ -87,7 +87,7 @@ export function CatalogPage() {
 
       <SearchInput value={search} onChange={setSearch} className="mb-5" />
 
-      <div className="no-scrollbar -mx-1 mb-6 flex gap-2 overflow-x-auto px-1 pb-1">
+      <div className="no-scrollbar -mx-1 mb-6 flex gap-2 overflow-x-auto px-1 pb-1 sm:mb-8">
         <CategoryPill
           label="Todo"
           active={!categoryId}
@@ -116,7 +116,7 @@ export function CatalogPage() {
           No hay productos con estos filtros.
         </p>
       ) : (
-        <ul className="grid grid-cols-2 gap-4 pb-4">
+        <ul className="grid grid-cols-2 gap-4 pb-4 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
           {data.data.map((item) => (
             <li key={item.id}>
               <CatalogProductCard item={item} />

@@ -43,8 +43,8 @@ export function FavoritesPage() {
   }, [data]);
 
   return (
-    <div className="mx-auto max-w-lg px-4 pt-10">
-      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+    <div className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:pb-10 sm:pt-8 lg:pb-12">
+      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-3xl">
         Favoritos
       </h1>
       {isLoading ? (
@@ -58,7 +58,7 @@ export function FavoritesPage() {
           Aún no guardas favoritos.
         </p>
       ) : (
-        <ul className="mt-8 grid grid-cols-2 gap-4">
+        <ul className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
           {products.map((p) => (
             <li key={p.id}>
               <FavoriteRowCard product={p} />

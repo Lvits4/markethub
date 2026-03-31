@@ -5,8 +5,19 @@ import { AuthProvider } from '../context/AuthProvider/AuthProvider';
 import { ThemeProvider } from '../context/ThemeProvider/ThemeProvider';
 import { AuthLayout } from '../layouts/AuthLayout/AuthLayout';
 import { MainLayout } from '../layouts/MainLayout/MainLayout';
+import { AdminRoute } from '../components/AdminRoute/AdminRoute';
 import { ProtectedRoute } from '../components/ProtectedRoute/ProtectedRoute';
+import { AdminLayout } from '../layouts/AdminLayout/AdminLayout';
+import { AdminCategoriesPage } from '../views/AdminCategoriesPage/AdminCategoriesPage';
+import { AdminDashboardPage } from '../views/AdminDashboardPage/AdminDashboardPage';
+import { AdminModerationPage } from '../views/AdminModerationPage/AdminModerationPage';
+import { AdminOrdersPage } from '../views/AdminOrdersPage/AdminOrdersPage';
+import { AdminProductsPage } from '../views/AdminProductsPage/AdminProductsPage';
+import { AdminSalesPage } from '../views/AdminSalesPage/AdminSalesPage';
+import { AdminStoresPage } from '../views/AdminStoresPage/AdminStoresPage';
+import { AdminUsersPage } from '../views/AdminUsersPage/AdminUsersPage';
 import { CatalogPage } from '../views/CatalogPage/CatalogPage';
+import { CatalogEntry } from '../views/CatalogEntry/CatalogEntry';
 import { CartPage } from '../views/CartPage/CartPage';
 import { FavoritesPage } from '../views/FavoritesPage/FavoritesPage';
 import { LoginPage } from '../views/LoginPage/LoginPage';
@@ -43,12 +54,32 @@ export default function App() {
           <AppToaster />
           <HashRouter>
             <Routes>
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <AdminRoute>
+                      <AdminLayout />
+                    </AdminRoute>
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<AdminDashboardPage />} />
+                <Route path="users" element={<AdminUsersPage />} />
+                <Route path="moderation" element={<AdminModerationPage />} />
+                <Route path="stores" element={<AdminStoresPage />} />
+                <Route path="products" element={<AdminProductsPage />} />
+                <Route path="orders" element={<AdminOrdersPage />} />
+                <Route path="sales" element={<AdminSalesPage />} />
+                <Route path="categories" element={<AdminCategoriesPage />} />
+              </Route>
               <Route path="/auth" element={<AuthLayout />}>
                 <Route path="login" element={<LoginPage />} />
                 <Route path="register" element={<RegisterPage />} />
               </Route>
               <Route path="/" element={<MainLayout />}>
-                <Route index element={<CatalogPage />} />
+                <Route index element={<CatalogEntry />} />
+                <Route path="browse" element={<CatalogPage />} />
                 <Route path="product/:id" element={<ProductDetailPage />} />
                 <Route
                   path="favorites"

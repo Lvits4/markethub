@@ -95,7 +95,7 @@ export class AdminService {
 
   async getAllOrders() {
     return this.ordersRepository.find({
-      relations: ['user', 'store', 'items'],
+      relations: ['user', 'store', 'items', 'items.product'],
       order: { createdAt: 'DESC' },
     });
   }

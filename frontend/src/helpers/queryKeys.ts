@@ -6,4 +6,12 @@ export const queryKeys = {
   cart: ['cart'] as const,
   favorites: ['favorites'] as const,
   favoriteCheck: (productId: string) => ['favorites', 'check', productId] as const,
+  adminDashboard: ['admin', 'dashboard'] as const,
+  adminUsers: ['admin', 'users'] as const,
+  adminStores: ['admin', 'stores'] as const,
+  adminProducts: ['admin', 'products'] as const,
+  adminOrders: ['admin', 'orders'] as const,
+  adminSalesReport: ['admin', 'reports', 'sales'] as const,
+  adminPlatformReport: ['admin', 'orders', 'store-report'] as const,
+  storesRejected: ['stores', 'rejected'] as const,
 };

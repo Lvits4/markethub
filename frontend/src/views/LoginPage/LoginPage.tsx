@@ -38,8 +38,12 @@ export function LoginPage() {
     }
     setFieldErrors({});
     loginMutation.mutate(parsed.data, {
-      onSuccess: () => {
+      onSuccess: (data) => {
         toast.success('Bienvenido');
+        if (data.user.role === 'ADMIN') {
+          navigate(routePaths.admin, { replace: true });
+          return;
+        }
         navigate(from, { replace: true });
       },
       onError: (err) =>

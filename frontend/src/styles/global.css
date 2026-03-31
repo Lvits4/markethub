@@ -4,6 +4,11 @@
 
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  /* Panel admin (referencia tipo Flup) */
+  --color-admin-primary: #27ae60;
+  --color-admin-primary-hover: #219a52;
+  --color-admin-surface: #f4f6f9;
+  --color-admin-card: #ffffff;
   --color-surface-cream: #f9f9f7;
   --color-forest: #2d4b37;
   --color-forest-muted: #3d5f48;
@@ -12,6 +17,9 @@
   --color-auth-primary: #2563eb;
   --color-auth-primary-hover: #1d4ed8;
   --color-auth-bg: #eef1f6;
+  --radius-market: 1.25rem;
+  --shadow-market: 0 10px 40px -12px rgb(0 0 0 / 0.08);
+  --shadow-market-dark: 0 12px 40px -8px rgb(0 0 0 / 0.45);
 }
 
 @font-face {
@@ -45,4 +53,54 @@ html.dark body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Shell del panel de administración */
+.admin-shell {
+  --admin-primary: var(--color-admin-primary);
+  --admin-primary-soft: color-mix(in srgb, var(--color-admin-primary) 14%, transparent);
+  --admin-page-bg: var(--color-admin-surface);
+  --admin-card: var(--color-admin-card);
+  --admin-border: rgb(0 0 0 / 0.06);
+}
+
+.dark .admin-shell {
+  --admin-page-bg: #0c0f12;
+  --admin-card: #14181d;
+  --admin-border: rgb(255 255 255 / 0.08);
+  --admin-primary-soft: color-mix(in srgb, var(--color-admin-primary) 22%, transparent);
+}
+
+.admin-nav-link {
+  @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-600 transition-colors dark:text-zinc-400;
+}
+
+.admin-nav-link:hover {
+  @apply bg-zinc-100 dark:bg-zinc-800/80;
+}
+
+.admin-nav-link--active {
+  background: var(--admin-primary-soft);
+  color: var(--admin-primary);
+}
+
+.dark .admin-nav-link--active {
+  @apply text-emerald-400;
+}
+
+.admin-rail-link {
+  @apply flex h-10 w-10 items-center justify-center rounded-xl text-zinc-500 transition-colors dark:text-zinc-400;
+}
+
+.admin-rail-link:hover {
+  @apply bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100;
+}
+
+.admin-rail-link--active {
+  background: var(--admin-primary-soft);
+  color: var(--admin-primary);
+}
+
+.dark .admin-rail-link--active {
+  @apply text-emerald-400;
 }

@@ -21,14 +21,14 @@ export function QuantitySelector({
     onChange(max != null ? Math.min(max, value + 1) : value + 1);
 
   return (
-    <div className="inline-flex items-center gap-2 rounded-md bg-zinc-100 p-1 dark:bg-zinc-800">
+    <div className="inline-flex items-center gap-1 rounded-full bg-zinc-100 p-1 dark:bg-zinc-800">
       <Button
         variant="icon"
         type="button"
         onClick={dec}
         disabled={disabled || value <= min}
         aria-label="Disminuir cantidad"
-        className="!p-2"
+        className="!rounded-full !p-2"
       >
         <FiMinus className="h-4 w-4" />
       </Button>
@@ -41,7 +41,7 @@ export function QuantitySelector({
         onClick={inc}
         disabled={disabled || (max != null && value >= max)}
         aria-label="Aumentar cantidad"
-        className="!p-2"
+        className="!rounded-full !p-2"
       >
         <FiPlus className="h-4 w-4" />
       </Button>

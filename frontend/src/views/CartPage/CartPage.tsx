@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
@@ -13,6 +14,8 @@ import { updateCartItemSchema } from '../../validations/updateCartItemSchema';
 export function CartPage() {
   const { data: cart, isLoading, isError } = useCartQuery();
   const { updateItem, removeItem } = useCartMutations();
+  const [coupon, setCoupon] = useState('');
+  const [orderNote, setOrderNote] = useState('');
 
   const items = cart?.items ?? [];
 
@@ -45,9 +48,12 @@ export function CartPage() {
     return acc + (Number.isNaN(priceNum) ? 0 : priceNum * it.quantity);
   }, 0);
 
+  const shipping = 0;
+  const total = subtotal + shipping;
+
   return (
-    <div className="mx-auto max-w-lg px-4 pt-10">
-      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+    <div className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:pb-10 sm:pt-8 lg:pb-12">
+      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-3xl">
         Carrito
       </h1>
 
@@ -68,17 +74,17 @@ export function CartPage() {
           </Link>
         </p>
       ) : (
-        <>
-          <ul className="mt-8 space-y-4">
+        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_min(100%,400px)] lg:items-start lg:gap-10">
+          <ul className="space-y-4">
             {items.map((it) => {
               const product = it.product;
               const img = product ? getPrimaryImageUrl(product) : null;
               return (
                 <li
                   key={it.id}
-                  className="flex gap-4 rounded-md bg-white p-3 shadow-sm ring-1 ring-zinc-200/80 dark:bg-zinc-900 dark:ring-zinc-800"
+                  className="flex gap-4 rounded-3xl bg-white p-4 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-zinc-800 sm:p-5"
                 >
-                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-md bg-zinc-100 dark:bg-zinc-800">
+                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800 sm:h-28 sm:w-28">
                     {img ? (
                       <img
                         src={img}
@@ -98,7 +104,7 @@ export function CartPage() {
                     >
                       {product?.name ?? 'Producto'}
                     </Link>
-                    <p className="text-sm text-[var(--color-forest)] dark:text-emerald-400">
+                    <p className="text-sm font-medium text-[var(--color-forest)] dark:text-emerald-400">
                       {product ? formatPrice(product.price) : ''}
                     </p>
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -124,19 +130,74 @@ export function CartPage() {
               );
             })}
           </ul>
-          <div className="mt-8 rounded-md bg-white p-5 shadow-sm ring-1 ring-zinc-200/80 dark:bg-zinc-900 dark:ring-zinc-800">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-zinc-500">Subtotal</span>
-              <span className="font-semibold text-zinc-900 dark:text-zinc-100">
-                {formatPrice(subtotal)}
-              </span>
+
+          <div className="lg:sticky lg:top-[5.25rem]">
+            <div className="rounded-3xl bg-white p-6 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-zinc-800">
+              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                Resumen del pedido
+              </h2>
+
+              <div className="mt-4 flex gap-2">
+                <input
+                  type="text"
+                  value={coupon}
+                  onChange={(e) => setCoupon(e.target.value)}
+                  placeholder="Código cupón"
+                  className="min-w-0 flex-1 rounded-2xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-100 dark:focus:border-emerald-500"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="shrink-0 px-4 py-3 text-sm"
+                  onClick={() =>
+                    coupon.trim()
+                      ? toast('Los cupones llegarán en una próxima versión')
+                      : toast.error('Escribe un código')
+                  }
+                >
+                  Aplicar
+                </Button>
+              </div>
+
+              <label className="mt-5 block text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                Nota para el pedido
+              </label>
+              <textarea
+                value={orderNote}
+                onChange={(e) => setOrderNote(e.target.value)}
+                rows={3}
+                placeholder="Instrucciones de entrega, regalo, etc."
+                className="mt-2 w-full resize-none rounded-2xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-100 dark:focus:border-emerald-500"
+              />
+
+              <dl className="mt-6 space-y-3 border-t border-zinc-100 pt-6 text-sm dark:border-zinc-800">
+                <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
+                  <dt>Productos</dt>
+                  <dd className="font-medium text-zinc-900 dark:text-zinc-100">
+                    {formatPrice(subtotal)}
+                  </dd>
+                </div>
+                <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
+                  <dt>Envío</dt>
+                  <dd className="font-medium text-zinc-900 dark:text-zinc-100">
+                    {shipping === 0 ? 'Gratis' : formatPrice(shipping)}
+                  </dd>
+                </div>
+                <div className="flex justify-between border-t border-zinc-100 pt-3 text-base font-bold dark:border-zinc-800">
+                  <dt className="text-zinc-900 dark:text-zinc-50">Total</dt>
+                  <dd className="text-[var(--color-forest)] dark:text-emerald-400">
+                    {formatPrice(total)}
+                  </dd>
+                </div>
+              </dl>
+
+              <p className="mt-4 text-xs leading-relaxed text-zinc-400">
+                El checkout completo no está disponible en esta versión; aquí
+                puedes revisar artículos y cantidades.
+              </p>
             </div>
-            <p className="mt-2 text-xs text-zinc-400">
-              Checkout no está disponible en esta versión; revisa el carrito y
-              cantidades desde aquí.
-            </p>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

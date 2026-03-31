@@ -10,10 +10,10 @@ const activeClass = '!text-white';
 export function BottomNav() {
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 mx-auto max-w-lg px-4 pb-4 pt-2"
+      className="fixed bottom-0 left-0 right-0 z-40 mx-auto max-w-lg px-4 pb-4 pt-2 lg:hidden"
       aria-label="Principal"
     >
-      <div className="flex items-stretch justify-between rounded-md bg-zinc-900 px-2 py-2 shadow-lg dark:bg-black/80 dark:ring-1 dark:ring-zinc-800">
+      <div className="flex items-stretch justify-between rounded-2xl bg-[var(--color-forest)] px-2 py-2 shadow-[var(--shadow-market)] dark:bg-emerald-950 dark:ring-1 dark:ring-emerald-900/50">
         <NavLink
           to={routePaths.catalog}
           end

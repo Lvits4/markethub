@@ -15,7 +15,7 @@ export function SearchInput({
 }: SearchInputProps) {
   return (
     <div
-      className={`relative flex items-center rounded-md bg-white px-4 py-3 shadow-sm ring-1 ring-zinc-200/80 dark:bg-zinc-900 dark:ring-zinc-800 ${className}`}
+      className={`relative flex items-center rounded-2xl bg-white px-4 py-3.5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-zinc-800 ${className}`}
     >
       <FiSearch className="mr-2 h-5 w-5 text-zinc-400" aria-hidden />
       <input
