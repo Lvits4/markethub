@@ -1,13 +1,14 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
   Patch,
   Post,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { StoresService } from './stores.service';
 import { CreateStoreDto, UpdateStoreDto } from './dto';
 import { CurrentUser, Public, Roles } from '../../common/decorators';
@@ -21,23 +22,27 @@ export class StoresController {
 
   @Public()
   @Get()
-  @ApiOperation({ summary: 'Listar tiendas aprobadas' })
+  @ApiOperation({
+    summary:
+      'Listar tiendas públicas (solo activas y aprobadas; las de vendedor aparecen tras PATCH .../approve)',
+  })
   findAll() {
     return this.storesService.findAll();
   }
 
   @Public()
-  @Get(':id')
-  @ApiOperation({ summary: 'Obtener tienda por ID' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.storesService.findById(id);
-  }
-
-  @Public()
-  @Get('slug/:slug')
-  @ApiOperation({ summary: 'Obtener tienda por slug' })
-  findBySlug(@Param('slug') slug: string) {
-    return this.storesService.findBySlug(slug);
+  @Get('lookup/:term')
+  @ApiOperation({
+    summary:
+      'Buscar tienda por término: UUID (id), slug o nombre exacto (sin distinguir mayúsculas)',
+  })
+  @ApiParam({
+    name: 'term',
+    description: 'Id UUID, slug o nombre de la tienda',
+    example: 'mi-tienda-online',
+  })
+  findByTerm(@Param('term') term: string) {
+    return this.storesService.findByTerm(term);
   }
 
   @Roles(Role.SELLER, Role.ADMIN)
@@ -48,24 +53,30 @@ export class StoresController {
     return this.storesService.findByUserId(user.id);
   }
 
+  @Public()
+  @Get('slug/:slug')
+  @ApiOperation({
+    summary: 'Obtener tienda por slug (solo activas; preferir GET .../lookup/:term)',
+  })
+  findBySlug(@Param('slug') slug: string) {
+    return this.storesService.findBySlug(slug);
+  }
+
+  @Public()
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Obtener tienda por ID UUID (preferir GET .../lookup/:term para id/slug/nombre)',
+  })
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.storesService.findById(id);
+  }
+
   @Roles(Role.SELLER, Role.ADMIN)
   @ApiBearerAuth('access-token')
   @Post()
   @ApiOperation({ summary: 'Crear tienda (vendedor o administrador)' })
   create(@Body() dto: CreateStoreDto, @CurrentUser() user: User) {
     return this.storesService.create(dto, user);
-  }
-
-  @Roles(Role.SELLER, Role.ADMIN)
-  @ApiBearerAuth('access-token')
-  @Patch(':id')
-  @ApiOperation({ summary: 'Actualizar tienda' })
-  update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdateStoreDto,
-    @CurrentUser() user: User,
-  ) {
-    return this.storesService.update(id, dto, user);
   }
 
   @Roles(Role.ADMIN)
@@ -82,5 +93,29 @@ export class StoresController {
   @ApiOperation({ summary: 'Rechazar tienda (Admin)' })
   reject(@Param('id', ParseUUIDPipe) id: string) {
     return this.storesService.reject(id);
+  }
+
+  @Roles(Role.SELLER, Role.ADMIN)
+  @ApiBearerAuth('access-token')
+  @Patch(':id')
+  @ApiOperation({ summary: 'Actualizar tienda' })
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateStoreDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.storesService.update(id, dto, user);
+  }
+
+  @Roles(Role.SELLER, Role.ADMIN)
+  @ApiBearerAuth('access-token')
+  @Delete(':id')
+  @ApiOperation({
+    summary:
+      'Eliminar tienda (dueño o admin). Borra productos, pedidos asociados y datos dependientes.',
+  })
+  async remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: User) {
+    await this.storesService.remove(id, user);
+    return { message: 'Tienda eliminada correctamente' };
   }
 }
