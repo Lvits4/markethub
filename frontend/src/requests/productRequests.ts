@@ -1,0 +1,29 @@
+import { apiPaths } from '../config/apiPaths';
+import type { PaginatedProducts, Product, ProductFilters } from '../types/product';
+import { fetchDefault } from './fetchDefault';
+
+function toQuery(filters: ProductFilters): string {
+  const p = new URLSearchParams();
+  if (filters.page != null) p.set('page', String(filters.page));
+  if (filters.limit != null) p.set('limit', String(filters.limit));
+  if (filters.search) p.set('search', filters.search);
+  if (filters.categoryId) p.set('categoryId', filters.categoryId);
+  if (filters.storeId) p.set('storeId', filters.storeId);
+  if (filters.minPrice != null) p.set('minPrice', String(filters.minPrice));
+  if (filters.maxPrice != null) p.set('maxPrice', String(filters.maxPrice));
+  if (filters.minRating != null) p.set('minRating', String(filters.minRating));
+  if (filters.sortBy) p.set('sortBy', filters.sortBy);
+  const qs = p.toString();
+  return qs ? `?${qs}` : '';
+}
+
+export async function fetchProducts(
+  filters: ProductFilters = {},
+): Promise<PaginatedProducts> {
+  const q = toQuery(filters);
+  return fetchDefault<PaginatedProducts>(`${apiPaths.products}${q}`);
+}
+
+export async function fetchProductById(id: string): Promise<Product> {
+  return fetchDefault<Product>(apiPaths.product(id));
+}

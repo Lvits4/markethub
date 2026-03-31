@@ -1,0 +1,15 @@
+export const apiPaths = {
+  login: '/auth/login',
+  register: '/auth/register',
+  categories: '/categories',
+  categoriesFlat: '/categories/flat',
+  products: '/products',
+  product: (id: string) => `/products/${id}`,
+  cart: '/cart',
+  cartSummary: '/cart/summary',
+  cartItems: '/cart/items',
+  cartItem: (itemId: string) => `/cart/items/${itemId}`,
+  favorites: '/favorites',
+  favoriteCheck: (productId: string) => `/favorites/${productId}/check`,
+  favoriteByProduct: (productId: string) => `/favorites/${productId}`,
+} as const;
