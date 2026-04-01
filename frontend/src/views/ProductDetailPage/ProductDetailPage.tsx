@@ -180,13 +180,13 @@ export function ProductDetailPage() {
         className="mb-4 flex flex-wrap items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 sm:text-sm"
         aria-label="Migas de pan"
       >
-        <Link to={routePaths.catalog} className="hover:text-[var(--color-forest)] dark:hover:text-emerald-400">
+        <Link to={routePaths.catalog} className="hover:text-[var(--color-forest)] dark:hover:text-blue-400">
           Inicio
         </Link>
         <span aria-hidden>/</span>
         <Link
           to={routePaths.catalog}
-          className="hover:text-[var(--color-forest)] dark:hover:text-emerald-400"
+          className="hover:text-[var(--color-forest)] dark:hover:text-blue-400"
         >
           Catálogo
         </Link>
@@ -198,10 +198,10 @@ export function ProductDetailPage() {
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_min(100%,380px)] lg:items-start lg:gap-10">
         <div>
-          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl bg-zinc-100 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/60 dark:bg-zinc-800 dark:shadow-[var(--shadow-market-dark)] dark:ring-zinc-700/50 sm:aspect-[5/6] lg:aspect-square">
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-md bg-zinc-100 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/60 dark:bg-night-800 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-700/50 sm:aspect-[5/6] lg:aspect-square">
             <Link
               to={routePaths.catalog}
-              className="absolute left-3 top-3 z-10 rounded-xl bg-white/95 p-2.5 text-zinc-900 shadow-sm backdrop-blur-sm dark:bg-zinc-900/95 dark:text-zinc-100"
+              className="absolute left-3 top-3 z-10 rounded-md bg-white/95 p-2.5 text-zinc-900 shadow-sm backdrop-blur-sm dark:bg-night-900/95 dark:text-zinc-100"
               aria-label="Volver al catálogo"
             >
               <FiArrowLeft className="h-5 w-5" />
@@ -209,7 +209,7 @@ export function ProductDetailPage() {
             <button
               type="button"
               onClick={() => void handleFavorite()}
-              className="absolute right-3 top-3 z-10 cursor-pointer rounded-xl bg-white/95 p-2.5 text-zinc-900 shadow-sm backdrop-blur-sm dark:bg-zinc-900/95 dark:text-zinc-100"
+              className="absolute right-3 top-3 z-10 cursor-pointer rounded-md bg-white/95 p-2.5 text-zinc-900 shadow-sm backdrop-blur-sm dark:bg-night-900/95 dark:text-zinc-100"
               aria-label="Favorito"
             >
               <FiHeart
@@ -236,9 +236,9 @@ export function ProductDetailPage() {
                   key={img.id}
                   type="button"
                   onClick={() => setActiveImage(i)}
-                  className={`h-16 w-16 shrink-0 overflow-hidden rounded-2xl ring-2 transition sm:h-20 sm:w-20 ${
+                  className={`h-16 w-16 shrink-0 overflow-hidden rounded-md ring-2 transition sm:h-20 sm:w-20 ${
                     i === activeImage
-                      ? 'ring-[var(--color-forest)] dark:ring-emerald-500'
+                      ? 'ring-[var(--color-forest)] dark:ring-blue-500'
                       : 'ring-transparent opacity-80 hover:opacity-100'
                   }`}
                 >
@@ -269,16 +269,16 @@ export function ProductDetailPage() {
                 {product.description}
               </p>
             ) : null}
-            <p className="mt-6 text-3xl font-bold text-[var(--color-forest)] dark:text-emerald-400">
+            <p className="mt-6 text-3xl font-bold text-[var(--color-forest)] dark:text-blue-400">
               {formatPrice(product.price)}
             </p>
           </div>
 
-          <div className="rounded-3xl bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-zinc-800">
+          <div className="rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">
             <label className="block text-xs font-semibold uppercase tracking-wide text-zinc-400">
               Entrega
             </label>
-            <div className="mt-2 flex cursor-default items-center justify-between rounded-2xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm font-medium text-zinc-800 dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-100">
+            <div className="mt-2 flex cursor-default items-center justify-between rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm font-medium text-zinc-800 dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100">
               España (península)
             </div>
 
@@ -289,7 +289,7 @@ export function ProductDetailPage() {
                 </span>
               ) : (
                 <>
-                  <span className="font-semibold text-[var(--color-forest)] dark:text-emerald-400">
+                  <span className="font-semibold text-[var(--color-forest)] dark:text-blue-400">
                     En stock
                   </span>
                   {` · ${maxQty} unidades`}
@@ -310,7 +310,7 @@ export function ProductDetailPage() {
               />
             </div>
 
-            <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-5 dark:border-zinc-800">
+            <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-5 dark:border-night-800">
               <span className="text-sm text-zinc-500 dark:text-zinc-400">
                 Subtotal
               </span>
@@ -407,13 +407,13 @@ function ProductReviewsSection({ productId }: { productId: string }) {
   };
 
   return (
-    <section className="mt-14 border-t border-zinc-200 pt-10 dark:border-zinc-800">
+    <section className="mt-14 border-t border-zinc-200 pt-10 dark:border-night-800">
       <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
         Opiniones
       </h2>
 
       {isAuthenticated && !myReview ? (
-        <div className="mt-4 rounded-3xl bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:ring-zinc-800">
+        <div className="mt-4 rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
           <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
             Valora este producto
           </p>
@@ -422,7 +422,7 @@ function ProductReviewsSection({ productId }: { productId: string }) {
             <select
               value={rating}
               onChange={(e) => setRating(Number(e.target.value))}
-              className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className="rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
             >
               {[1, 2, 3, 4, 5].map((n) => (
                 <option key={n} value={n}>
@@ -436,7 +436,7 @@ function ProductReviewsSection({ productId }: { productId: string }) {
             onChange={(e) => setComment(e.target.value)}
             rows={3}
             placeholder="Comentario (opcional)"
-            className="mt-3 w-full rounded-2xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            className="mt-3 w-full rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm dark:border-night-700 dark:bg-night-950"
           />
           <Button
             type="button"
@@ -459,14 +459,14 @@ function ProductReviewsSection({ productId }: { productId: string }) {
           {reviews.map((r) => (
             <li
               key={r.id}
-              className="rounded-2xl border border-zinc-100 bg-white/80 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/80"
+              className="rounded-md border border-zinc-100 bg-white/80 px-4 py-3 dark:border-night-800 dark:bg-night-900/80"
             >
               {editingId === r.id ? (
                 <div className="space-y-2">
                   <select
                     value={editRating}
                     onChange={(e) => setEditRating(Number(e.target.value))}
-                    className="rounded-lg border border-zinc-200 px-2 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                    className="rounded-md border border-zinc-200 px-2 py-1 text-sm dark:border-night-700 dark:bg-night-950"
                   >
                     {[1, 2, 3, 4, 5].map((n) => (
                       <option key={n} value={n}>
@@ -478,7 +478,7 @@ function ProductReviewsSection({ productId }: { productId: string }) {
                     value={editComment}
                     onChange={(e) => setEditComment(e.target.value)}
                     rows={2}
-                    className="w-full rounded-lg border border-zinc-200 px-2 py-1 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                    className="w-full rounded-md border border-zinc-200 px-2 py-1 text-sm dark:border-night-700 dark:bg-night-950"
                   />
                   <div className="flex gap-2">
                     <Button

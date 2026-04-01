@@ -32,7 +32,7 @@ export function OrdersPage() {
           Aún no tienes pedidos.{' '}
           <Link
             to={routePaths.catalog}
-            className="font-semibold text-[var(--color-forest)] dark:text-emerald-400"
+            className="font-semibold text-[var(--color-forest)] dark:text-blue-400"
           >
             Ir al catálogo
           </Link>
@@ -43,7 +43,7 @@ export function OrdersPage() {
             <li key={o.id}>
               <Link
                 to={routePaths.orderDetail(o.id)}
-                className="block rounded-3xl bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 transition hover:ring-zinc-300 dark:bg-zinc-900 dark:ring-zinc-800 dark:hover:ring-zinc-700"
+                className="block rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 transition hover:ring-zinc-300 dark:bg-night-900 dark:ring-night-800 dark:hover:ring-night-700"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
@@ -55,7 +55,7 @@ export function OrdersPage() {
                       {formatPrice(numAmount(o.totalAmount))}
                     </p>
                   </div>
-                  <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                  <span className="rounded-md bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-700 dark:bg-night-800 dark:text-zinc-300">
                     {formatOrderStatus(o.status)}
                   </span>
                 </div>

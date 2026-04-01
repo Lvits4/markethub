@@ -1,16 +1,18 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import { SellerCreateStoreModalProvider } from '../../context/SellerCreateStoreModalProvider/SellerCreateStoreModalProvider';
 import { routePaths } from '../../config/routes';
 
 const navClass =
-  'rounded-xl px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100';
+  'rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-night-800 dark:hover:text-zinc-100';
 
 const activeClass =
-  'bg-[var(--color-forest)]/10 text-[var(--color-forest)] dark:bg-emerald-500/15 dark:text-emerald-400';
+  'bg-[var(--color-forest)]/10 text-[var(--color-forest)] dark:bg-blue-500/15 dark:text-blue-400';
 
 export function SellerLayout() {
   return (
-    <div className="min-h-screen bg-zinc-50/80 pb-24 dark:bg-zinc-950/80">
-      <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+    <SellerCreateStoreModalProvider>
+    <div className="min-h-screen bg-zinc-50/80 pb-24 dark:bg-night-950/80">
+      <div className="border-b border-zinc-200 bg-white dark:border-night-800 dark:bg-night-900">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
@@ -29,14 +31,6 @@ export function SellerLayout() {
               }
             >
               Inicio
-            </NavLink>
-            <NavLink
-              to={routePaths.sellerStores}
-              className={({ isActive }) =>
-                `${navClass} ${isActive ? activeClass : ''}`
-              }
-            >
-              Tiendas
             </NavLink>
             <NavLink
               to={routePaths.sellerOrders}
@@ -61,5 +55,6 @@ export function SellerLayout() {
         <Outlet />
       </div>
     </div>
+    </SellerCreateStoreModalProvider>
   );
 }

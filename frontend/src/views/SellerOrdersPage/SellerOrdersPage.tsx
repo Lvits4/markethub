@@ -62,7 +62,7 @@ export function SellerOrdersPage() {
           {data.map((o) => (
             <div
               key={o.id}
-              className="rounded-3xl bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:ring-zinc-800"
+              className="rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800"
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
                 <div>
@@ -88,7 +88,7 @@ export function SellerOrdersPage() {
                     Estado
                   </label>
                   <select
-                    className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                    className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
                     value={isOrderStatusValue(o.status) ? o.status : 'PENDING'}
                     disabled={updateStatus.isPending}
                     onChange={(e) => onStatusChange(o.id, e.target.value)}
@@ -102,7 +102,7 @@ export function SellerOrdersPage() {
                 </div>
               </div>
               {o.shippingAddress ? (
-                <p className="mt-3 border-t border-zinc-100 pt-3 text-sm text-zinc-500 dark:border-zinc-800">
+                <p className="mt-3 border-t border-zinc-100 pt-3 text-sm text-zinc-500 dark:border-night-800">
                   <span className="font-medium text-zinc-700 dark:text-zinc-300">
                     Envío:
                   </span>{' '}

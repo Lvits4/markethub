@@ -44,6 +44,10 @@ export class Store {
   @Column({ name: 'is_approved', default: false })
   isApproved: boolean;
 
+  /** Si el admin rechazó explícitamente (no confundir con “pendiente de revisión”). */
+  @Column({ name: 'is_rejected', default: false })
+  isRejected: boolean;
+
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 

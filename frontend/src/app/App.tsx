@@ -31,7 +31,6 @@ import { ResetPasswordPage } from '../views/ResetPasswordPage/ResetPasswordPage'
 import { OrdersPage } from '../views/OrdersPage/OrdersPage';
 import { OrderDetailPage } from '../views/OrderDetailPage/OrderDetailPage';
 import { SellerDashboardPage } from '../views/SellerDashboardPage/SellerDashboardPage';
-import { SellerStoresPage } from '../views/SellerStoresPage/SellerStoresPage';
 import { SellerStoreProductsPage } from '../views/SellerStoreProductsPage/SellerStoreProductsPage';
 import { SellerProductFormPage } from '../views/SellerProductFormPage/SellerProductFormPage';
 import { SellerOrdersPage } from '../views/SellerOrdersPage/SellerOrdersPage';
@@ -51,7 +50,7 @@ function AppToaster() {
     <Toaster
       position="top-center"
       toastOptions={{
-        className: 'rounded-md text-sm dark:bg-zinc-800 dark:text-zinc-100',
+        className: 'rounded-md text-sm dark:bg-night-800 dark:text-zinc-100',
         duration: 3200,
       }}
     />
@@ -96,7 +95,6 @@ export default function App() {
                 }
               >
                 <Route index element={<SellerDashboardPage />} />
-                <Route path="stores" element={<SellerStoresPage />} />
                 <Route
                   path="stores/:storeId/products"
                   element={<SellerStoreProductsPage />}

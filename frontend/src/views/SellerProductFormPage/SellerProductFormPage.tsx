@@ -150,7 +150,7 @@ export function SellerProductFormPage() {
     return (
       <p className="text-center text-sm text-red-600">
         Producto no encontrado.{' '}
-        <Link to={routePaths.sellerStores} className="font-semibold underline">
+        <Link to={routePaths.seller} className="font-semibold underline">
           Volver
         </Link>
       </p>
@@ -161,8 +161,11 @@ export function SellerProductFormPage() {
     return (
       <p className="text-center text-sm text-zinc-600">
         Abre “Nuevo producto” desde una tienda.{' '}
-        <Link to={routePaths.sellerStores} className="font-semibold text-[var(--color-forest)]">
-          Ir a tiendas
+        <Link
+          to={routePaths.seller}
+          className="font-semibold text-[var(--color-forest)]"
+        >
+          Ir al panel vendedor
         </Link>
       </p>
     );
@@ -171,14 +174,14 @@ export function SellerProductFormPage() {
   const backHref =
     effectiveStoreId != null && effectiveStoreId !== ''
       ? routePaths.sellerStoreProducts(effectiveStoreId)
-      : routePaths.sellerStores;
+      : routePaths.seller;
 
   return (
     <div>
       <div className="mb-6">
         <Link
           to={backHref}
-          className="text-sm font-medium text-[var(--color-forest)] dark:text-emerald-400"
+          className="text-sm font-medium text-[var(--color-forest)] dark:text-blue-400"
         >
           ← Volver
         </Link>
@@ -187,13 +190,13 @@ export function SellerProductFormPage() {
         {isEdit ? 'Editar producto' : 'Nuevo producto'}
       </h2>
 
-      <div className="mt-6 max-w-xl space-y-4 rounded-3xl bg-white p-6 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:ring-zinc-800">
+      <div className="mt-6 max-w-xl space-y-4 rounded-md bg-white p-6 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
         <div>
           <label className="text-xs text-zinc-500">Nombre</label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            className="mt-1 w-full rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
           />
         </div>
         <div>
@@ -202,7 +205,7 @@ export function SellerProductFormPage() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            className="mt-1 w-full rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
           />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -214,7 +217,7 @@ export function SellerProductFormPage() {
               step="0.01"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className="mt-1 w-full rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
             />
           </div>
           <div>
@@ -224,7 +227,7 @@ export function SellerProductFormPage() {
               min={0}
               value={stock}
               onChange={(e) => setStock(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className="mt-1 w-full rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
             />
           </div>
         </div>
@@ -233,7 +236,7 @@ export function SellerProductFormPage() {
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
-            className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            className="mt-1 w-full rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
           >
             <option value="">—</option>
             {(categories ?? []).map((c) => (

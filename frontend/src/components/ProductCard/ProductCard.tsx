@@ -24,10 +24,10 @@ export function ProductCard({
   const img = getPrimaryImageUrl(product);
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/60 transition hover:shadow-md dark:bg-zinc-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-zinc-800">
+    <article className="group relative flex flex-col overflow-hidden rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/60 transition hover:shadow-md dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">
       <Link
         to={routePaths.productDetail(product.id)}
-        className="relative aspect-[4/5] w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800"
+        className="relative aspect-[4/5] w-full overflow-hidden bg-zinc-100 dark:bg-night-800"
       >
         {img ? (
           <img
@@ -52,7 +52,7 @@ export function ProductCard({
             e.preventDefault();
             onToggleFavorite();
           }}
-          className="absolute right-3 top-3 cursor-pointer rounded-xl bg-white/90 p-2 text-zinc-900 shadow-sm backdrop-blur-sm transition hover:bg-white disabled:cursor-not-allowed dark:bg-zinc-900/90 dark:text-zinc-100 dark:hover:bg-zinc-800"
+          className="absolute right-3 top-3 cursor-pointer rounded-md bg-white/90 p-2 text-zinc-900 shadow-sm backdrop-blur-sm transition hover:bg-white disabled:cursor-not-allowed dark:bg-night-900/90 dark:text-zinc-100 dark:hover:bg-night-800"
         >
           <FiHeart
             className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`}
@@ -66,7 +66,7 @@ export function ProductCard({
         >
           {product.name}
         </Link>
-        <p className="text-sm font-medium text-[var(--color-forest)] dark:text-emerald-400">
+        <p className="text-sm font-medium text-[var(--color-forest)] dark:text-blue-400">
           {formatPrice(product.price)}
         </p>
       </div>

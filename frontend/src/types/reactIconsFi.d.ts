@@ -14,6 +14,7 @@ declare module 'react-icons/fi' {
   export const FiGrid: I;
   export const FiHeart: I;
   export const FiHome: I;
+  export const FiImage: I;
   export const FiLogOut: I;
   export const FiMenu: I;
   export const FiMessageCircle: I;
@@ -31,5 +32,7 @@ declare module 'react-icons/fi' {
   export const FiShield: I;
   export const FiShoppingBag: I;
   export const FiShoppingCart: I;
+  export const FiUpload: I;
   export const FiUsers: I;
+  export const FiX: I;
 }

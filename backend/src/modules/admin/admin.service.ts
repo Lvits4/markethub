@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
@@ -32,6 +32,7 @@ export class AdminService {
       totalSellers,
       totalStores,
       approvedStores,
+      rejectedStores,
       pendingStores,
       totalProducts,
       activeProducts,
@@ -43,7 +44,12 @@ export class AdminService {
       this.usersRepository.count({ where: { role: Role.SELLER } }),
       this.storesRepository.count(),
       this.storesRepository.count({ where: { isApproved: true } }),
-      this.storesRepository.count({ where: { isApproved: false } }),
+      this.storesRepository.count({
+        where: { isApproved: false, isRejected: true },
+      }),
+      this.storesRepository.count({
+        where: { isApproved: false, isRejected: false },
+      }),
       this.productsRepository.count(),
       this.productsRepository.count({ where: { isActive: true } }),
       this.ordersRepository.count(),
@@ -58,7 +64,12 @@ export class AdminService {
 
     return {
       users: { total: totalUsers, customers: totalCustomers, sellers: totalSellers },
-      stores: { total: totalStores, approved: approvedStores, pending: pendingStores },
+      stores: {
+        total: totalStores,
+        approved: approvedStores,
+        rejected: rejectedStores,
+        pending: pendingStores,
+      },
       products: { total: totalProducts, active: activeProducts },
       orders: { total: totalOrders, completed: completedOrders },
       revenue: { totalSales: parseFloat(totalSalesResult?.total || '0') },
@@ -86,6 +97,31 @@ export class AdminService {
       relations: ['user'],
       order: { createdAt: 'DESC' },
     });
+  }
+
+  async getStoreById(storeId: string) {
+    const store = await this.storesRepository.findOne({
+      where: { id: storeId },
+      relations: ['user'],
+    });
+    if (!store) {
+      throw new NotFoundException('Tienda no encontrada');
+    }
+    const u = store.user;
+    if (u) {
+      const {
+        password: _p,
+        passwordResetToken: _t,
+        passwordResetExpires: _e,
+        ...safeUser
+      } = u as User & {
+        password?: string;
+        passwordResetToken?: string | null;
+        passwordResetExpires?: Date | null;
+      };
+      return { ...store, user: safeUser };
+    }
+    return store;
   }
 
   async getAllProducts() {

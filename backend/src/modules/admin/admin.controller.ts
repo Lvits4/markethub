@@ -45,6 +45,12 @@ export class AdminController {
     return this.adminService.getAllStores();
   }
 
+  @Get('stores/:id')
+  @ApiOperation({ summary: 'Detalle de una tienda (admin)' })
+  getStoreById(@Param('id', ParseUUIDPipe) id: string) {
+    return this.adminService.getStoreById(id);
+  }
+
   @Patch('stores/:id/commission')
   @ApiOperation({ summary: 'Actualizar comisión de una tienda' })
   updateCommission(

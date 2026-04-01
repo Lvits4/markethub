@@ -58,7 +58,7 @@ export class StoresController {
   @Get('rejected')
   @ApiOperation({
     summary:
-      'Listar tiendas no aprobadas (pendientes o rechazadas). Aprobar con PATCH .../stores/:id/approve',
+      'Cola de moderación: tiendas pendientes de aprobar (no aprobadas ni rechazadas explícitamente)',
   })
   listRejected() {
     return this.storesService.findAllRejected();

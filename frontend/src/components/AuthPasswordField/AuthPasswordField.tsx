@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 const fieldClass =
-  'w-full rounded-xl border border-zinc-200/90 bg-zinc-50/80 py-3 pl-4 pr-11 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-auth-primary focus:bg-white focus:ring-2 focus:ring-auth-primary/18 dark:border-zinc-600 dark:bg-zinc-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:bg-zinc-950';
+  'w-full rounded-md border border-zinc-200/90 bg-zinc-50/80 py-3 pl-4 pr-11 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-auth-primary focus:bg-white focus:ring-2 focus:ring-auth-primary/18 dark:border-night-600 dark:bg-night-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:bg-night-950';
 
 type AuthPasswordFieldProps = {
   id: string;
@@ -46,7 +46,7 @@ export function AuthPasswordField({
         <button
           type="button"
           onClick={() => setVisible((v) => !v)}
-          className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+          className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-night-800 dark:hover:text-zinc-200"
           aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
         >
           {visible ? (

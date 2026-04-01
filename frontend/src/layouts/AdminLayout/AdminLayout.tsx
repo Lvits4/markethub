@@ -19,6 +19,7 @@ import {
   FiUsers,
 } from 'react-icons/fi';
 import { Button } from '../../components/Button/Button';
+import { SellerCreateStoreModalProvider } from '../../context/SellerCreateStoreModalProvider/SellerCreateStoreModalProvider';
 import { useTheme } from '../../hooks/useTheme';
 import { routePaths } from '../../config/routes';
 import { useAuth } from '../../hooks/useAuth';
@@ -45,7 +46,7 @@ function SidebarNavItem({
 }: NavItemProps) {
   const collapsedBadge =
     collapsed && collapsedBadgeCount != null && collapsedBadgeCount > 0 ? (
-      <span className="absolute right-0 top-0 flex h-4 min-w-4 translate-x-0.5 -translate-y-0.5 items-center justify-center rounded-full bg-red-500 px-0.5 text-[9px] font-bold leading-none text-white">
+      <span className="absolute right-0 top-0 flex h-4 min-w-4 translate-x-0.5 -translate-y-0.5 items-center justify-center rounded-md bg-red-500 px-0.5 text-[9px] font-bold leading-none text-white">
         {collapsedBadgeCount > 9 ? '9+' : collapsedBadgeCount}
       </span>
     ) : null;
@@ -122,21 +123,22 @@ export function AdminLayout() {
 
   const moderationBadge =
     pendingCount > 0 ? (
-      <span className="rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+      <span className="rounded-md bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
         {pendingCount > 99 ? '99+' : pendingCount}
       </span>
     ) : null;
 
   return (
-    <div className="admin-shell flex min-h-screen bg-[var(--admin-page-bg)] text-zinc-800 dark:text-zinc-100">
+    <SellerCreateStoreModalProvider>
+    <div className="admin-shell flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-[var(--admin-page-bg)] text-zinc-800 dark:text-zinc-100">
       <aside
-        className={`flex shrink-0 flex-col border-r border-[var(--admin-border)] bg-[var(--admin-card)] transition-[width] duration-200 ease-out dark:bg-zinc-900 ${collapsed ? 'w-[72px]' : 'w-[248px]'}`}
+        className={`flex min-h-0 shrink-0 flex-col border-r border-[var(--admin-border)] bg-[var(--admin-card)] transition-[width] duration-200 ease-out dark:bg-night-900 ${collapsed ? 'w-[72px]' : 'w-[248px]'}`}
         aria-label="Navegación del panel"
       >
         <div className="flex h-14 items-center justify-between gap-2 border-b border-[var(--admin-border)] px-3">
           <div className="flex min-w-0 items-center gap-2.5">
             <div
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--admin-primary)] text-sm font-bold text-white"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[var(--admin-primary)] text-sm font-bold text-white"
               aria-hidden
             >
               M
@@ -152,7 +154,7 @@ export function AdminLayout() {
           <button
             type="button"
             onClick={() => setCollapsed((c) => !c)}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-night-800"
             aria-expanded={!collapsed}
             aria-label={collapsed ? 'Expandir menú' : 'Contraer menú'}
           >
@@ -164,7 +166,7 @@ export function AdminLayout() {
           </button>
         </div>
 
-        <nav className="flex-1 space-y-5 overflow-y-auto p-3">
+        <nav className="min-h-0 flex-1 space-y-5 overflow-y-auto overflow-x-hidden p-3 overscroll-contain">
           <div>
             <SectionLabel collapsed={collapsed}>Mercado</SectionLabel>
             <div className="space-y-0.5">
@@ -249,7 +251,7 @@ export function AdminLayout() {
                 ) : null}
               </button>
               <div
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 ${collapsed ? 'justify-center px-2' : ''}`}
+                className={`flex items-center gap-3 rounded-md px-3 py-2.5 ${collapsed ? 'justify-center px-2' : ''}`}
               >
                 {theme === 'dark' ? (
                   <FiSun className="h-[18px] w-[18px] shrink-0 text-zinc-500" aria-hidden />
@@ -266,10 +268,10 @@ export function AdminLayout() {
                       role="switch"
                       aria-checked={theme === 'dark'}
                       onClick={toggleTheme}
-                      className={`relative h-7 w-12 shrink-0 rounded-full transition-colors ${theme === 'dark' ? 'bg-[var(--admin-primary)]' : 'bg-zinc-200 dark:bg-zinc-700'}`}
+                      className={`relative h-7 w-12 shrink-0 rounded-md transition-colors ${theme === 'dark' ? 'bg-[var(--admin-primary)]' : 'bg-zinc-200 dark:bg-night-700'}`}
                     >
                       <span
-                        className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-transform ${theme === 'dark' ? 'left-6' : 'left-1'}`}
+                        className={`absolute top-1 h-5 w-5 rounded-md bg-white shadow transition-transform ${theme === 'dark' ? 'left-6' : 'left-1'}`}
                       />
                     </button>
                   </>
@@ -277,7 +279,7 @@ export function AdminLayout() {
                   <button
                     type="button"
                     onClick={toggleTheme}
-                    className="rounded-lg p-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    className="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-night-800"
                     aria-label="Cambiar tema"
                   >
                     {theme === 'dark' ? (
@@ -300,9 +302,9 @@ export function AdminLayout() {
 
         <div className="border-t border-[var(--admin-border)] p-3">
           <div
-            className={`flex items-center gap-3 rounded-xl bg-zinc-50 p-2.5 dark:bg-zinc-800/60 ${collapsed ? 'flex-col' : ''}`}
+            className={`flex items-center gap-3 rounded-md bg-zinc-50 p-2.5 dark:bg-night-800/60 ${collapsed ? 'flex-col' : ''}`}
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--admin-primary-soft)] text-sm font-semibold text-[var(--admin-primary)]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[var(--admin-primary-soft)] text-sm font-semibold text-[var(--admin-primary)]">
               {initials}
             </div>
             {!collapsed ? (
@@ -319,7 +321,7 @@ export function AdminLayout() {
           <Button
             type="button"
             variant="outline"
-            className="mt-3 w-full gap-2 border-zinc-200 text-sm text-zinc-700 dark:border-zinc-700 dark:text-zinc-200"
+            className="mt-3 w-full gap-2 border-zinc-200 text-sm text-zinc-700 dark:border-night-700 dark:text-zinc-200"
             onClick={handleLogout}
           >
             <FiLogOut className="h-4 w-4" />
@@ -328,13 +330,14 @@ export function AdminLayout() {
         </div>
       </aside>
 
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <main className="flex-1 overflow-auto p-5 md:p-8">
-          <div className="mx-auto max-w-[1360px]">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <main className="flex min-h-0 flex-1 flex-col overflow-hidden p-5 md:p-8">
+          <div className="mx-auto flex min-h-0 w-full max-w-[1360px] flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain">
             <Outlet />
           </div>
         </main>
       </div>
     </div>
+    </SellerCreateStoreModalProvider>
   );
 }

@@ -1,6 +1,11 @@
 export type AdminDashboardStats = {
   users: { total: number; customers: number; sellers: number };
-  stores: { total: number; approved: number; pending: number };
+  stores: {
+    total: number;
+    approved: number;
+    rejected: number;
+    pending: number;
+  };
   products: { total: number; active: number };
   orders: { total: number; completed: number };
   revenue: { totalSales: number };
@@ -31,11 +36,46 @@ export type AdminStoreRow = {
   contactEmail: string | null;
   contactPhone: string | null;
   isApproved: boolean;
+  isRejected?: boolean;
   isActive: boolean;
   commission: string | number;
   userId: string;
   user?: AdminStoreOwner;
   createdAt?: string;
+};
+
+/** Respuesta de GET /admin/stores/:id (usuario sin campos sensibles). */
+export type AdminStoreDetailUser = {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  avatar: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AdminStoreDetail = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  logo: string | null;
+  banner: string | null;
+  shippingPolicy: string | null;
+  returnPolicy: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  isApproved: boolean;
+  isRejected: boolean;
+  isActive: boolean;
+  commission: string | number;
+  userId: string;
+  user?: AdminStoreDetailUser;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type AdminProductRow = {

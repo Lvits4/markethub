@@ -13,7 +13,7 @@ export function BottomNav() {
       className="fixed bottom-0 left-0 right-0 z-40 mx-auto max-w-lg px-4 pb-4 pt-2 lg:hidden"
       aria-label="Principal"
     >
-      <div className="flex items-stretch justify-between rounded-2xl bg-[var(--color-forest)] px-2 py-2 shadow-[var(--shadow-market)] dark:bg-emerald-950 dark:ring-1 dark:ring-emerald-900/50">
+      <div className="flex items-stretch justify-between rounded-md bg-[var(--color-forest)] px-2 py-2 shadow-[var(--shadow-market)] backdrop-blur-md dark:bg-blue-950/92 dark:ring-1 dark:ring-blue-500/25 dark:backdrop-blur-xl">
         <NavLink
           to={routePaths.catalog}
           end

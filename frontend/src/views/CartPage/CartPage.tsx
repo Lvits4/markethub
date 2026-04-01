@@ -102,7 +102,7 @@ export function CartPage() {
           Tu carrito está vacío.{' '}
           <Link
             to={routePaths.catalog}
-            className="font-semibold text-[var(--color-forest)] dark:text-emerald-400"
+            className="font-semibold text-[var(--color-forest)] dark:text-blue-400"
           >
             Ir al catálogo
           </Link>
@@ -116,9 +116,9 @@ export function CartPage() {
               return (
                 <li
                   key={it.id}
-                  className="flex gap-4 rounded-3xl bg-white p-4 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-zinc-800 sm:p-5"
+                  className="flex gap-4 rounded-md bg-white p-4 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800 sm:p-5"
                 >
-                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800 sm:h-28 sm:w-28">
+                  <div className="h-24 w-24 shrink-0 overflow-hidden rounded-md bg-zinc-100 dark:bg-night-800 sm:h-28 sm:w-28">
                     {img ? (
                       <img
                         src={img}
@@ -138,7 +138,7 @@ export function CartPage() {
                     >
                       {product?.name ?? 'Producto'}
                     </Link>
-                    <p className="text-sm font-medium text-[var(--color-forest)] dark:text-emerald-400">
+                    <p className="text-sm font-medium text-[var(--color-forest)] dark:text-blue-400">
                       {product ? formatPrice(product.price) : ''}
                     </p>
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -166,7 +166,7 @@ export function CartPage() {
           </ul>
 
           <div className="lg:sticky lg:top-[5.25rem]">
-            <div className="rounded-3xl bg-white p-6 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-zinc-800">
+            <div className="rounded-md bg-white p-6 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">
               <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
                 Resumen del pedido
               </h2>
@@ -177,7 +177,7 @@ export function CartPage() {
                   value={coupon}
                   onChange={(e) => setCoupon(e.target.value)}
                   placeholder="Código cupón"
-                  className="min-w-0 flex-1 rounded-2xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-100 dark:focus:border-emerald-500"
+                  className="min-w-0 flex-1 rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100 dark:focus:border-blue-500"
                 />
                 <Button
                   type="button"
@@ -201,7 +201,7 @@ export function CartPage() {
                 onChange={(e) => setShippingAddress(e.target.value)}
                 rows={3}
                 placeholder="Calle, número, ciudad, código postal…"
-                className="mt-2 w-full resize-none rounded-2xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-100 dark:focus:border-emerald-500"
+                className="mt-2 w-full resize-none rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100 dark:focus:border-blue-500"
               />
 
               <label className="mt-5 block text-xs font-semibold uppercase tracking-wide text-zinc-400">
@@ -212,10 +212,10 @@ export function CartPage() {
                 onChange={(e) => setOrderNote(e.target.value)}
                 rows={2}
                 placeholder="Instrucciones de entrega, regalo, etc."
-                className="mt-2 w-full resize-none rounded-2xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-100 dark:focus:border-emerald-500"
+                className="mt-2 w-full resize-none rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100 dark:focus:border-blue-500"
               />
 
-              <dl className="mt-6 space-y-3 border-t border-zinc-100 pt-6 text-sm dark:border-zinc-800">
+              <dl className="mt-6 space-y-3 border-t border-zinc-100 pt-6 text-sm dark:border-night-800">
                 <div className="flex justify-between text-zinc-600 dark:text-zinc-400">
                   <dt>Productos</dt>
                   <dd className="font-medium text-zinc-900 dark:text-zinc-100">
@@ -228,9 +228,9 @@ export function CartPage() {
                     {shipping === 0 ? 'Gratis' : formatPrice(shipping)}
                   </dd>
                 </div>
-                <div className="flex justify-between border-t border-zinc-100 pt-3 text-base font-bold dark:border-zinc-800">
+                <div className="flex justify-between border-t border-zinc-100 pt-3 text-base font-bold dark:border-night-800">
                   <dt className="text-zinc-900 dark:text-zinc-50">Total</dt>
-                  <dd className="text-[var(--color-forest)] dark:text-emerald-400">
+                  <dd className="text-[var(--color-forest)] dark:text-blue-400">
                     {formatPrice(total)}
                   </dd>
                 </div>

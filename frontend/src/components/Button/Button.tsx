@@ -18,13 +18,13 @@ export function Button({
 
   const styles: Record<ButtonVariant, string> = {
     primary:
-      'rounded-xl bg-[var(--color-forest)] px-5 py-3 text-white shadow-sm hover:bg-[var(--color-forest-muted)] dark:bg-emerald-600 dark:hover:bg-emerald-500',
+      'rounded-md bg-[var(--color-forest)] px-5 py-3 text-white shadow-sm hover:bg-[var(--color-forest-muted)] dark:bg-blue-600 dark:hover:bg-blue-500',
     outline:
-      'rounded-xl border-2 border-[var(--color-forest)] bg-transparent px-5 py-3 text-[var(--color-forest)] hover:bg-[var(--color-forest)]/8 dark:border-emerald-500 dark:text-emerald-400 dark:hover:bg-emerald-500/10',
+      'rounded-md border-2 border-[var(--color-forest)] bg-transparent px-5 py-3 text-[var(--color-forest)] hover:bg-[var(--color-forest)]/8 dark:border-blue-500 dark:text-blue-400 dark:hover:bg-blue-500/10',
     ghost:
-      'rounded-xl px-4 py-2 text-zinc-800 dark:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800',
+      'rounded-md px-4 py-2 text-zinc-800 dark:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-night-800',
     icon:
-      'rounded-xl p-2.5 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-800',
+      'rounded-md p-2.5 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-night-800',
   };
 
   return (

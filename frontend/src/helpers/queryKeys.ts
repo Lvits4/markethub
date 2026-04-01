@@ -22,6 +22,7 @@ export const queryKeys = {
   adminDashboard: ['admin', 'dashboard'] as const,
   adminUsers: ['admin', 'users'] as const,
   adminStores: ['admin', 'stores'] as const,
+  adminStore: (id: string) => ['admin', 'stores', id] as const,
   adminProducts: ['admin', 'products'] as const,
   adminOrders: ['admin', 'orders'] as const,
   adminSalesReport: ['admin', 'reports', 'sales'] as const,

@@ -17,11 +17,11 @@ export function AdminProductsPage() {
       </h2>
       <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
         Catálogo global (
-        <code className="rounded bg-zinc-100 px-1 text-xs dark:bg-zinc-800">
+        <code className="rounded-md bg-zinc-100 px-1 text-xs dark:bg-night-800">
           GET /admin/products
         </code>
         ). La creación y edición de productos sigue las rutas de vendedor (
-        <code className="rounded bg-zinc-100 px-1 text-xs dark:bg-zinc-800">
+        <code className="rounded-md bg-zinc-100 px-1 text-xs dark:bg-night-800">
           /products
         </code>
         ) con tu sesión de administrador.
@@ -38,10 +38,10 @@ export function AdminProductsPage() {
           No hay productos.
         </p>
       ) : (
-        <div className="mt-8 overflow-x-auto rounded-3xl bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-zinc-800">
+        <div className="mt-8 overflow-x-auto rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead>
-              <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800">
+              <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-night-800">
                 <th className="px-5 py-4">Producto</th>
                 <th className="px-5 py-4">Tienda</th>
                 <th className="px-5 py-4">Categoría</th>
@@ -55,7 +55,7 @@ export function AdminProductsPage() {
               {data.map((p) => (
                 <tr
                   key={p.id}
-                  className="border-b border-zinc-50 last:border-0 dark:border-zinc-800/80"
+                  className="border-b border-zinc-50 last:border-0 dark:border-night-800/80"
                 >
                   <td className="px-5 py-4">
                     <p className="font-medium text-zinc-900 dark:text-zinc-50">
@@ -77,7 +77,7 @@ export function AdminProductsPage() {
                     <span
                       className={
                         p.isActive
-                          ? 'text-[var(--color-forest)] dark:text-emerald-400'
+                          ? 'text-[var(--color-forest)] dark:text-blue-400'
                           : 'text-zinc-400'
                       }
                     >

@@ -6,7 +6,7 @@ import { getErrorMessage } from '../../helpers/mapApiError';
 import { forgotPasswordRequest } from '../../requests/authRequests';
 
 const inputClass =
-  'mt-1 w-full rounded-xl border border-zinc-200/90 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-auth-primary focus:bg-white focus:ring-2 focus:ring-auth-primary/18 dark:border-zinc-600 dark:bg-zinc-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:bg-zinc-950';
+  'mt-1 w-full rounded-md border border-zinc-200/90 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-auth-primary focus:bg-white focus:ring-2 focus:ring-auth-primary/18 dark:border-night-600 dark:bg-night-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:bg-night-950';
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -66,14 +66,14 @@ export function ForgotPasswordPage() {
         <button
           type="submit"
           disabled={pending}
-          className="mt-3 w-full cursor-pointer rounded-xl bg-auth-primary py-3 text-sm font-semibold text-white shadow-md shadow-auth-primary/35 transition hover:bg-auth-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-3 w-full cursor-pointer rounded-md bg-auth-primary py-3 text-sm font-semibold text-white shadow-md shadow-auth-primary/35 transition hover:bg-auth-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           {pending ? 'Enviando…' : 'Enviar'}
         </button>
       </form>
 
       {devToken ? (
-        <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
+        <div className="mt-6 rounded-md border border-amber-200 bg-amber-50 p-4 text-xs text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
           <p className="font-semibold">Token (solo desarrollo)</p>
           <p className="mt-2 break-all font-mono">{devToken}</p>
           <Link

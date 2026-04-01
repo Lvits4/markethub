@@ -13,22 +13,22 @@ import { NotificationsBell } from '../NotificationsBell/NotificationsBell';
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
 
 const navInactive =
-  'flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100';
+  'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-night-800 dark:hover:text-zinc-100';
 
 const navActive =
-  'flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold bg-[var(--color-forest)]/10 text-[var(--color-forest)] dark:bg-emerald-500/15 dark:text-emerald-400';
+  'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold bg-[var(--color-forest)]/10 text-[var(--color-forest)] dark:bg-blue-500/15 dark:text-blue-400';
 
 export function MarketHeader() {
   const { isAuthenticated, user } = useAuth();
   const showSeller = user?.role === 'SELLER' || user?.role === 'ADMIN';
 
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-[var(--color-surface-cream)]/90 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/90">
+    <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-[var(--color-surface-cream)]/90 backdrop-blur-md dark:border-night-700/80 dark:bg-night-950/75 dark:backdrop-blur-xl dark:backdrop-saturate-150">
       <div className="mx-auto flex w-full max-w-6xl items-center gap-2 px-4 py-3 sm:gap-3">
         <NavLink
           to={routePaths.catalog}
           end
-          className="shrink-0 text-lg font-bold tracking-tight text-[var(--color-forest)] dark:text-emerald-400"
+          className="shrink-0 text-lg font-bold tracking-tight text-[var(--color-forest)] dark:text-blue-400"
         >
           MarketHub
         </NavLink>
@@ -96,7 +96,7 @@ export function MarketHeader() {
 
         <NavLink
           to={routePaths.cart}
-          className="flex rounded-xl p-2.5 text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800 lg:hidden"
+          className="flex rounded-md p-2.5 text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800 lg:hidden"
           aria-label="Carrito"
         >
           <FiShoppingBag className="h-5 w-5" />
@@ -104,7 +104,7 @@ export function MarketHeader() {
         {isAuthenticated ? (
           <NavLink
             to={routePaths.orders}
-            className="flex rounded-xl p-2.5 text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800 lg:hidden"
+            className="flex rounded-md p-2.5 text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800 lg:hidden"
             aria-label="Mis pedidos"
           >
             <FiPackage className="h-5 w-5" />

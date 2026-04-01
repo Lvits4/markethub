@@ -28,10 +28,10 @@ export function SellerStoreProductsPage() {
     <div>
       <div className="mb-6">
         <Link
-          to={routePaths.sellerStores}
-          className="text-sm font-medium text-[var(--color-forest)] dark:text-emerald-400"
+          to={routePaths.seller}
+          className="text-sm font-medium text-[var(--color-forest)] dark:text-blue-400"
         >
-          ← Tiendas
+          ← Inicio
         </Link>
       </div>
       <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
@@ -40,7 +40,7 @@ export function SellerStoreProductsPage() {
       <div className="mt-4">
         <Link
           to={`${routePaths.sellerProductNew}?storeId=${encodeURIComponent(storeId ?? '')}`}
-          className="inline-flex rounded-xl bg-[var(--color-forest)] px-5 py-2.5 text-sm font-semibold text-white dark:bg-emerald-600"
+          className="inline-flex rounded-md bg-[var(--color-forest)] px-5 py-2.5 text-sm font-semibold text-white dark:bg-blue-600"
         >
           Nuevo producto
         </Link>
@@ -57,10 +57,10 @@ export function SellerStoreProductsPage() {
           No hay productos en esta tienda.
         </p>
       ) : (
-        <div className="mt-8 overflow-x-auto rounded-3xl bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:ring-zinc-800">
+        <div className="mt-8 overflow-x-auto rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead>
-              <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800">
+              <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-night-800">
                 <th className="px-4 py-3">Producto</th>
                 <th className="px-4 py-3">Precio</th>
                 <th className="px-4 py-3">Stock</th>
@@ -72,7 +72,7 @@ export function SellerStoreProductsPage() {
               {data.data.map((p) => (
                 <tr
                   key={p.id}
-                  className="border-b border-zinc-50 last:border-0 dark:border-zinc-800/80"
+                  className="border-b border-zinc-50 last:border-0 dark:border-night-800/80"
                 >
                   <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-50">
                     {p.name}
@@ -86,7 +86,7 @@ export function SellerStoreProductsPage() {
                     <div className="flex justify-end gap-2">
                       <Link
                         to={routePaths.sellerProductEdit(p.id)}
-                        className="text-sm font-medium text-[var(--color-forest)] dark:text-emerald-400"
+                        className="text-sm font-medium text-[var(--color-forest)] dark:text-blue-400"
                       >
                         Editar
                       </Link>

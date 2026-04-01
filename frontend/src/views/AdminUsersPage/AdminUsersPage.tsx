@@ -36,10 +36,10 @@ export function AdminUsersPage() {
           No hay usuarios.
         </p>
       ) : (
-        <div className="mt-8 overflow-x-auto rounded-3xl bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-zinc-800">
+        <div className="mt-8 overflow-x-auto rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead>
-              <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800">
+              <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-night-800">
                 <th className="px-5 py-4">Usuario</th>
                 <th className="px-5 py-4">Rol</th>
                 <th className="px-5 py-4">Estado</th>
@@ -50,7 +50,7 @@ export function AdminUsersPage() {
               {data.map((u) => (
                 <tr
                   key={u.id}
-                  className="border-b border-zinc-50 last:border-0 dark:border-zinc-800/80"
+                  className="border-b border-zinc-50 last:border-0 dark:border-night-800/80"
                 >
                   <td className="px-5 py-4">
                     <p className="font-medium text-zinc-900 dark:text-zinc-50">
@@ -59,7 +59,7 @@ export function AdminUsersPage() {
                     <p className="text-zinc-500 dark:text-zinc-400">{u.email}</p>
                   </td>
                   <td className="px-5 py-4">
-                    <span className="inline-flex rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                    <span className="inline-flex rounded-md bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:bg-night-800 dark:text-zinc-300">
                       {u.role}
                     </span>
                   </td>
@@ -67,7 +67,7 @@ export function AdminUsersPage() {
                     <span
                       className={
                         u.isActive
-                          ? 'text-[var(--color-forest)] dark:text-emerald-400'
+                          ? 'text-[var(--color-forest)] dark:text-blue-400'
                           : 'text-red-600 dark:text-red-400'
                       }
                     >

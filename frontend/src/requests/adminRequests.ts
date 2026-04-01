@@ -5,6 +5,7 @@ import type {
   AdminPlatformReport,
   AdminProductRow,
   AdminSalesReport,
+  AdminStoreDetail,
   AdminStoreRow,
   AdminUserRow,
 } from '../types/admin';
@@ -27,6 +28,12 @@ export function toggleAdminUserActive(token: string, userId: string) {
 
 export function fetchAdminStores(token: string) {
   return fetchDefault<AdminStoreRow[]>(apiPaths.adminStores, { token });
+}
+
+export function fetchAdminStoreById(token: string, storeId: string) {
+  return fetchDefault<AdminStoreDetail>(apiPaths.adminStore(storeId), {
+    token,
+  });
 }
 
 export function patchAdminStoreCommission(

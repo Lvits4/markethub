@@ -29,7 +29,7 @@ export function OrderDetailPage() {
         Pedido no encontrado.{' '}
         <Link
           to={routePaths.orders}
-          className="font-semibold text-[var(--color-forest)] dark:text-emerald-400"
+          className="font-semibold text-[var(--color-forest)] dark:text-blue-400"
         >
           Volver a mis pedidos
         </Link>
@@ -42,7 +42,7 @@ export function OrderDetailPage() {
       <div className="mb-6">
         <Link
           to={routePaths.orders}
-          className="inline-flex rounded-xl px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-200/60 dark:text-zinc-100 dark:hover:bg-zinc-800"
+          className="inline-flex rounded-md px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-200/60 dark:text-zinc-100 dark:hover:bg-night-800"
         >
           ← Mis pedidos
         </Link>
@@ -53,7 +53,7 @@ export function OrderDetailPage() {
       </h1>
       <p className="mt-1 font-mono text-xs text-zinc-400">{order.id}</p>
 
-      <div className="mt-6 rounded-3xl bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:ring-zinc-800">
+      <div className="mt-6 rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
         <dl className="grid gap-3 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-zinc-500">Estado</dt>
@@ -63,7 +63,7 @@ export function OrderDetailPage() {
           </div>
           <div>
             <dt className="text-zinc-500">Total</dt>
-            <dd className="font-semibold tabular-nums text-[var(--color-forest)] dark:text-emerald-400">
+            <dd className="font-semibold tabular-nums text-[var(--color-forest)] dark:text-blue-400">
               {formatPrice(numAmount(order.totalAmount))}
             </dd>
           </div>
@@ -77,7 +77,7 @@ export function OrderDetailPage() {
       </div>
 
       {payment ? (
-        <div className="mt-6 rounded-3xl bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:ring-zinc-800">
+        <div className="mt-6 rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">
             Pago
           </h2>
@@ -105,7 +105,7 @@ export function OrderDetailPage() {
           {(order.items ?? []).map((it) => (
             <li
               key={it.id}
-              className="flex flex-wrap justify-between gap-2 rounded-2xl border border-zinc-100 px-4 py-3 text-sm dark:border-zinc-800"
+              className="flex flex-wrap justify-between gap-2 rounded-md border border-zinc-100 px-4 py-3 text-sm dark:border-night-800"
             >
               <span>
                 {it.quantity}× {it.product?.name ?? 'Producto'}

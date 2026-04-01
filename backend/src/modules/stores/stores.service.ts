@@ -60,10 +60,10 @@ export class StoresService {
     });
   }
 
-  /** Pendientes o rechazadas (`isApproved: false`). Uso: listado admin. */
+  /** Cola de moderación: pendientes de decisión (`isApproved: false` y sin rechazo explícito). */
   async findAllRejected(): Promise<Store[]> {
     return this.storesRepository.find({
-      where: { isApproved: false },
+      where: { isApproved: false, isRejected: false },
       relations: ['user'],
       order: { createdAt: 'DESC' },
     });
@@ -240,12 +240,14 @@ export class StoresService {
   async approve(id: string): Promise<Store> {
     const store = await this.findById(id);
     store.isApproved = true;
+    store.isRejected = false;
     return this.storesRepository.save(store);
   }
 
   async reject(id: string): Promise<Store> {
     const store = await this.findById(id);
     store.isApproved = false;
+    store.isRejected = true;
     return this.storesRepository.save(store);
   }
 

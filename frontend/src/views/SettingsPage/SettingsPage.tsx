@@ -59,7 +59,7 @@ export function SettingsPage() {
         Ajustes
       </h1>
 
-      <div className="mt-8 space-y-6 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-zinc-200/80 dark:bg-zinc-900 dark:ring-zinc-800">
+      <div className="mt-8 space-y-6 rounded-md bg-white p-6 shadow-sm ring-1 ring-zinc-200/80 dark:bg-night-900 dark:ring-night-800">
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="font-medium text-zinc-900 dark:text-zinc-50">Tema</p>
@@ -72,7 +72,7 @@ export function SettingsPage() {
           </Button>
         </div>
 
-        <div className="border-t border-zinc-100 pt-6 dark:border-zinc-800">
+        <div className="border-t border-zinc-100 pt-6 dark:border-night-800">
           {isAuthenticated && user ? (
             <>
               <p className="font-medium text-zinc-900 dark:text-zinc-50">
@@ -84,7 +84,7 @@ export function SettingsPage() {
                 {user.email}
               </p>
 
-              <div className="mt-6 border-t border-zinc-100 pt-6 dark:border-zinc-800">
+              <div className="mt-6 border-t border-zinc-100 pt-6 dark:border-night-800">
                 <p className="font-medium text-zinc-900 dark:text-zinc-50">
                   Perfil
                 </p>
@@ -106,7 +106,7 @@ export function SettingsPage() {
                         id="profile-first"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
-                        className="mt-1 w-full rounded-2xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none focus:border-[var(--color-forest)] dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-100"
+                        className="mt-1 w-full rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100"
                       />
                     </div>
                     <div>
@@ -120,7 +120,7 @@ export function SettingsPage() {
                         id="profile-last"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
-                        className="mt-1 w-full rounded-2xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none focus:border-[var(--color-forest)] dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-100"
+                        className="mt-1 w-full rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100"
                       />
                     </div>
                     <div>
@@ -135,7 +135,7 @@ export function SettingsPage() {
                         type="url"
                         value={avatar}
                         onChange={(e) => setAvatar(e.target.value)}
-                        className="mt-1 w-full rounded-2xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none focus:border-[var(--color-forest)] dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-100"
+                        className="mt-1 w-full rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100"
                         placeholder="https://…"
                       />
                     </div>

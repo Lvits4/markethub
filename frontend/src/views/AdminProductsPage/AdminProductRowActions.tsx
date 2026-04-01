@@ -17,7 +17,7 @@ export function AdminProductRowActions({ productId, storeId }: Props) {
     <div className="flex flex-wrap justify-end gap-2">
       <Link
         to={routePaths.sellerProductEdit(productId)}
-        className="text-sm font-medium text-[var(--color-forest)] dark:text-emerald-400"
+        className="text-sm font-medium text-[var(--color-forest)] dark:text-blue-400"
       >
         Editar
       </Link>

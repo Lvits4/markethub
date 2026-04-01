@@ -8,7 +8,7 @@ import { useRegister } from '../../hooks/useRegister';
 import { registerSchema } from '../../validations/registerSchema';
 
 const inputClass =
-  'mt-1 w-full rounded-xl border border-zinc-200/90 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-auth-primary focus:bg-white focus:ring-2 focus:ring-auth-primary/18 dark:border-zinc-600 dark:bg-zinc-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:bg-zinc-950';
+  'mt-1 w-full rounded-md border border-zinc-200/90 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-auth-primary focus:bg-white focus:ring-2 focus:ring-auth-primary/18 dark:border-night-600 dark:bg-night-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:bg-night-950';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -120,10 +120,10 @@ export function RegisterPage() {
             <button
               type="button"
               onClick={() => setRole('CUSTOMER')}
-              className={`cursor-pointer rounded-xl border px-3 py-2 text-sm font-medium transition ${
+              className={`cursor-pointer rounded-md border px-3 py-2 text-sm font-medium transition ${
                 role === 'CUSTOMER'
                   ? 'border-auth-primary bg-auth-primary/8 text-auth-primary'
-                  : 'border-zinc-200 text-zinc-600 hover:border-zinc-300 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-500'
+                  : 'border-zinc-200 text-zinc-600 hover:border-zinc-300 dark:border-night-600 dark:text-zinc-300 dark:hover:border-zinc-500'
               }`}
             >
               Comprador
@@ -131,10 +131,10 @@ export function RegisterPage() {
             <button
               type="button"
               onClick={() => setRole('SELLER')}
-              className={`cursor-pointer rounded-xl border px-3 py-2 text-sm font-medium transition ${
+              className={`cursor-pointer rounded-md border px-3 py-2 text-sm font-medium transition ${
                 role === 'SELLER'
                   ? 'border-auth-primary bg-auth-primary/8 text-auth-primary'
-                  : 'border-zinc-200 text-zinc-600 hover:border-zinc-300 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-500'
+                  : 'border-zinc-200 text-zinc-600 hover:border-zinc-300 dark:border-night-600 dark:text-zinc-300 dark:hover:border-zinc-500'
               }`}
             >
               Vendedor
@@ -148,7 +148,7 @@ export function RegisterPage() {
         <button
           type="submit"
           disabled={registerMutation.isPending}
-          className="mt-3 w-full cursor-pointer rounded-xl bg-auth-primary py-3 text-sm font-semibold text-white shadow-md shadow-auth-primary/35 transition hover:bg-auth-primary-hover hover:shadow-lg hover:shadow-auth-primary/30 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50 disabled:active:translate-y-0"
+          className="mt-3 w-full cursor-pointer rounded-md bg-auth-primary py-3 text-sm font-semibold text-white shadow-md shadow-auth-primary/35 transition hover:bg-auth-primary-hover hover:shadow-lg hover:shadow-auth-primary/30 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50 disabled:active:translate-y-0"
         >
           {registerMutation.isPending ? 'Creando cuenta…' : 'Crear mi cuenta'}
         </button>

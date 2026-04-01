@@ -14,7 +14,6 @@ export const routePaths = {
   orderDetail: (id: string) => `/orders/${id}`,
   settings: '/settings',
   seller: '/seller',
-  sellerStores: '/seller/stores',
   sellerStoreProducts: (storeId: string) => `/seller/stores/${storeId}/products`,
   sellerProductNew: '/seller/products/new',
   sellerProductEdit: (id: string) => `/seller/products/${id}/edit`,

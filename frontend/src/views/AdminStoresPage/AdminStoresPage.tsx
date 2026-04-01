@@ -5,12 +5,17 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiChevronUp,
+  FiEdit2,
+  FiEye,
   FiSearch,
+  FiTrash2,
 } from 'react-icons/fi';
 import { Button } from '../../components/Button/Button';
+import { Modal } from '../../components/Modal/Modal';
+import { useSellerCreateStoreModal } from '../../context/SellerCreateStoreModalProvider/SellerCreateStoreModalProvider';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAdminDeleteStore } from '../../hooks/useAdminDeleteStore';
-import { useAdminPatchCommission } from '../../hooks/useAdminPatchCommission';
+import { useAdminStoreDetailQuery } from '../../queries/useAdminStoreDetailQuery';
 import { useAdminStoresQuery } from '../../queries/useAdminStoresQuery';
 import type { AdminStoreRow } from '../../types/admin';
 
@@ -24,8 +29,7 @@ type SortKey =
   | 'vendor'
   | 'status'
   | 'contactEmail'
-  | 'contactPhone'
-  | 'commission';
+  | 'contactPhone';
 
 type SortDir = 'asc' | 'desc';
 
@@ -67,9 +71,6 @@ function compareStores(
       cmp = (a.contactPhone ?? '').localeCompare(b.contactPhone ?? '', 'es', {
         numeric: true,
       });
-      break;
-    case 'commission':
-      cmp = numOrZero(a.commission) - numOrZero(b.commission);
       break;
     default:
       cmp = 0;
@@ -119,7 +120,7 @@ function SortHeader({
         <span className="inline-flex shrink-0 flex-col gap-0">
           <button
             type="button"
-            className={`rounded p-0.5 leading-none transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-700 ${active && dir === 'asc' ? 'text-[var(--color-forest)] dark:text-emerald-400' : 'text-zinc-400'}`}
+            className={`rounded-md p-0.5 leading-none transition-colors hover:bg-zinc-200 dark:hover:bg-night-700 ${active && dir === 'asc' ? 'text-[var(--color-forest)] dark:text-blue-400' : 'text-zinc-400'}`}
             aria-label={`Ordenar ${label} ascendente`}
             onClick={() => onSort(sortKey, 'asc')}
           >
@@ -127,7 +128,7 @@ function SortHeader({
           </button>
           <button
             type="button"
-            className={`-mt-1 rounded p-0.5 leading-none transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-700 ${active && dir === 'desc' ? 'text-[var(--color-forest)] dark:text-emerald-400' : 'text-zinc-400'}`}
+            className={`-mt-1 rounded-md p-0.5 leading-none transition-colors hover:bg-zinc-200 dark:hover:bg-night-700 ${active && dir === 'desc' ? 'text-[var(--color-forest)] dark:text-blue-400' : 'text-zinc-400'}`}
             aria-label={`Ordenar ${label} descendente`}
             onClick={() => onSort(sortKey, 'desc')}
           >
@@ -140,10 +141,9 @@ function SortHeader({
 }
 
 export function AdminStoresPage() {
+  const { openCreateStoreModal } = useSellerCreateStoreModal();
   const { data, isLoading, isError } = useAdminStoresQuery();
-  const patchCommission = useAdminPatchCommission();
   const deleteStore = useAdminDeleteStore();
-  const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
@@ -151,26 +151,16 @@ export function AdminStoresPage() {
   const [pageSize, setPageSize] = useState<(typeof PAGE_SIZE_OPTIONS)[number]>(
     PAGE_SIZE_OPTIONS[0],
   );
+  const [viewStoreId, setViewStoreId] = useState<string | null>(null);
+  const storeDetailQuery = useAdminStoreDetailQuery(viewStoreId);
 
-  useEffect(() => {
-    if (!data?.length) return;
-    setDrafts((prev) => {
-      const next = { ...prev };
-      for (const s of data) {
-        if (next[s.id] === undefined) {
-          next[s.id] = String(numOrZero(s.commission));
-        }
-      }
-      return next;
-    });
-  }, [data]);
+  const stores = Array.isArray(data) ? data : [];
 
   const filteredSorted = useMemo(() => {
-    if (!data?.length) return [];
     const q = search.trim();
-    const list = data.filter((s) => matchesSearch(s, q));
+    const list = stores.filter((s) => matchesSearch(s, q));
     return [...list].sort((a, b) => compareStores(a, b, sortKey, sortDir));
-  }, [data, search, sortKey, sortDir]);
+  }, [stores, search, sortKey, sortDir]);
 
   const totalPages = Math.max(
     1,
@@ -195,22 +185,6 @@ export function AdminStoresPage() {
     setSortDir(direction);
   }, []);
 
-  const saveCommission = (storeId: string) => {
-    const raw = drafts[storeId]?.trim() ?? '';
-    const n = Number.parseFloat(raw.replace(',', '.'));
-    if (!Number.isFinite(n) || n < 0 || n > 100) {
-      toast.error('Comisión debe ser un número entre 0 y 100');
-      return;
-    }
-    patchCommission.mutate(
-      { storeId, commission: n },
-      {
-        onSuccess: () => toast.success('Comisión actualizada'),
-        onError: (e) => toast.error(getErrorMessage(e)),
-      },
-    );
-  };
-
   const handleDelete = (s: AdminStoreRow) => {
     const ok = window.confirm(
       `¿Eliminar la tienda «${s.name}»? Se borrarán productos y pedidos asociados. Esta acción no se puede deshacer.`,
@@ -219,18 +193,13 @@ export function AdminStoresPage() {
     deleteStore.mutate(s.id, {
       onSuccess: () => {
         toast.success('Tienda eliminada');
-        setDrafts((d) => {
-          const next = { ...d };
-          delete next[s.id];
-          return next;
-        });
       },
       onError: (e) => toast.error(getErrorMessage(e)),
     });
   };
 
   return (
-    <div className="flex h-[calc(100dvh-7rem)] min-h-[420px] flex-col gap-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
       <h2 className="shrink-0 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
         Tiendas
       </h2>
@@ -241,32 +210,38 @@ export function AdminStoresPage() {
         <p className="text-center text-sm text-red-600">
           No se pudieron cargar las tiendas.
         </p>
-      ) : !data?.length ? (
-        <p className="text-center text-sm text-zinc-500">
-          No hay tiendas registradas.
-        </p>
       ) : (
-        <>
-          <div className="relative shrink-0">
-            <FiSearch
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
-              aria-hidden
-            />
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por tienda, slug, correo, teléfono o vendedor…"
-              className="w-full rounded-2xl border border-zinc-200 bg-white py-2.5 pl-10 pr-4 text-sm text-zinc-900 shadow-sm ring-zinc-200 placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:outline-none focus:ring-2 focus:ring-[var(--color-forest)]/25 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50 dark:ring-zinc-800"
-              aria-label="Buscar tiendas"
-            />
+        <div className="flex min-h-0 flex-1 flex-col gap-4">
+          <div className="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="relative min-w-0 flex-1">
+              <FiSearch
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
+                aria-hidden
+              />
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar por tienda, slug, correo, teléfono o vendedor…"
+                className="box-border h-11 w-full rounded-md border border-zinc-200 bg-white py-0 pl-10 pr-4 text-sm leading-normal text-zinc-900 shadow-sm ring-zinc-200 placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:outline-none focus:ring-2 focus:ring-[var(--color-forest)]/25 dark:border-night-700 dark:bg-night-950 dark:text-zinc-50 dark:ring-night-800"
+                aria-label="Buscar tiendas"
+              />
+            </div>
+            <Button
+              type="button"
+              variant="primary"
+              className="h-11 min-h-11 shrink-0 border-0 px-6 py-0 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e]"
+              onClick={() => openCreateStoreModal()}
+            >
+              Crear tienda
+            </Button>
           </div>
 
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-zinc-800">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-zinc-200/80 bg-white/70 shadow-lg shadow-zinc-900/[0.06] backdrop-blur-xl dark:border-blue-500/15 dark:bg-night-900/55 dark:shadow-[0_24px_48px_-12px_rgb(0_0_0/0.45)] dark:backdrop-blur-xl">
             <div className="min-h-0 flex-1 overflow-auto">
               <table className="w-full min-w-[900px] text-left text-sm">
-                <thead className="sticky top-0 z-10 bg-zinc-50/95 backdrop-blur-sm dark:bg-zinc-900/95">
-                  <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+                <thead className="sticky top-0 z-10 bg-zinc-100/85 backdrop-blur-md dark:bg-night-800/80 dark:backdrop-blur-md">
+                  <tr className="border-b border-zinc-200/60 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:border-night-700/80 dark:text-zinc-400">
                     <SortHeader
                       label="Tienda"
                       sortKey="name"
@@ -302,13 +277,9 @@ export function AdminStoresPage() {
                       dir={sortDir}
                       onSort={handleSort}
                     />
-                    <SortHeader
-                      label="Comisión %"
-                      sortKey="commission"
-                      activeKey={sortKey}
-                      dir={sortDir}
-                      onSort={handleSort}
-                    />
+                    <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                      Comisión
+                    </th>
                     <th className="px-5 py-3 text-right">Acción</th>
                   </tr>
                 </thead>
@@ -319,14 +290,16 @@ export function AdminStoresPage() {
                         colSpan={7}
                         className="px-5 py-12 text-center text-sm text-zinc-500"
                       >
-                        Ninguna tienda coincide con la búsqueda.
+                        {stores.length === 0
+                          ? 'No hay tiendas registradas.'
+                          : 'Ninguna tienda coincide con la búsqueda.'}
                       </td>
                     </tr>
                   ) : (
                     pageRows.map((s) => (
                       <tr
                         key={s.id}
-                        className="border-b border-zinc-50 last:border-0 dark:border-zinc-800/80"
+                        className="border-b border-zinc-200/40 last:border-0 dark:border-night-700/50"
                       >
                         <td className="px-5 py-3 align-top">
                           <p className="font-medium text-zinc-900 dark:text-zinc-50">
@@ -357,7 +330,7 @@ export function AdminStoresPage() {
                         <td className="px-5 py-3 align-top">
                           <span className="text-xs">
                             {s.isApproved ? (
-                              <span className="text-[var(--color-forest)] dark:text-emerald-400">
+                              <span className="text-[var(--color-forest)] dark:text-blue-400">
                                 Aprobada
                               </span>
                             ) : (
@@ -372,37 +345,38 @@ export function AdminStoresPage() {
                             )}
                           </span>
                         </td>
-                        <td className="px-5 py-3 align-top">
-                          <input
-                            type="text"
-                            inputMode="decimal"
-                            className="w-24 rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-950"
-                            value={drafts[s.id] ?? ''}
-                            onChange={(e) =>
-                              setDrafts((d) => ({ ...d, [s.id]: e.target.value }))
-                            }
-                            aria-label={`Comisión ${s.name}`}
-                          />
+                        <td className="px-5 py-3 align-top text-zinc-600 tabular-nums dark:text-zinc-300">
+                          {numOrZero(s.commission)}%
                         </td>
                         <td className="px-5 py-3 align-top text-right">
-                          <div className="flex flex-col items-end gap-1 sm:flex-row sm:justify-end sm:gap-2">
+                          <div className="flex flex-wrap items-center justify-end gap-1">
                             <Button
                               type="button"
-                              variant="ghost"
-                              className="text-xs"
-                              disabled={patchCommission.isPending}
-                              onClick={() => saveCommission(s.id)}
+                              variant="icon"
+                              className="text-[#458bde] hover:bg-blue-50 dark:text-[#458bde] dark:hover:bg-blue-950/35"
+                              aria-label={`Ver detalle de ${s.name}`}
+                              onClick={() => setViewStoreId(s.id)}
                             >
-                              Guardar comisión
+                              <FiEye className="h-4 w-4" aria-hidden />
                             </Button>
                             <Button
                               type="button"
-                              variant="ghost"
-                              className="text-xs text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
+                              variant="icon"
+                              className="text-[var(--color-forest)] hover:bg-zinc-100 dark:text-blue-400 dark:hover:bg-night-800"
+                              aria-label={`Editar ${s.name}`}
+                              onClick={() => setViewStoreId(s.id)}
+                            >
+                              <FiEdit2 className="h-4 w-4" aria-hidden />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="icon"
+                              className="text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
                               disabled={deleteStore.isPending}
+                              aria-label={`Eliminar ${s.name}`}
                               onClick={() => handleDelete(s)}
                             >
-                              Eliminar
+                              <FiTrash2 className="h-4 w-4" aria-hidden />
                             </Button>
                           </div>
                         </td>
@@ -413,7 +387,7 @@ export function AdminStoresPage() {
               </table>
             </div>
 
-            <div className="flex shrink-0 flex-col gap-3 border-t border-zinc-100 px-4 py-3 dark:border-zinc-800 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex shrink-0 flex-col gap-3 border-t border-zinc-200/60 bg-zinc-50/50 px-4 py-3 backdrop-blur-sm dark:border-night-700/80 dark:bg-night-800/40 dark:backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs text-zinc-500">
                 {filteredSorted.length === 0
                   ? '0 tiendas'
@@ -429,7 +403,7 @@ export function AdminStoresPage() {
                         Number(e.target.value) as (typeof PAGE_SIZE_OPTIONS)[number],
                       )
                     }
-                    className="rounded-lg border border-zinc-200 bg-white px-2 py-1 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50"
+                    className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-sm text-zinc-900 dark:border-night-700 dark:bg-night-950 dark:text-zinc-50"
                   >
                     {PAGE_SIZE_OPTIONS.map((n) => (
                       <option key={n} value={n}>
@@ -466,7 +440,32 @@ export function AdminStoresPage() {
               </div>
             </div>
           </div>
-        </>
+
+          <Modal
+            open={viewStoreId != null}
+            onClose={() => setViewStoreId(null)}
+            title={
+              storeDetailQuery.data?.name
+                ? `Tienda: ${storeDetailQuery.data.name}`
+                : 'Detalle de tienda'
+            }
+            wide
+          >
+            <div className="min-h-0 flex-1 overflow-auto px-5 py-4">
+              {storeDetailQuery.isLoading ? (
+                <p className="text-sm text-zinc-500">Cargando detalle…</p>
+              ) : storeDetailQuery.isError ? (
+                <p className="text-sm text-red-600">
+                  No se pudo cargar el detalle de la tienda.
+                </p>
+              ) : storeDetailQuery.data ? (
+                <pre className="whitespace-pre-wrap break-words rounded-md bg-zinc-50 p-4 font-mono text-xs text-zinc-800 dark:bg-night-950 dark:text-zinc-200">
+                  {JSON.stringify(storeDetailQuery.data, null, 2)}
+                </pre>
+              ) : null}
+            </div>
+          </Modal>
+        </div>
       )}
     </div>
   );

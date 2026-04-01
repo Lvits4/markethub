@@ -3,7 +3,7 @@ import { useSellerReportQuery } from '../../queries/useSellerReportQuery';
 
 function StatBlock({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:ring-zinc-800">
+    <div className="rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
       <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
         {label}
       </p>
@@ -26,7 +26,7 @@ export function SellerReportPage() {
         Informe de ventas
       </h2>
       <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-        Datos de <code className="rounded bg-zinc-100 px-1 text-xs dark:bg-zinc-800">GET /orders/store/report</code>
+        Datos de <code className="rounded-md bg-zinc-100 px-1 text-xs dark:bg-night-800">GET /orders/store/report</code>
         .
       </p>
 
@@ -49,10 +49,10 @@ export function SellerReportPage() {
             />
           </div>
           {data.productSales.length > 0 ? (
-            <div className="mt-8 overflow-x-auto rounded-2xl bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-zinc-900 dark:ring-zinc-800">
+            <div className="mt-8 overflow-x-auto rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
               <table className="w-full min-w-[480px] text-left text-sm">
                 <thead>
-                  <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800">
+                  <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-night-800">
                     <th className="px-4 py-3">Producto</th>
                     <th className="px-4 py-3">Unidades</th>
                     <th className="px-4 py-3">Ingresos</th>
@@ -62,7 +62,7 @@ export function SellerReportPage() {
                   {data.productSales.map((row, i) => (
                     <tr
                       key={`${row.name}-${i}`}
-                      className="border-b border-zinc-50 last:border-0 dark:border-zinc-800/80"
+                      className="border-b border-zinc-50 last:border-0 dark:border-night-800/80"
                     >
                       <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-50">
                         {row.name}

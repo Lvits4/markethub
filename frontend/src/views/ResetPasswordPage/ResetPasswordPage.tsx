@@ -58,7 +58,7 @@ export function ResetPasswordPage() {
             type="text"
             value={token}
             onChange={(e) => setToken(e.target.value)}
-            className="mt-1 w-full rounded-xl border border-zinc-200/90 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none dark:border-zinc-600 dark:bg-zinc-950/80 dark:text-zinc-100"
+            className="mt-1 w-full rounded-md border border-zinc-200/90 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none dark:border-night-600 dark:bg-night-950/80 dark:text-zinc-100"
             placeholder="Pega el token aquí"
           />
         </div>
@@ -73,7 +73,7 @@ export function ResetPasswordPage() {
         <button
           type="submit"
           disabled={pending}
-          className="mt-2 w-full cursor-pointer rounded-xl bg-auth-primary py-3 text-sm font-semibold text-white shadow-md transition hover:bg-auth-primary-hover disabled:opacity-50"
+          className="mt-2 w-full cursor-pointer rounded-md bg-auth-primary py-3 text-sm font-semibold text-white shadow-md transition hover:bg-auth-primary-hover disabled:opacity-50"
         >
           {pending ? 'Guardando…' : 'Guardar contraseña'}
         </button>

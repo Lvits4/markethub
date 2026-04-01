@@ -21,7 +21,7 @@ export function AuthBrand({
       } ${className}`.trim()}
     >
       <span
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg font-bold shadow-md ring-2 ${
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-lg font-bold shadow-md ring-2 ${
           onDark
             ? 'bg-white/15 text-white shadow-black/20 ring-white/25'
             : 'bg-auth-primary text-white shadow-auth-primary/40 ring-white/25 dark:ring-white/15'
