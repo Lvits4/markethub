@@ -1,8 +1,10 @@
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { Button } from '../Button/Button';
 import { FormSelect } from './FormSelect';
+import { ProductImagesField } from './ProductImagesField';
+import { StepperNumberInput } from './StepperNumberInput';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAuth } from '../../hooks/useAuth';
 import { useCreateProductMutation } from '../../hooks/useProductSellerMutations';
@@ -49,8 +51,8 @@ export function CreateProductForm({
   const [price, setPrice] = useState('');
   const [stock, setStock] = useState('0');
   const [categoryId, setCategoryId] = useState('');
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [uploading, setUploading] = useState(false);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
   const createMut = useCreateProductMutation(storeId || undefined);
@@ -81,8 +83,8 @@ export function CreateProductForm({
     setPrice('');
     setStock('0');
     setCategoryId('');
-    setImageUrls([]);
-    setUploading(false);
+    setImageFiles([]);
+    setIsUploadingImages(false);
     setErrors({});
   };
 
@@ -113,23 +115,7 @@ export function CreateProductForm({
 
   const goBack = () => setStep((s) => Math.max(0, s - 1));
 
-  const handleUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !token) return;
-    setUploading(true);
-    try {
-      const res = await uploadFile(token, file, 'products');
-      setImageUrls((prev) => [...prev, res.url]);
-      toast.success('Imagen subida');
-    } catch (err) {
-      toast.error(getErrorMessage(err));
-    } finally {
-      setUploading(false);
-      e.target.value = '';
-    }
-  };
-
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!validateStep(0)) {
       setStep(0);
       return;
@@ -143,10 +129,29 @@ export function CreateProductForm({
     const pr = Number.parseFloat(price.replace(',', '.'));
     const st = Number.parseInt(stock, 10);
 
-    const images =
-      imageUrls.length > 0
-        ? imageUrls.map((url, i) => ({ url, sortOrder: i }))
-        : undefined;
+    let imagePayload: { url: string; sortOrder: number }[] | undefined =
+      undefined;
+
+    if (imageFiles.length > 0) {
+      if (!token) {
+        toast.error('No hay sesión para subir imágenes.');
+        return;
+      }
+      setIsUploadingImages(true);
+      const urls: string[] = [];
+      try {
+        for (const file of imageFiles) {
+          const res = await uploadFile(token, file, 'products');
+          urls.push(res.url);
+        }
+      } catch (err) {
+        toast.error(getErrorMessage(err));
+        setIsUploadingImages(false);
+        return;
+      }
+      setIsUploadingImages(false);
+      imagePayload = urls.map((url, i) => ({ url, sortOrder: i }));
+    }
 
     createMut.mutate(
       {
@@ -156,7 +161,7 @@ export function CreateProductForm({
         stock: st,
         storeId,
         categoryId: categoryId || undefined,
-        images,
+        images: imagePayload,
       },
       {
         onSuccess: () => {
@@ -169,7 +174,7 @@ export function CreateProductForm({
     );
   };
 
-  const disabledNav = createMut.isPending || uploading;
+  const disabledNav = createMut.isPending || isUploadingImages;
   const errorFieldClass =
     'border-red-500 focus:border-red-500 focus:ring-red-500/20 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400/20';
 
@@ -293,18 +298,19 @@ export function CreateProductForm({
                     Precio{' '}
                     <span className="text-red-600 dark:text-red-400">*</span>
                   </label>
-                  <input
+                  <StepperNumberInput
                     id="create-product-price"
-                    type="number"
+                    mode="money"
+                    step={0.01}
                     min={0}
-                    step="0.01"
                     placeholder="0.00"
                     value={price}
-                    onChange={(e) => {
-                      setPrice(e.target.value);
+                    onChange={(v) => {
+                      setPrice(v);
                       setErrors((prev) => ({ ...prev, price: undefined }));
                     }}
-                    className={`${fieldClass} ${errors.price ? errorFieldClass : ''}`}
+                    error={Boolean(errors.price)}
+                    disabled={disabledNav}
                   />
                   {errors.price ? (
                     <p className="mt-1 text-xs text-red-600 dark:text-red-400">
@@ -320,17 +326,19 @@ export function CreateProductForm({
                     Stock{' '}
                     <span className="text-red-600 dark:text-red-400">*</span>
                   </label>
-                  <input
+                  <StepperNumberInput
                     id="create-product-stock"
-                    type="number"
+                    mode="int"
+                    step={1}
                     min={0}
                     placeholder="0"
                     value={stock}
-                    onChange={(e) => {
-                      setStock(e.target.value);
+                    onChange={(v) => {
+                      setStock(v);
                       setErrors((prev) => ({ ...prev, stock: undefined }));
                     }}
-                    className={`${fieldClass} ${errors.stock ? errorFieldClass : ''}`}
+                    error={Boolean(errors.stock)}
+                    disabled={disabledNav}
                   />
                   {errors.stock ? (
                     <p className="mt-1 text-xs text-red-600 dark:text-red-400">
@@ -340,39 +348,23 @@ export function CreateProductForm({
                 </div>
               </div>
               <div>
-                <label className={labelClass}>
-                  Imágenes (subir archivo)
+                <label
+                  htmlFor="create-product-images"
+                  className={labelClass}
+                >
+                  Imágenes
                 </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={uploading || !token}
-                  onChange={(e) => void handleUpload(e)}
-                  className="mt-1 block w-full text-sm"
-                />
-                {imageUrls.length > 0 ? (
-                  <ul className="mt-2 space-y-1 text-xs text-zinc-500">
-                    {imageUrls.map((u) => (
-                      <li
-                        key={u}
-                        className="flex items-center justify-between gap-2"
-                      >
-                        <span className="truncate font-mono">{u}</span>
-                        <button
-                          type="button"
-                          className="shrink-0 cursor-pointer text-red-600"
-                          onClick={() =>
-                            setImageUrls((prev) =>
-                              prev.filter((x) => x !== u),
-                            )
-                          }
-                        >
-                          Quitar
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
+                <p className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-500">
+                  Opcional. Se suben al pulsar «Crear producto».
+                </p>
+                <div className="mt-2">
+                  <ProductImagesField
+                    id="create-product-images"
+                    files={imageFiles}
+                    onChange={setImageFiles}
+                    disabled={disabledNav || !token}
+                  />
+                </div>
               </div>
             </>
           ) : null}
@@ -426,10 +418,14 @@ export function CreateProductForm({
               type="button"
               variant="primary"
               disabled={disabledNav}
-              onClick={handleCreate}
+              onClick={() => void handleCreate()}
               className="h-11 min-h-11 min-w-0 flex-1 justify-center border-0 px-3 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e] sm:min-w-[11rem]"
             >
-              {createMut.isPending ? 'Creando…' : 'Crear producto'}
+              {isUploadingImages
+                ? 'Subiendo imágenes…'
+                : createMut.isPending
+                  ? 'Creando…'
+                  : 'Crear producto'}
             </Button>
           )}
         </div>
