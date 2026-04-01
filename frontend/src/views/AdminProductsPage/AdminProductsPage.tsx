@@ -20,6 +20,7 @@ import {
   FiTrash2,
   FiX,
 } from 'react-icons/fi';
+import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminEditProductForm } from '../../components/AdminEditProductForm/AdminEditProductForm';
@@ -168,15 +169,9 @@ function ProductDetailsPanel({ product }: { product: Product }) {
             <span className="rounded border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
               Stock: {product.stock}
             </span>
-            <span
-              className={`rounded border px-2 py-0.5 text-[11px] font-semibold ${
-                product.isActive
-                  ? 'border-emerald-200/80 bg-emerald-50 text-emerald-700 dark:border-emerald-500/35 dark:bg-emerald-500/10 dark:text-emerald-300'
-                  : 'border-rose-200/80 bg-rose-50 text-rose-700 dark:border-rose-500/35 dark:bg-rose-500/10 dark:text-rose-300'
-              }`}
-            >
+            <AdminStatusBadge tone={product.isActive ? 'success' : 'danger'}>
               {product.isActive ? 'Activo' : 'Inactivo'}
-            </span>
+            </AdminStatusBadge>
           </div>
         </section>
 
@@ -219,39 +214,15 @@ function ProductDetailsPanel({ product }: { product: Product }) {
   );
 }
 
-function adminProductRowFromDetail(p: Product): AdminProductRow {
-  return {
-    id: p.id,
-    name: p.name,
-    slug: p.slug,
-    price: p.price,
-    stock: p.stock,
-    isActive: p.isActive,
-    storeId: p.storeId,
-    store: p.store
-      ? { id: p.store.id, name: p.store.name, slug: p.store.slug }
-      : undefined,
-    category: p.category
-      ? { id: p.category.id, name: p.category.name }
-      : null,
-  };
-}
-
 function ProductDetailsDrawer({
   open,
   onClose,
-  onEdit,
-  onRequestDelete,
-  deleteDisabled,
   isLoading,
   isError,
   product,
 }: {
   open: boolean;
   onClose: () => void;
-  onEdit: () => void;
-  onRequestDelete?: () => void;
-  deleteDisabled?: boolean;
   isLoading: boolean;
   isError: boolean;
   product?: Product;
@@ -278,7 +249,7 @@ function ProductDetailsDrawer({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-80 flex items-stretch justify-end bg-black/35"
+      className="fixed inset-0 z-80 flex cursor-pointer items-stretch justify-end bg-black/35"
       role="presentation"
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -288,7 +259,7 @@ function ProductDetailsDrawer({
         role="dialog"
         aria-modal="true"
         aria-label="Detalle de producto"
-        className="flex h-full w-full max-w-[640px] flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-[#0b152f]"
+        className="flex h-full w-full max-w-[640px] cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-[#0b152f]"
         onPointerDown={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-[#0d1938]">
@@ -296,26 +267,6 @@ function ProductDetailsDrawer({
             Panel de detalles
           </h2>
           <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-8 px-3 text-xs"
-              onClick={onEdit}
-              disabled={!product}
-            >
-              Editar
-            </Button>
-            {onRequestDelete ? (
-              <Button
-                type="button"
-                variant="outline"
-                className="h-8 border-rose-200 px-3 text-xs text-rose-700 hover:bg-rose-50 dark:border-rose-500/40 dark:text-rose-300 dark:hover:bg-rose-950/40"
-                onClick={onRequestDelete}
-                disabled={!product || deleteDisabled}
-              >
-                Eliminar
-              </Button>
-            ) : null}
             <Button
               type="button"
               variant="icon"
@@ -484,17 +435,6 @@ export function AdminProductsPage() {
     });
   };
 
-  const openDeleteForViewedProduct = useCallback(() => {
-    if (!viewProductId) return;
-    const row = products.find((x) => x.id === viewProductId);
-    if (row) {
-      setProductToDelete(row);
-      return;
-    }
-    const d = productDetailQuery.data;
-    if (d) setProductToDelete(adminProductRowFromDetail(d));
-  }, [viewProductId, products, productDetailQuery.data]);
-
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <h2 className="flex shrink-0 items-center gap-2.5 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
@@ -654,17 +594,9 @@ export function AdminProductsPage() {
                             {p.stock}
                           </td>
                           <td className="px-4 py-2 align-middle">
-                            <span className="text-xs leading-tight">
-                              {p.isActive ? (
-                                <span className="text-[var(--color-forest)] dark:text-sky-400">
-                                  Activo
-                                </span>
-                              ) : (
-                                <span className="text-red-600 dark:text-red-400">
-                                  Inactivo
-                                </span>
-                              )}
-                            </span>
+                            <AdminStatusBadge tone={p.isActive ? 'success' : 'danger'}>
+                              {p.isActive ? 'Activo' : 'Inactivo'}
+                            </AdminStatusBadge>
                           </td>
                           <td className="px-4 py-2 align-middle text-center">
                             <div className="flex flex-nowrap items-center justify-center gap-1.5">
@@ -818,9 +750,6 @@ export function AdminProductsPage() {
               setViewProductId(null);
               setMode('view');
             }}
-            onEdit={() => setMode('edit')}
-            onRequestDelete={openDeleteForViewedProduct}
-            deleteDisabled={deleteMut.isPending}
             isLoading={productDetailQuery.isLoading}
             isError={productDetailQuery.isError}
             product={productDetailQuery.data}

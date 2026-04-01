@@ -57,6 +57,15 @@ export type AdminStoreDetailUser = {
   updatedAt: string;
 };
 
+/** Agregados en GET /admin/stores/:id para el panel de detalle. */
+export type AdminStoreDetailStats = {
+  productsTotal: number;
+  productsActive: number;
+  ordersTotal: number;
+  ordersDelivered: number;
+  revenue: number;
+};
+
 export type AdminStoreDetail = {
   id: string;
   name: string;
@@ -76,6 +85,7 @@ export type AdminStoreDetail = {
   user?: AdminStoreDetailUser;
   createdAt: string;
   updatedAt: string;
+  stats?: AdminStoreDetailStats;
 };
 
 export type AdminProductRow = {

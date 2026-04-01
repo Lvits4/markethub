@@ -37,7 +37,7 @@ export function AdminAccountSettingsDrawer({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-80 flex items-stretch justify-end bg-black/35"
+      className="fixed inset-0 z-80 flex cursor-pointer items-stretch justify-end bg-black/35"
       role="presentation"
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -47,7 +47,7 @@ export function AdminAccountSettingsDrawer({
         role="dialog"
         aria-modal="true"
         aria-label="Ajustes de cuenta"
-        className="flex h-full w-full max-w-[640px] flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-[#0b152f]"
+        className="flex h-full w-full max-w-[640px] cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-[#0b152f]"
         onPointerDown={(e) => e.stopPropagation()}
       >
         <div className="flex shrink-0 items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-[#0d1938]">

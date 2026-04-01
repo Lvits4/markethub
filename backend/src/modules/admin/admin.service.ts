@@ -295,6 +295,47 @@ export class AdminService {
     if (!store) {
       throw new NotFoundException('Tienda no encontrada');
     }
+
+    const [productsTotal, productsActive, rawStats] = await Promise.all([
+      this.productsRepository.count({ where: { storeId } }),
+      this.productsRepository.count({ where: { storeId, isActive: true } }),
+      this.ordersRepository
+        .createQueryBuilder('o')
+        .select('COUNT(o.id)', 'ordersTotal')
+        .addSelect(
+          'COALESCE(SUM(CASE WHEN o.status != :cancelled THEN o.total_amount ELSE 0 END), 0)',
+          'revenue',
+        )
+        .addSelect(
+          'COALESCE(SUM(CASE WHEN o.status = :delivered THEN 1 ELSE 0 END), 0)',
+          'ordersDelivered',
+        )
+        .where('o.store_id = :storeId', { storeId })
+        .setParameters({
+          cancelled: OrderStatus.CANCELLED,
+          delivered: OrderStatus.DELIVERED,
+        })
+        .getRawOne<{
+          ordersTotal: string;
+          revenue: string | null;
+          ordersDelivered: string | null;
+        }>(),
+    ]);
+
+    const ordersTotal =
+      Number.parseInt(String(rawStats?.ordersTotal ?? '0'), 10) || 0;
+    const ordersDelivered =
+      Number.parseInt(String(rawStats?.ordersDelivered ?? '0'), 10) || 0;
+    const revenue = parseFloat(String(rawStats?.revenue ?? '0')) || 0;
+
+    const stats = {
+      productsTotal,
+      productsActive,
+      ordersTotal,
+      ordersDelivered,
+      revenue,
+    };
+
     const u = store.user;
     if (u) {
       const {
@@ -307,9 +348,9 @@ export class AdminService {
         passwordResetToken?: string | null;
         passwordResetExpires?: Date | null;
       };
-      return { ...store, user: safeUser };
+      return { ...store, user: safeUser, stats };
     }
-    return store;
+    return { ...store, stats };
   }
 
   async getAllProducts() {

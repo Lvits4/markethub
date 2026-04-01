@@ -1,12 +1,15 @@
-import { useEffect, useId, useRef, useState, type ChangeEvent } from 'react';
+import { useId, useRef, useState, type ChangeEvent } from 'react';
 import toast from 'react-hot-toast';
 import { FiImage, FiUpload, FiX } from 'react-icons/fi';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAuth } from '../../hooks/useAuth';
-import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc';
 import { uploadFile } from '../../requests/fileRequests';
 
 const labelClass = 'text-xs font-medium text-zinc-600 dark:text-zinc-300';
+
+function truncateUrl(url: string) {
+  return url.length > 48 ? `${url.slice(0, 22)}…${url.slice(-20)}` : url;
+}
 
 type LogoUploadFieldProps = {
   value: string;
@@ -14,7 +17,7 @@ type LogoUploadFieldProps = {
   disabled?: boolean;
   /** Carpeta en el backend (p. ej. stores) */
   uploadFolder?: string;
-  /** Si es false, solo selecciona y previsualiza; no sube automáticamente. */
+  /** Si es false, solo selecciona; no sube automáticamente. */
   uploadOnSelect?: boolean;
   /** Archivo seleccionado cuando uploadOnSelect es false. */
   onFileChange?: (file: File | null) => void;
@@ -36,43 +39,8 @@ export function LogoUploadField({
   const inputId = useId();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState('');
-  const { src: valueSrc, loading: valueLoading } = useProtectedImageSrc(
-    value,
-    token,
-  );
-
-  const clearPreview = () => {
-    setPreviewUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return '';
-    });
-  };
-
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
-
-  useEffect(() => {
-    if (uploadOnSelect) return;
-    if (!selectedFile) {
-      clearPreview();
-      return;
-    }
-    clearPreview();
-    const next = URL.createObjectURL(selectedFile);
-    setPreviewUrl(next);
-  }, [selectedFile, uploadOnSelect]);
-
-  const setPreviewFromFile = (file: File) => {
-    clearPreview();
-    const next = URL.createObjectURL(file);
-    setPreviewUrl(next);
-  };
+  const [dragOver, setDragOver] = useState(false);
+  const dragDepth = useRef(0);
 
   const uploadSelectedFile = async (file: File) => {
     if (!token) {
@@ -106,24 +74,77 @@ export function LogoUploadField({
       return;
     }
     if (!uploadOnSelect) {
-      setPreviewFromFile(file);
       onFileChange?.(file);
       return;
     }
     await uploadSelectedFile(file);
   };
 
+  const processDroppedOrPicked = (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('El archivo debe ser una imagen');
+      return;
+    }
+    if (!uploadOnSelect) {
+      onFileChange?.(file);
+      return;
+    }
+    void uploadSelectedFile(file);
+  };
+
   const busy = disabled || uploading;
-  const hasValuePreview = Boolean(value.trim());
-  const showPreviewSlot = hasValuePreview || Boolean(previewUrl);
-  const imgSrc = previewUrl || valueSrc;
+  const hasPendingFile = Boolean(selectedFile);
+  const hasSavedUrl = Boolean(value.trim());
+  const zoneClass = `flex w-full flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed px-4 py-8 text-center transition-colors ${
+    busy || !token
+      ? 'cursor-not-allowed border-zinc-200 bg-zinc-50/40 opacity-50 dark:border-night-700 dark:bg-night-950/30'
+      : dragOver
+        ? 'cursor-pointer border-[#1f6feb] bg-blue-50/80 dark:border-sky-400 dark:bg-sky-500/10'
+        : 'cursor-pointer border-zinc-300 bg-zinc-50/60 hover:border-zinc-400 hover:bg-zinc-100/80 dark:border-night-600 dark:bg-night-950/40 dark:hover:border-sky-500/35 dark:hover:bg-night-900/60'
+  }`;
+
+  const listRowClass =
+    'flex items-center justify-between gap-2 rounded-md border border-zinc-200 bg-zinc-50/80 px-3 py-2 dark:border-night-600 dark:bg-night-900/60';
+
+  const fileInputId = `${inputId}-logo-file`;
+
+  const zoneBody = (
+    <>
+      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-200/90 text-zinc-600 transition-colors group-hover:bg-zinc-300/90 dark:bg-night-700 dark:text-sky-300/90 dark:group-hover:bg-night-600">
+        {uploading ? (
+          <FiUpload className="h-6 w-6 animate-pulse" aria-hidden />
+        ) : dragOver ? (
+          <FiUpload className="h-6 w-6" aria-hidden />
+        ) : (
+          <FiImage className="h-6 w-6" aria-hidden />
+        )}
+      </span>
+      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+        {uploading ? (
+          'Subiendo…'
+        ) : (
+          <>
+            Arrastra una imagen aquí o{' '}
+            <span className="text-[var(--color-forest)] underline decoration-transparent underline-offset-2 transition-colors group-hover:decoration-current dark:text-sky-400">
+              elige archivo
+            </span>
+          </>
+        )}
+      </span>
+      <span className="max-w-xs text-xs text-zinc-500 dark:text-zinc-500">
+        PNG, JPG, WebP…
+      </span>
+    </>
+  );
 
   return (
-    <div>
+    <div className="space-y-3">
       <p id={`${inputId}-label`} className={labelClass}>
         Logo de la tienda
       </p>
       <input
+        id={fileInputId}
         ref={fileRef}
         type="file"
         accept="image/*"
@@ -132,83 +153,89 @@ export function LogoUploadField({
         disabled={busy || !token}
         onChange={(e) => void handleFile(e)}
       />
-      <div className="mt-0.5 flex flex-col gap-2 sm:flex-row sm:items-stretch">
-        <button
-          type="button"
-          disabled={busy || !token}
-          onClick={() => fileRef.current?.click()}
+
+      {busy || !token ? (
+        <div className={`group ${zoneClass}`}>{zoneBody}</div>
+      ) : (
+        <label
+          htmlFor={fileInputId}
+          className={`group ${zoneClass}`}
+          onDragEnter={(e) => {
+            e.preventDefault();
+            dragDepth.current += 1;
+            setDragOver(true);
+          }}
+          onDragLeave={(e) => {
+            e.preventDefault();
+            dragDepth.current = Math.max(0, dragDepth.current - 1);
+            if (dragDepth.current === 0) setDragOver(false);
+          }}
           onDragOver={(e) => {
             e.preventDefault();
-            e.stopPropagation();
+            e.dataTransfer.dropEffect = 'copy';
           }}
           onDrop={(e) => {
             e.preventDefault();
-            e.stopPropagation();
-            const file = e.dataTransfer.files?.[0];
-            if (!file) return;
-            if (!file.type.startsWith('image/')) {
-              toast.error('El archivo debe ser una imagen');
-              return;
-            }
-            if (!uploadOnSelect) {
-              setPreviewFromFile(file);
-              onFileChange?.(file);
-              return;
-            }
-            void uploadSelectedFile(file);
+            dragDepth.current = 0;
+            setDragOver(false);
+            processDroppedOrPicked(e.dataTransfer.files?.[0]);
           }}
-          className="flex h-[7rem] flex-1 flex-col items-center justify-center gap-2 rounded-md border border-dashed border-zinc-300 bg-zinc-50 px-4 py-3 text-sm text-zinc-600 transition hover:border-[var(--color-forest)] hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-night-600 dark:bg-night-950 dark:text-zinc-400 dark:hover:border-blue-500 dark:hover:bg-night-900"
         >
-          {uploading ? (
-            <span>Subiendo…</span>
-          ) : (
-            <>
-              <FiUpload className="h-5 w-5 text-zinc-400 dark:text-zinc-500" aria-hidden />
-              <span>
-                {showPreviewSlot
-                  ? 'Cambiar imagen'
-                  : 'Haz clic o suelta una imagen aquí'}
-              </span>
-              <span className="text-[11px] text-zinc-400">PNG, JPG, WebP…</span>
-            </>
-          )}
-        </button>
-        {showPreviewSlot ? (
-          <div className="relative flex h-[7rem] w-full shrink-0 overflow-hidden rounded-md border border-zinc-200 bg-white dark:border-night-700 dark:bg-night-900 sm:w-[7rem]">
-            {imgSrc ? (
-              <img
-                src={imgSrc}
-                alt=""
-                className="h-full w-full object-contain"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-zinc-50 text-xs text-zinc-500 dark:bg-night-950 dark:text-zinc-400">
-                {valueLoading ? 'Cargando…' : 'Sin vista previa'}
-              </div>
-            )}
+          {zoneBody}
+        </label>
+      )}
+
+      {hasPendingFile ? (
+        <ul className="space-y-2">
+          <li className={listRowClass}>
+            <span
+              className="min-w-0 truncate text-xs font-medium text-zinc-700 dark:text-zinc-200"
+              title={selectedFile!.name}
+            >
+              {selectedFile!.name}
+            </span>
             <button
               type="button"
               disabled={busy}
-              onClick={() => {
-                clearPreview();
+              onClick={(e) => {
+                e.stopPropagation();
                 onFileChange?.(null);
+              }}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-200 hover:text-zinc-800 disabled:opacity-50 dark:hover:bg-night-700 dark:hover:text-zinc-200"
+              aria-label="Quitar imagen seleccionada"
+            >
+              <FiX className="h-4 w-4" strokeWidth={2.5} aria-hidden />
+            </button>
+          </li>
+        </ul>
+      ) : null}
+
+      {!hasPendingFile && hasSavedUrl ? (
+        <ul className="space-y-2">
+          <li className={listRowClass}>
+            <span className="min-w-0 text-xs text-zinc-600 dark:text-zinc-400">
+              <span className="font-medium text-zinc-700 dark:text-zinc-200">
+                Imagen actual:{' '}
+              </span>
+              <span className="font-mono" title={value.trim()}>
+                {truncateUrl(value.trim())}
+              </span>
+            </span>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={(e) => {
+                e.stopPropagation();
                 onChange('');
               }}
-              className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-md bg-zinc-900/75 text-white shadow-sm hover:bg-zinc-900 disabled:opacity-50"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-200 hover:text-zinc-800 disabled:opacity-50 dark:hover:bg-night-700 dark:hover:text-zinc-200"
               aria-label="Quitar imagen"
             >
-              <FiX className="h-4 w-4" aria-hidden />
+              <FiX className="h-4 w-4" strokeWidth={2.5} aria-hidden />
             </button>
-          </div>
-        ) : (
-          <div
-            className="flex h-[7rem] w-full shrink-0 items-center justify-center rounded-md border border-zinc-200 bg-zinc-50 dark:border-night-700 dark:bg-night-950 sm:w-[7rem]"
-            aria-hidden
-          >
-            <FiImage className="h-8 w-8 text-zinc-300 dark:text-night-600" />
-          </div>
-        )}
-      </div>
+          </li>
+        </ul>
+      ) : null}
     </div>
   );
 }

@@ -4,7 +4,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
@@ -23,17 +22,23 @@ import {
   FiUser,
   FiX,
 } from 'react-icons/fi';
+import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminEditStoreForm } from '../../components/AdminEditStoreForm/AdminEditStoreForm';
 import { useSellerCreateStoreModal } from '../../context/SellerCreateStoreModalProvider/SellerCreateStoreModalProvider';
 import { useAuth } from '../../hooks/useAuth';
 import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc';
+import { formatPrice } from '../../helpers/formatPrice';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAdminDeleteStore } from '../../hooks/useAdminDeleteStore';
 import { useAdminStoreDetailQuery } from '../../queries/useAdminStoreDetailQuery';
 import { useAdminStoresQuery } from '../../queries/useAdminStoresQuery';
-import type { AdminStoreDetail, AdminStoreRow } from '../../types/admin';
+import type {
+  AdminStoreDetail,
+  AdminStoreDetailStats,
+  AdminStoreRow,
+} from '../../types/admin';
 
 function numOrZero(v: string | number) {
   const n = typeof v === 'string' ? Number.parseFloat(v) : v;
@@ -122,32 +127,13 @@ function matchesSearch(s: AdminStoreRow, q: string): boolean {
   return chunks.some((c) => (c ?? '').toLowerCase().includes(n));
 }
 
-function statusChipClass(isActive: boolean) {
-  return isActive
-    ? 'border-emerald-200/80 bg-emerald-50 text-emerald-700 dark:border-emerald-500/35 dark:bg-emerald-500/10 dark:text-emerald-300'
-    : 'border-rose-200/80 bg-rose-50 text-rose-700 dark:border-rose-500/35 dark:bg-rose-500/10 dark:text-rose-300';
-}
-
-function DetailField({
-  label,
-  children,
+function StoreDetailLogo({
+  logo,
+  compact,
 }: {
-  label: string;
-  children: ReactNode;
+  logo: string | null;
+  compact?: boolean;
 }) {
-  return (
-    <div className="space-y-1">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-        {label}
-      </p>
-      <div className="rounded-md border border-slate-200/80 bg-white px-2.5 py-1.5 text-xs text-slate-700 dark:border-sky-500/20 dark:bg-[#0f1a38] dark:text-slate-200">
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function StoreDetailLogo({ logo }: { logo: string | null }) {
   const { token } = useAuth();
   const { src, loading, error } = useProtectedImageSrc(logo, token);
   if (!logo?.trim()) {
@@ -163,8 +149,46 @@ function StoreDetailLogo({ logo }: { logo: string | null }) {
     <img
       src={src}
       alt=""
-      className="mx-auto max-h-28 w-auto max-w-full object-contain"
+      className={`mx-auto w-auto max-w-full object-contain ${compact ? 'max-h-12' : 'max-h-28'}`}
     />
+  );
+}
+
+function storeDetailStats(store: AdminStoreDetail): AdminStoreDetailStats {
+  return (
+    store.stats ?? {
+      productsTotal: 0,
+      productsActive: 0,
+      ordersTotal: 0,
+      ordersDelivered: 0,
+      revenue: 0,
+    }
+  );
+}
+
+function StatTile({
+  label,
+  value,
+  hint,
+}: {
+  label: string;
+  value: string | number;
+  hint?: string;
+}) {
+  return (
+    <div className="rounded-md border border-slate-200/80 bg-white px-2 py-1.5 shadow-sm dark:border-sky-500/20 dark:bg-[#0f1a38]">
+      <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        {label}
+      </p>
+      <p className="truncate text-sm font-bold tabular-nums text-slate-900 dark:text-slate-100">
+        {value}
+      </p>
+      {hint ? (
+        <p className="truncate text-[9px] leading-tight text-slate-500 dark:text-slate-500">
+          {hint}
+        </p>
+      ) : null}
+    </div>
   );
 }
 
@@ -173,128 +197,182 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
   const ownerName = store.user
     ? `${store.user.firstName} ${store.user.lastName}`.trim()
     : '';
+  const st = storeDetailStats(store);
+  const createdLabel = store.createdAt
+    ? new Date(store.createdAt).toLocaleDateString('es', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      })
+    : '—';
+  const descText = store.description?.trim() || 'Sin descripción';
+  const shipText = store.shippingPolicy?.trim() || 'No definida';
+  const retText = store.returnPolicy?.trim() || 'No definida';
 
   return (
-    <div className="market-scroll min-h-0 flex-1 overflow-y-auto px-4 py-3">
-      <div className="space-y-4">
-        <section className="space-y-3">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden px-3 py-2">
+      <div className="shrink-0 space-y-2">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="min-w-0">
+            <h3 className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
               {store.name}
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">/{store.slug}</p>
+            <p className="truncate text-[11px] text-slate-500 dark:text-slate-400">
+              /{store.slug}
+            </p>
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            <span className="rounded border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
-              Comisión {numOrZero(store.commission)}%
-            </span>
-            <span
-              className={`rounded border px-2 py-0.5 text-[11px] font-semibold ${statusChipClass(store.isApproved)}`}
-            >
-              {store.isApproved ? 'Aprobada' : 'Pendiente'}
-            </span>
-            <span
-              className={`rounded border px-2 py-0.5 text-[11px] font-semibold ${statusChipClass(store.isActive)}`}
-            >
-              {store.isActive ? 'Activa' : 'Inactiva'}
+          <div className="flex flex-wrap justify-end gap-1">
+            <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
+              {numOrZero(store.commission)}% comisión
             </span>
             {store.isRejected ? (
-              <span className="rounded border border-amber-200/80 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:border-amber-500/35 dark:bg-amber-500/10 dark:text-amber-300">
-                Rechazada
-              </span>
-            ) : null}
+              <AdminStatusBadge tone="danger">Rechazada</AdminStatusBadge>
+            ) : store.isApproved ? (
+              <AdminStatusBadge tone="success">Aprobada</AdminStatusBadge>
+            ) : (
+              <AdminStatusBadge tone="warning">Pendiente</AdminStatusBadge>
+            )}
+            <AdminStatusBadge tone={store.isActive ? 'success' : 'danger'}>
+              {store.isActive ? 'Activa' : 'Inactiva'}
+            </AdminStatusBadge>
           </div>
-        </section>
+        </div>
 
-        <section className="space-y-2 border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            Contacto
-          </h4>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <DetailField label="Vendedor">
-              <span className="inline-flex items-center gap-1.5">
-                <FiUser className="h-3.5 w-3.5 text-slate-400" aria-hidden />
-                {ownerName || '—'}
-              </span>
-            </DetailField>
-            <DetailField label="Correo vendedor">
-              <span className="inline-flex items-center gap-1.5">
-                <FiMail className="h-3.5 w-3.5 text-slate-400" aria-hidden />
-                {store.user?.email ?? '—'}
-              </span>
-            </DetailField>
-            <DetailField label="Correo tienda">
-              <span className="inline-flex items-center gap-1.5">
-                <FiMail className="h-3.5 w-3.5 text-slate-400" aria-hidden />
-                {store.contactEmail ?? '—'}
-              </span>
-            </DetailField>
-            <DetailField label="Teléfono">
-              <span className="inline-flex items-center gap-1.5">
-                <FiPhone className="h-3.5 w-3.5 text-slate-400" aria-hidden />
-                {store.contactPhone ?? '—'}
-              </span>
-            </DetailField>
+        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+          <StatTile label="Productos" value={st.productsTotal} hint={`${st.productsActive} activos`} />
+          <StatTile label="Pedidos" value={st.ordersTotal} hint={`${st.ordersDelivered} entregados`} />
+          <StatTile
+            label="Ventas (bruto)"
+            value={formatPrice(st.revenue)}
+            hint="excl. cancelados"
+          />
+          <StatTile label="Alta" value={createdLabel} hint="registro" />
+        </div>
+
+        <div className="grid grid-cols-2 gap-1.5 border-t border-slate-200/80 pt-2 dark:border-sky-500/20">
+          <div className="min-w-0">
+            <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Vendedor
+            </p>
+            <p className="flex items-center gap-1 truncate text-[11px] text-slate-800 dark:text-slate-200">
+              <FiUser className="h-3 w-3 shrink-0 text-slate-400" aria-hidden />
+              <span className="truncate">{ownerName || '—'}</span>
+            </p>
           </div>
-        </section>
+          <div className="min-w-0">
+            <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Correo vendedor
+            </p>
+            <p className="flex items-center gap-1 truncate text-[11px] text-slate-800 dark:text-slate-200">
+              <FiMail className="h-3 w-3 shrink-0 text-slate-400" aria-hidden />
+              <span className="truncate">{store.user?.email ?? '—'}</span>
+            </p>
+          </div>
+          <div className="min-w-0">
+            <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Correo tienda
+            </p>
+            <p className="flex items-center gap-1 truncate text-[11px] text-slate-800 dark:text-slate-200">
+              <FiMail className="h-3 w-3 shrink-0 text-slate-400" aria-hidden />
+              <span className="truncate">{store.contactEmail ?? '—'}</span>
+            </p>
+          </div>
+          <div className="min-w-0">
+            <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              Teléfono
+            </p>
+            <p className="flex items-center gap-1 truncate text-[11px] text-slate-800 dark:text-slate-200">
+              <FiPhone className="h-3 w-3 shrink-0 text-slate-400" aria-hidden />
+              <span className="truncate">{store.contactPhone ?? '—'}</span>
+            </p>
+          </div>
+        </div>
+      </div>
 
-        <section className="space-y-2 border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
-          <div
-            className="inline-flex rounded-md bg-slate-100 p-0.5 dark:bg-[#0f1a38]"
-            role="tablist"
-            aria-label="Datos y políticas"
+      <section className="mt-2 flex min-h-0 flex-1 flex-col overflow-hidden border-t border-slate-200/80 pt-2 dark:border-sky-500/20">
+        <div
+          className="inline-flex shrink-0 rounded-md bg-slate-100 p-0.5 dark:bg-[#0f1a38]"
+          role="tablist"
+          aria-label="Datos y políticas"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={detailTab === 'datos'}
+            onClick={() => setDetailTab('datos')}
+            className={`cursor-pointer rounded px-2 py-0.5 text-[11px] font-semibold transition-colors ${
+              detailTab === 'datos'
+                ? 'bg-white text-slate-700 shadow-sm dark:bg-[#162647] dark:text-slate-100'
+                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+            }`}
           >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={detailTab === 'datos'}
-              onClick={() => setDetailTab('datos')}
-              className={`cursor-pointer rounded px-2.5 py-1 text-xs font-semibold transition-colors ${
-                detailTab === 'datos'
-                  ? 'bg-white text-slate-700 shadow-sm dark:bg-[#162647] dark:text-slate-100'
-                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
-            >
-              Datos
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={detailTab === 'politicas'}
-              onClick={() => setDetailTab('politicas')}
-              className={`cursor-pointer rounded px-2.5 py-1 text-xs font-semibold transition-colors ${
-                detailTab === 'politicas'
-                  ? 'bg-white text-slate-700 shadow-sm dark:bg-[#162647] dark:text-slate-100'
-                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
-            >
-              Políticas
-            </button>
-          </div>
+            Datos
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={detailTab === 'politicas'}
+            onClick={() => setDetailTab('politicas')}
+            className={`cursor-pointer rounded px-2 py-0.5 text-[11px] font-semibold transition-colors ${
+              detailTab === 'politicas'
+                ? 'bg-white text-slate-700 shadow-sm dark:bg-[#162647] dark:text-slate-100'
+                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+            }`}
+          >
+            Políticas
+          </button>
+        </div>
+        <div className="mt-1.5 min-h-0 flex-1 overflow-hidden">
           {detailTab === 'datos' ? (
-            <div className="space-y-2">
-              <DetailField label="Logo">
-                <div className="flex min-h-[4.5rem] items-center justify-center py-1">
-                  <StoreDetailLogo logo={store.logo} />
+            <div className="flex h-full min-h-0 gap-2">
+              <div className="flex w-[4.5rem] shrink-0 flex-col rounded-md border border-slate-200/80 bg-white p-1 dark:border-sky-500/20 dark:bg-[#0f1a38]">
+                <p className="text-[9px] font-semibold uppercase text-slate-500 dark:text-slate-400">
+                  Logo
+                </p>
+                <div className="flex flex-1 items-center justify-center overflow-hidden">
+                  <StoreDetailLogo logo={store.logo} compact />
                 </div>
-              </DetailField>
-              <DetailField label="Descripción">
-                {store.description || 'Sin descripción'}
-              </DetailField>
+              </div>
+              <div className="min-w-0 flex-1 rounded-md border border-slate-200/80 bg-white p-2 dark:border-sky-500/20 dark:bg-[#0f1a38]">
+                <p className="text-[9px] font-semibold uppercase text-slate-500 dark:text-slate-400">
+                  Descripción
+                </p>
+                <p
+                  className="mt-0.5 line-clamp-4 text-[11px] leading-snug text-slate-700 dark:text-slate-200"
+                  title={descText.length > 120 ? descText : undefined}
+                >
+                  {descText}
+                </p>
+              </div>
             </div>
           ) : (
-            <div className="space-y-2">
-              <DetailField label="Política de envíos">
-                {store.shippingPolicy || 'No definida'}
-              </DetailField>
-              <DetailField label="Política de devoluciones">
-                {store.returnPolicy || 'No definida'}
-              </DetailField>
+            <div className="grid h-full min-h-0 grid-rows-2 gap-1.5">
+              <div className="min-h-0 overflow-hidden rounded-md border border-slate-200/80 bg-white p-2 dark:border-sky-500/20 dark:bg-[#0f1a38]">
+                <p className="text-[9px] font-semibold uppercase text-slate-500 dark:text-slate-400">
+                  Envíos
+                </p>
+                <p
+                  className="mt-0.5 line-clamp-3 text-[11px] leading-snug text-slate-700 dark:text-slate-200"
+                  title={shipText.length > 100 ? shipText : undefined}
+                >
+                  {shipText}
+                </p>
+              </div>
+              <div className="min-h-0 overflow-hidden rounded-md border border-slate-200/80 bg-white p-2 dark:border-sky-500/20 dark:bg-[#0f1a38]">
+                <p className="text-[9px] font-semibold uppercase text-slate-500 dark:text-slate-400">
+                  Devoluciones
+                </p>
+                <p
+                  className="mt-0.5 line-clamp-3 text-[11px] leading-snug text-slate-700 dark:text-slate-200"
+                  title={retText.length > 100 ? retText : undefined}
+                >
+                  {retText}
+                </p>
+              </div>
             </div>
           )}
-        </section>
-
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
@@ -302,14 +380,12 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
 function StoreDetailsDrawer({
   open,
   onClose,
-  onEdit,
   isLoading,
   isError,
   store,
 }: {
   open: boolean;
   onClose: () => void;
-  onEdit: () => void;
   isLoading: boolean;
   isError: boolean;
   store?: AdminStoreDetail;
@@ -336,7 +412,7 @@ function StoreDetailsDrawer({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-80 flex items-stretch justify-end bg-black/35"
+      className="fixed inset-0 z-80 flex cursor-pointer items-stretch justify-end bg-black/35"
       role="presentation"
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -346,7 +422,7 @@ function StoreDetailsDrawer({
         role="dialog"
         aria-modal="true"
         aria-label="Detalle de tienda"
-        className="flex h-full w-full max-w-[640px] flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-[#0b152f]"
+        className="flex h-full w-full max-w-[640px] cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-[#0b152f]"
         onPointerDown={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-[#0d1938]">
@@ -356,15 +432,6 @@ function StoreDetailsDrawer({
           <div className="flex items-center gap-2">
             <Button
               type="button"
-              variant="outline"
-              className="h-8 px-3 text-xs"
-              onClick={onEdit}
-              disabled={!store}
-            >
-              Editar
-            </Button>
-            <Button
-              type="button"
               variant="icon"
               className="h-8 w-8 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-sky-500/20"
               aria-label="Cerrar panel"
@@ -372,7 +439,7 @@ function StoreDetailsDrawer({
             >
               <FiX className="h-4 w-4" aria-hidden />
             </Button>
-        </div>
+          </div>
         </div>
         <div className="min-h-0 flex-1 overflow-hidden bg-[#f5f8fc] dark:bg-[#091126]">
           {isLoading ? (
@@ -678,22 +745,26 @@ export function AdminStoresPage() {
                             {s.contactPhone ?? '—'}
                           </td>
                           <td className="px-4 py-2 align-middle">
-                            <span className="text-xs leading-tight">
-                              {s.isApproved ? (
-                                <span className="text-[var(--color-forest)] dark:text-sky-400">
+                            <div className="flex flex-wrap gap-1.5">
+                              {s.isRejected ? (
+                                <AdminStatusBadge tone="danger">
+                                  Rechazada
+                                </AdminStatusBadge>
+                              ) : s.isApproved ? (
+                                <AdminStatusBadge tone="success">
                                   Aprobada
-                                </span>
+                                </AdminStatusBadge>
                               ) : (
-                                <span className="text-amber-600 dark:text-amber-400">
-                                  Pendiente / rechazada
-                                </span>
+                                <AdminStatusBadge tone="warning">
+                                  Pendiente
+                                </AdminStatusBadge>
                               )}
-                              {s.isActive ? null : (
-                                <span className="ml-2 text-red-600 dark:text-red-400">
-                                  (inactiva)
-                                </span>
-                              )}
-                            </span>
+                              <AdminStatusBadge
+                                tone={s.isActive ? 'success' : 'danger'}
+                              >
+                                {s.isActive ? 'Activa' : 'Inactiva'}
+                              </AdminStatusBadge>
+                            </div>
                           </td>
                           <td className="px-4 py-2 align-middle text-slate-700 tabular-nums dark:text-slate-300">
                             {numOrZero(s.commission)}%
@@ -849,7 +920,6 @@ export function AdminStoresPage() {
               setViewStoreId(null);
               setMode('view');
             }}
-            onEdit={() => setMode('edit')}
             isLoading={storeDetailQuery.isLoading}
             isError={storeDetailQuery.isError}
             store={storeDetailQuery.data}

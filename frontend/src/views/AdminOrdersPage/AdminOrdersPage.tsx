@@ -18,6 +18,10 @@ import {
   FiShoppingCart,
   FiX,
 } from 'react-icons/fi';
+import {
+  AdminStatusBadge,
+  orderStatusTone,
+} from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminEditOrderForm } from '../../components/AdminEditOrderForm/AdminEditOrderForm';
@@ -111,21 +115,6 @@ function matchesSearch(o: AdminOrderRow, q: string): boolean {
   return chunks.some((c) => (c ?? '').toLowerCase().includes(n));
 }
 
-function statusChipClass(status: string) {
-  switch (status) {
-    case 'DELIVERED':
-      return 'border-emerald-200/80 bg-emerald-50 text-emerald-700 dark:border-emerald-500/35 dark:bg-emerald-500/10 dark:text-emerald-300';
-    case 'CANCELLED':
-      return 'border-rose-200/80 bg-rose-50 text-rose-700 dark:border-rose-500/35 dark:bg-rose-500/10 dark:text-rose-300';
-    case 'SHIPPED':
-      return 'border-sky-200/80 bg-sky-50 text-sky-700 dark:border-sky-500/35 dark:bg-sky-500/10 dark:text-sky-300';
-    case 'CONFIRMED':
-      return 'border-blue-200/80 bg-blue-50 text-blue-700 dark:border-blue-500/35 dark:bg-blue-500/10 dark:text-blue-300';
-    default:
-      return 'border-amber-200/80 bg-amber-50 text-amber-700 dark:border-amber-500/35 dark:bg-amber-500/10 dark:text-amber-300';
-  }
-}
-
 function formatDate(iso?: string) {
   if (!iso) return '—';
   const d = new Date(iso);
@@ -173,11 +162,9 @@ function OrderDetailsPanel({ order }: { order: Order }) {
             <span className="rounded border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
               {formatPrice(numAmount(order.totalAmount))}
             </span>
-            <span
-              className={`rounded border px-2 py-0.5 text-[11px] font-semibold ${statusChipClass(order.status)}`}
-            >
+            <AdminStatusBadge tone={orderStatusTone(order.status)}>
               {formatOrderStatus(order.status)}
-            </span>
+            </AdminStatusBadge>
           </div>
         </section>
 
@@ -254,14 +241,12 @@ function OrderDetailsPanel({ order }: { order: Order }) {
 function OrderDetailsDrawer({
   open,
   onClose,
-  onEdit,
   isLoading,
   isError,
   order,
 }: {
   open: boolean;
   onClose: () => void;
-  onEdit: () => void;
   isLoading: boolean;
   isError: boolean;
   order?: Order;
@@ -288,7 +273,7 @@ function OrderDetailsDrawer({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-80 flex items-stretch justify-end bg-black/35"
+      className="fixed inset-0 z-80 flex cursor-pointer items-stretch justify-end bg-black/35"
       role="presentation"
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -298,7 +283,7 @@ function OrderDetailsDrawer({
         role="dialog"
         aria-modal="true"
         aria-label="Detalle de pedido"
-        className="flex h-full w-full max-w-[640px] flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-[#0b152f]"
+        className="flex h-full w-full max-w-[640px] cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-[#0b152f]"
         onPointerDown={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-[#0d1938]">
@@ -306,15 +291,6 @@ function OrderDetailsDrawer({
             Panel de detalles
           </h2>
           <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-8 px-3 text-xs"
-              onClick={onEdit}
-              disabled={!order}
-            >
-              Editar
-            </Button>
             <Button
               type="button"
               variant="icon"
@@ -616,11 +592,9 @@ export function AdminOrdersPage() {
                             {formatPrice(numAmount(o.totalAmount))}
                           </td>
                           <td className="px-4 py-2 align-middle">
-                            <span
-                              className={`inline-block rounded border px-2 py-0.5 text-[11px] font-semibold ${statusChipClass(o.status)}`}
-                            >
+                            <AdminStatusBadge tone={orderStatusTone(o.status)}>
                               {formatOrderStatus(o.status)}
-                            </span>
+                            </AdminStatusBadge>
                           </td>
                           <td className="px-4 py-2 align-middle text-center">
                             <div className="flex flex-nowrap items-center justify-center gap-1.5">
@@ -763,7 +737,6 @@ export function AdminOrdersPage() {
               setViewOrderId(null);
               setMode('view');
             }}
-            onEdit={() => setMode('edit')}
             isLoading={orderDetailQuery.isLoading}
             isError={orderDetailQuery.isError}
             order={orderDetailQuery.data}

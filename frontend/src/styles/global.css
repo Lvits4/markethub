@@ -2,6 +2,44 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@layer base {
+  a[href]:not([href='']) {
+    cursor: pointer;
+  }
+
+  button:enabled,
+  input[type='button']:enabled,
+  input[type='submit']:enabled,
+  input[type='reset']:enabled,
+  input[type='image']:enabled {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  input[type='button']:disabled,
+  input[type='submit']:disabled,
+  input[type='reset']:disabled,
+  input[type='image']:disabled {
+    cursor: not-allowed;
+  }
+
+  summary {
+    cursor: pointer;
+  }
+
+  label[for] {
+    cursor: pointer;
+  }
+
+  select:enabled {
+    cursor: pointer;
+  }
+
+  select:disabled {
+    cursor: not-allowed;
+  }
+}
+
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   /* Marca y admin: azul principal */
@@ -169,7 +207,7 @@ body {
 }
 
 .admin-nav-link {
-  @apply flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-zinc-600 transition-colors dark:text-zinc-400;
+  @apply flex cursor-pointer items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-zinc-600 transition-colors dark:text-zinc-400;
 }
 
 .admin-nav-link:hover {
@@ -183,4 +221,28 @@ body {
 
 .dark .admin-nav-link--active {
   @apply text-blue-400;
+}
+
+/* Sidebar admin colapsado: scroll sin barra visible (rueda/táctil) y enlaces centrados en todo el ancho */
+.admin-sidebar-nav--collapsed {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.admin-sidebar-nav--collapsed::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.admin-sidebar-nav--collapsed .admin-nav-link,
+.admin-sidebar-nav--collapsed .admin-sidebar-icon-row {
+  width: 100%;
+  justify-content: center;
+  padding-left: 0.375rem;
+  padding-right: 0.375rem;
+}
+
+.admin-sidebar-nav--collapsed .admin-nav-link {
+  box-sizing: border-box;
 }

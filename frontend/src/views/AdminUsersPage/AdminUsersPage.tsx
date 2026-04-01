@@ -20,6 +20,7 @@ import {
   FiUsers,
   FiX,
 } from 'react-icons/fi';
+import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminCreateUserForm } from '../../components/AdminCreateUserForm/AdminCreateUserForm';
@@ -108,12 +109,6 @@ function formatDate(iso?: string) {
   });
 }
 
-function statusChipClass(isActive: boolean) {
-  return isActive
-    ? 'border-emerald-200/80 bg-emerald-50 text-emerald-700 dark:border-emerald-500/35 dark:bg-emerald-500/10 dark:text-emerald-300'
-    : 'border-rose-200/80 bg-rose-50 text-rose-700 dark:border-rose-500/35 dark:bg-rose-500/10 dark:text-rose-300';
-}
-
 function DetailField({
   label,
   children,
@@ -150,11 +145,9 @@ function UserDetailsPanel({ user }: { user: AdminUserRow }) {
             <span className="rounded border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
               {user.role}
             </span>
-            <span
-              className={`rounded border px-2 py-0.5 text-[11px] font-semibold ${statusChipClass(user.isActive)}`}
-            >
+            <AdminStatusBadge tone={user.isActive ? 'success' : 'danger'}>
               {user.isActive ? 'Activo' : 'Inactivo'}
-            </span>
+            </AdminStatusBadge>
           </div>
         </section>
 
@@ -178,8 +171,8 @@ function UserDetailsPanel({ user }: { user: AdminUserRow }) {
         <section className="space-y-2 border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Para cambiar el estado activo/inactivo, el rol o los datos de la
-            cuenta, usa <strong>Editar</strong>. Desde aquí solo puedes eliminar
-            de forma definitiva (si aplica).
+            cuenta, o para eliminar de forma definitiva, usa las acciones de la
+            fila en la tabla.
           </p>
         </section>
       </div>
@@ -191,21 +184,11 @@ function UserDetailsDrawer({
   open,
   onClose,
   user,
-  currentUserId,
-  busy,
-  onEdit,
-  onRequestDelete,
 }: {
   open: boolean;
   onClose: () => void;
   user: AdminUserRow | null;
-  currentUserId: string | undefined;
-  busy: boolean;
-  onEdit: () => void;
-  onRequestDelete: () => void;
 }) {
-  const isSelf = Boolean(user && currentUserId && user.id === currentUserId);
-
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -228,7 +211,7 @@ function UserDetailsDrawer({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-80 flex items-stretch justify-end bg-black/35"
+      className="fixed inset-0 z-80 flex cursor-pointer items-stretch justify-end bg-black/35"
       role="presentation"
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -238,7 +221,7 @@ function UserDetailsDrawer({
         role="dialog"
         aria-modal="true"
         aria-label="Detalle de usuario"
-        className="flex h-full w-full max-w-[640px] flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-[#0b152f]"
+        className="flex h-full w-full max-w-[640px] cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-[#0b152f]"
         onPointerDown={(e) => e.stopPropagation()}
       >
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-[#0d1938]">
@@ -246,35 +229,6 @@ function UserDetailsDrawer({
             Panel de detalles
           </h2>
           <div className="flex flex-wrap items-center justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-8 px-3 text-xs"
-              onClick={onEdit}
-              disabled={busy}
-              aria-label="Editar usuario"
-            >
-              Editar
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="h-8 border-rose-300 px-3 text-xs text-rose-800 hover:bg-rose-100 dark:border-rose-500/50 dark:text-rose-200 dark:hover:bg-rose-950/50"
-              onClick={onRequestDelete}
-              disabled={busy || isSelf}
-              aria-label={
-                isSelf
-                  ? 'No puedes eliminar tu propio usuario'
-                  : 'Eliminar usuario permanentemente'
-              }
-              title={
-                isSelf
-                  ? 'No puedes eliminar tu propio usuario'
-                  : 'Borrado definitivo: pedidos, tiendas y datos asociados'
-              }
-            >
-              Eliminar
-            </Button>
             <Button
               type="button"
               variant="icon"
@@ -591,11 +545,9 @@ export function AdminUsersPage() {
                             </span>
                           </td>
                           <td className="px-4 py-2 align-middle">
-                            <span
-                              className={`inline-block rounded border px-2 py-0.5 text-[11px] font-semibold ${statusChipClass(u.isActive)}`}
-                            >
+                            <AdminStatusBadge tone={u.isActive ? 'success' : 'danger'}>
                               {u.isActive ? 'Activo' : 'Inactivo'}
-                            </span>
+                            </AdminStatusBadge>
                           </td>
                           <td className="px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
                             {formatDate(u.createdAt)}
@@ -717,19 +669,6 @@ export function AdminUsersPage() {
             open={viewUserId != null && drawerUser != null}
             onClose={() => setViewUserId(null)}
             user={drawerUser}
-            currentUserId={authUser?.id}
-            busy={busy}
-            onEdit={() => {
-              if (drawerUser) {
-                setEditUserId(drawerUser.id);
-                setViewUserId(null);
-              }
-            }}
-            onRequestDelete={() => {
-              if (drawerUser && !isSelf(drawerUser.id)) {
-                setUserToDelete(drawerUser);
-              }
-            }}
           />
 
           <Modal

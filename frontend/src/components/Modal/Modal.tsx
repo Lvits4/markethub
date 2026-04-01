@@ -81,7 +81,7 @@ export function Modal({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-80 flex items-end justify-center bg-black/45 p-4 sm:items-center sm:p-6"
+      className="fixed inset-0 z-80 flex cursor-pointer items-end justify-center bg-black/45 p-4 sm:items-center sm:p-6"
       role="presentation"
       onPointerDown={handleOverlayPointerDown}
     >
@@ -90,7 +90,7 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className={`flex max-h-[min(90vh,720px)] w-full flex-col overflow-hidden rounded-t-xl bg-white shadow-xl ring-1 ring-zinc-200/80 dark:bg-night-900 dark:ring-night-700 sm:rounded-xl ${wide ? 'max-w-3xl' : 'max-w-lg'} ${className}`}
+        className={`flex max-h-[min(90vh,720px)] w-full cursor-default flex-col overflow-hidden rounded-t-xl bg-white shadow-xl ring-1 ring-zinc-200/80 dark:bg-night-900 dark:ring-night-700 sm:rounded-xl ${wide ? 'max-w-3xl' : 'max-w-lg'} ${className}`}
         onPointerDown={(e) => e.stopPropagation()}
       >
         <div

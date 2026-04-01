@@ -23,6 +23,7 @@ import {
   FiX,
   FiXCircle,
 } from 'react-icons/fi';
+import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
 import { useAuth } from '../../hooks/useAuth';
 import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc';
@@ -180,9 +181,9 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
             <span className="rounded border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
               Comisión {numOrZero(store.commission)}%
             </span>
-            <span className="rounded border border-amber-200/80 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:border-amber-500/35 dark:bg-amber-500/10 dark:text-amber-300">
+            <AdminStatusBadge tone="warning">
               Pendiente de aprobación
-            </span>
+            </AdminStatusBadge>
           </div>
         </section>
 
@@ -319,7 +320,7 @@ function ModerationDrawer({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-80 flex items-stretch justify-end bg-black/35"
+      className="fixed inset-0 z-80 flex cursor-pointer items-stretch justify-end bg-black/35"
       role="presentation"
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -329,7 +330,7 @@ function ModerationDrawer({
         role="dialog"
         aria-modal="true"
         aria-label="Detalle de tienda pendiente"
-        className="flex h-full w-full max-w-[640px] flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-[#0b152f]"
+        className="flex h-full w-full max-w-[640px] cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-[#0b152f]"
         onPointerDown={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-[#0d1938]">

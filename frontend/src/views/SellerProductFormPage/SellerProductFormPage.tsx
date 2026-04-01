@@ -1,7 +1,8 @@
-import { useEffect, useState, type ChangeEvent } from 'react';
+import { useEffect, useId, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
+import { ProductImagesField } from '../../components/CreateProductForm/ProductImagesField';
 import { routePaths } from '../../config/routes';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAuth } from '../../hooks/useAuth';
@@ -41,6 +42,7 @@ export function SellerProductFormPage() {
   const [categoryId, setCategoryId] = useState('');
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const productImagesFieldId = useId();
 
   useEffect(() => {
     if (!existing) return;
@@ -54,19 +56,26 @@ export function SellerProductFormPage() {
     setImageUrls(urls);
   }, [existing]);
 
-  const handleUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !token) return;
+  const handlePickFiles = async (picked: File[]) => {
+    if (!token) {
+      toast.error('Inicia sesión para subir archivos');
+      return;
+    }
     setUploading(true);
     try {
-      const res = await uploadFile(token, file, 'products');
-      setImageUrls((prev) => [...prev, res.url]);
-      toast.success('Imagen subida');
+      for (const file of picked) {
+        const res = await uploadFile(token, file, 'products');
+        setImageUrls((prev) => [...prev, res.url]);
+      }
+      toast.success(
+        picked.length === 1
+          ? 'Imagen subida'
+          : `${picked.length} imágenes subidas`,
+      );
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {
       setUploading(false);
-      e.target.value = '';
     }
   };
 
@@ -247,32 +256,26 @@ export function SellerProductFormPage() {
           </select>
         </div>
         <div>
-          <label className="text-xs text-zinc-500">Imágenes (subir archivo)</label>
-          <input
-            type="file"
-            accept="image/*"
-            disabled={uploading || !token}
-            onChange={(e) => void handleUpload(e)}
-            className="mt-1 block w-full text-sm"
-          />
-          {imageUrls.length > 0 ? (
-            <ul className="mt-2 space-y-1 text-xs text-zinc-500">
-              {imageUrls.map((u) => (
-                <li key={u} className="flex items-center justify-between gap-2">
-                  <span className="truncate font-mono">{u}</span>
-                  <button
-                    type="button"
-                    className="shrink-0 text-red-600"
-                    onClick={() =>
-                      setImageUrls((prev) => prev.filter((x) => x !== u))
-                    }
-                  >
-                    Quitar
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : null}
+          <label
+            htmlFor={productImagesFieldId}
+            className="text-xs text-zinc-500 dark:text-zinc-400"
+          >
+            Imágenes
+          </label>
+          <div className="mt-1">
+            <ProductImagesField
+              id={productImagesFieldId}
+              files={[]}
+              onChange={() => {}}
+              remoteUrls={imageUrls}
+              onRemoveRemote={(u) =>
+                setImageUrls((prev) => prev.filter((x) => x !== u))
+              }
+              disabled={uploading || !token}
+              onPickFiles={handlePickFiles}
+              hintText="PNG, JPG, WebP… Se suben al elegir o soltar archivos."
+            />
+          </div>
         </div>
         <Button
           type="button"
