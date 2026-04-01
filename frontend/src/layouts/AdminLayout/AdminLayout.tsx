@@ -81,6 +81,7 @@ function SidebarNavItem({
 
 export function AdminLayout() {
   const { logout, user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
@@ -95,8 +96,11 @@ export function AdminLayout() {
   };
 
   const displayName = user?.email
-    ? user.email.split('@')[0]?.replace(/\./g, ' ') ?? 'Admin'
-    : 'Admin';
+    ? user.email.split('@')[0]?.replace(/\./g, ' ') ??
+      (isAdmin ? 'Admin' : 'Vendedor')
+    : isAdmin
+      ? 'Admin'
+      : 'Vendedor';
   const initials = displayName
     .split(' ')
     .map((w) => w[0])
@@ -163,14 +167,16 @@ export function AdminLayout() {
             label="Panel"
             collapsed={collapsed}
           />
-          <SidebarNavItem
-            to={routePaths.adminModeration}
-            icon={FiShield}
-            label="Moderación"
-            collapsed={collapsed}
-            badge={moderationBadge}
-            collapsedBadgeCount={pendingCount}
-          />
+          {isAdmin ? (
+            <SidebarNavItem
+              to={routePaths.adminModeration}
+              icon={FiShield}
+              label="Moderación"
+              collapsed={collapsed}
+              badge={moderationBadge}
+              collapsedBadgeCount={pendingCount}
+            />
+          ) : null}
           <SidebarNavItem
             to={routePaths.adminOrders}
             icon={FiShoppingCart}
@@ -189,18 +195,22 @@ export function AdminLayout() {
             label="Productos"
             collapsed={collapsed}
           />
-          <SidebarNavItem
-            to={routePaths.adminUsers}
-            icon={FiUsers}
-            label="Usuarios"
-            collapsed={collapsed}
-          />
-          <SidebarNavItem
-            to={routePaths.adminCategories}
-            icon={FiTag}
-            label="Categorías"
-            collapsed={collapsed}
-          />
+          {isAdmin ? (
+            <SidebarNavItem
+              to={routePaths.adminUsers}
+              icon={FiUsers}
+              label="Usuarios"
+              collapsed={collapsed}
+            />
+          ) : null}
+          {isAdmin ? (
+            <SidebarNavItem
+              to={routePaths.adminCategories}
+              icon={FiTag}
+              label="Categorías"
+              collapsed={collapsed}
+            />
+          ) : null}
           <button
             type="button"
             title={collapsed ? 'Tienda pública' : undefined}
@@ -288,7 +298,7 @@ export function AdminLayout() {
                   {displayName}
                 </p>
                 <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-                  {user?.email ?? 'Administrador'}
+                  {user?.email ?? (isAdmin ? 'Administrador' : 'Vendedor')}
                 </p>
               </div>
             ) : null}

@@ -326,8 +326,8 @@ export function AdminCategoriesPage() {
             </div>
             <Button
               type="button"
-              variant="primary"
-              className="h-11 min-h-11 shrink-0 border-0 px-6 py-0 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e]"
+              variant="cta"
+              className="h-11 min-h-11 shrink-0 px-6 py-0"
               onClick={() => setCreateOpen(true)}
             >
               Nueva categoría
@@ -433,7 +433,7 @@ export function AdminCategoriesPage() {
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="!text-[#1d4ed8] hover:bg-blue-500/10 dark:!text-sky-300 dark:hover:bg-sky-500/15"
+                                className="!text-yellow-600 hover:bg-yellow-500/15 dark:!text-sky-300 dark:hover:bg-sky-500/15"
                                 aria-label={`Editar ${c.name}`}
                                 disabled={busy}
                                 onClick={() => setEditCategory(c)}

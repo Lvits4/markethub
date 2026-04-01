@@ -193,7 +193,7 @@ body {
 /* Shell del panel de administración */
 .admin-shell {
   --admin-primary: var(--color-admin-primary);
-  --admin-primary-soft: color-mix(in srgb, var(--color-admin-primary) 14%, transparent);
+  --admin-primary-soft: color-mix(in srgb, var(--color-admin-primary) 18%, transparent);
   --admin-page-bg: var(--color-admin-surface);
   --admin-card: var(--color-admin-card);
   --admin-border: rgb(0 0 0 / 0.06);
@@ -217,10 +217,46 @@ body {
 .admin-nav-link--active {
   background: var(--admin-primary-soft);
   color: var(--admin-primary);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-admin-primary) 20%, transparent);
 }
 
 .dark .admin-nav-link--active {
   @apply text-blue-400;
+  box-shadow: none;
+}
+
+/* CTA sólido: azul marca en claro, navy/cyan en oscuro (tablas admin, formularios) */
+.admin-cta-solid {
+  border-width: 0;
+  border-radius: var(--radius-md);
+  background-color: var(--color-admin-primary);
+  color: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+}
+
+.admin-cta-solid:hover {
+  background-color: var(--color-admin-primary-hover);
+}
+
+.admin-cta-solid:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-admin-card),
+    0 0 0 4px color-mix(in srgb, var(--color-admin-primary) 28%, transparent);
+}
+
+.dark .admin-cta-solid {
+  background-color: #102251;
+  color: #458bde;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.25);
+}
+
+.dark .admin-cta-solid:hover {
+  background-color: #152a5e;
+}
+
+.dark .admin-cta-solid:focus-visible {
+  box-shadow: 0 0 0 2px rgb(69 139 222 / 0.35);
 }
 
 /* Sidebar admin colapsado: scroll sin barra visible (rueda/táctil) y enlaces centrados en todo el ancho */

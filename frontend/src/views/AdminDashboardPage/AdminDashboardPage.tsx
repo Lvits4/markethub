@@ -4,10 +4,6 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -17,23 +13,12 @@ import { FiChevronDown, FiPlus } from 'react-icons/fi';
 import { routePaths } from '../../config/routes';
 import { formatPrice } from '../../helpers/formatPrice';
 import { useAdminDashboardQuery } from '../../queries/useAdminDashboardQuery';
-import { useAdminPlatformReportQuery } from '../../queries/useAdminPlatformReportQuery';
 import { useAdminSalesReportQuery } from '../../queries/useAdminSalesReportQuery';
 
-const DONUT_COLORS = [
-  '#27ae60',
-  '#3b82f6',
-  '#f97316',
-  '#8b5cf6',
-  '#ec4899',
-  '#14b8a6',
-  '#64748b',
-];
-
 const PERIOD_OPTIONS: { value: 3 | 6 | 12; label: string }[] = [
-  { value: 3, label: 'Últimos 3 meses' },
-  { value: 6, label: 'Últimos 6 meses' },
-  { value: 12, label: 'Últimos 12 meses' },
+  { value: 3, label: '3 meses' },
+  { value: 6, label: '6 meses' },
+  { value: 12, label: '12 meses' },
 ];
 
 function ChartPeriodSelect({
@@ -68,32 +53,30 @@ function ChartPeriodSelect({
     PERIOD_OPTIONS.find((o) => o.value === value) ?? PERIOD_OPTIONS[2];
 
   return (
-    <div className="relative w-full sm:w-auto" ref={wrapRef}>
+    <div className="relative shrink-0" ref={wrapRef}>
       <button
         type="button"
-        id="admin-period-trigger"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-labelledby={labelledBy}
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full min-w-[min(100%,220px)] sm:min-w-[220px] items-center justify-between gap-3 rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] px-4 py-2 text-left text-sm font-medium text-zinc-800 shadow-sm outline-none ring-[var(--admin-primary)]/0 transition hover:border-zinc-300 focus-visible:ring-2 dark:text-zinc-100 dark:hover:border-night-600"
+        className="flex min-w-[7.5rem] items-center justify-between gap-2 rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] px-2.5 py-1.5 text-left text-xs font-medium text-zinc-800 shadow-sm outline-none ring-[var(--admin-primary)]/0 transition hover:border-zinc-300 focus-visible:ring-2 dark:text-zinc-100 dark:hover:border-night-600"
       >
         <span className="truncate">{selected.label}</span>
         <FiChevronDown
-          className={`h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          className={`h-3.5 w-3.5 shrink-0 text-zinc-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
           aria-hidden
         />
       </button>
       {open ? (
         <ul
           role="listbox"
-          className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 overflow-hidden rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] py-0.5 shadow-lg ring-1 ring-black/5 dark:ring-white/10 sm:left-auto sm:right-0 sm:min-w-[220px]"
+          className="absolute right-0 top-[calc(100%+4px)] z-50 min-w-full overflow-hidden rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] py-0.5 shadow-lg ring-1 ring-black/5 dark:ring-white/10"
         >
           {PERIOD_OPTIONS.map((opt) => (
             <li key={opt.value} role="presentation">
               <button
                 type="button"
-                id={`period-opt-${opt.value}`}
                 role="option"
                 aria-selected={opt.value === value}
                 onClick={() => {
@@ -102,8 +85,8 @@ function ChartPeriodSelect({
                 }}
                 className={
                   opt.value === value
-                    ? 'w-full px-4 py-2 text-left text-sm font-semibold text-[var(--admin-primary)] bg-[var(--admin-primary-soft)] dark:text-blue-400'
-                    : 'w-full px-4 py-2 text-left text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800/80'
+                    ? 'w-full px-3 py-1.5 text-left text-xs font-semibold text-[var(--admin-primary)] bg-[var(--admin-primary-soft)] dark:text-blue-400'
+                    : 'w-full px-3 py-1.5 text-left text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800/80'
                 }
               >
                 {opt.label}
@@ -205,11 +188,16 @@ function KpiCard({
   );
 }
 
+function truncateLabel(name: string, max = 14) {
+  const t = name.trim();
+  if (t.length <= max) return t;
+  return `${t.slice(0, max - 1)}…`;
+}
+
 export function AdminDashboardPage() {
   const { data, isLoading, isError } = useAdminDashboardQuery();
   const sales = useAdminSalesReportQuery();
-  const platform = useAdminPlatformReportQuery();
-  const [periodMonths, setPeriodMonths] = useState<3 | 6 | 12>(12);
+  const [periodMonths, setPeriodMonths] = useState<3 | 6 | 12>(6);
 
   const monthlyChrono = useMemo(() => {
     const raw = [...(sales.data?.monthlySales ?? [])];
@@ -226,35 +214,16 @@ export function AdminDashboardPage() {
     }));
   }, [monthlyChrono, periodMonths]);
 
-  const donutData = useMemo(() => {
-    const rows = platform.data?.productSales ?? [];
-    if (!rows.length) return [];
-    const sorted = [...rows].sort((a, b) => b.revenue - a.revenue);
-    const top = sorted.slice(0, 6);
-    const sumTop = top.reduce((s, r) => s + r.revenue, 0);
-    const sumAll = sorted.reduce((s, r) => s + r.revenue, 0);
-    const other = Math.max(0, sumAll - sumTop);
-    const data = top.map((r) => ({ name: r.name, value: r.revenue }));
-    if (other > 0) data.push({ name: 'Otros', value: other });
-    return data;
-  }, [platform.data]);
-
-  const storeShare = useMemo(() => {
+  const topStoresChart = useMemo(() => {
     const rows = sales.data?.topStores ?? [];
-    const total = rows.reduce(
-      (s, r) => s + (Number.parseFloat(String(r.totalRevenue)) || 0),
-      0,
-    );
-    return rows.map((r) => {
-      const rev = Number.parseFloat(String(r.totalRevenue)) || 0;
-      return {
-        id: r.storeId,
-        name: r.storeName,
-        pct: total > 0 ? (rev / total) * 100 : 0,
-        revenue: rev,
-      };
-    });
+    return rows.slice(0, 6).map((r) => ({
+      nombre: truncateLabel(r.storeName, 16),
+      nombreCompleto: r.storeName,
+      ingresos: Number.parseFloat(String(r.totalRevenue)) || 0,
+    }));
   }, [sales.data]);
+
+  const CHART_H = 168;
 
   if (isLoading) {
     return (
@@ -273,34 +242,19 @@ export function AdminDashboardPage() {
   }
 
   return (
-    <div>
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0 shrink">
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+    <div className="flex min-h-0 flex-col gap-3">
+      <header className="flex shrink-0 flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-2xl">
             Panel
           </h1>
-          <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 sm:text-sm">
             Resumen de MarketHub
           </p>
         </div>
-        <div className="flex w-full flex-col gap-1.5 sm:w-auto sm:max-w-md sm:items-stretch">
-          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-end sm:gap-3">
-            <span
-              id="admin-period-label"
-              className="shrink-0 text-sm font-medium leading-none text-zinc-600 dark:text-zinc-400"
-            >
-              Periodo gráficos
-            </span>
-            <ChartPeriodSelect
-              labelledBy="admin-period-label"
-              value={periodMonths}
-              onChange={setPeriodMonths}
-            />
-          </div>
-        </div>
       </header>
 
-      <div className="mt-5 flex min-w-0 flex-nowrap items-stretch gap-2 overflow-x-auto pb-0.5 md:gap-2.5 lg:gap-3">
+      <div className="flex min-w-0 flex-nowrap items-stretch gap-2 overflow-x-auto pb-0.5 md:gap-2.5">
         <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
           <KpiCard variant={0} label="Vendedores" value={data.users.sellers} />
         </div>
@@ -329,212 +283,194 @@ export function AdminDashboardPage() {
         </div>
         <NavLink
           to={routePaths.adminSales}
-          className="flex min-h-[88px] min-w-[4.25rem] shrink-0 grow basis-0 flex-col items-center justify-center gap-1 rounded-md border-2 border-dashed border-blue-300/80 bg-blue-50/30 px-1.5 py-2 text-center backdrop-blur-md transition-colors hover:border-[var(--admin-primary)] hover:bg-[var(--admin-primary-soft)] md:min-w-0 md:shrink dark:border-blue-500/35 dark:bg-blue-950/25 dark:hover:bg-blue-950/40"
+          className="flex min-h-[76px] min-w-[4.25rem] shrink-0 grow basis-0 flex-col items-center justify-center gap-0.5 rounded-md border-2 border-dashed border-blue-300/80 bg-blue-50/30 px-1 py-1.5 text-center backdrop-blur-md transition-colors hover:border-[var(--admin-primary)] hover:bg-[var(--admin-primary-soft)] md:min-w-0 md:shrink dark:border-blue-500/35 dark:bg-blue-950/25 dark:hover:bg-blue-950/40"
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-blue-100/90 text-blue-600 shadow-sm sm:h-9 sm:w-9 dark:bg-blue-500/15 dark:text-blue-300">
-            <FiPlus className="h-4 w-4" aria-hidden />
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-blue-100/90 text-blue-600 shadow-sm dark:bg-blue-500/15 dark:text-blue-300">
+            <FiPlus className="h-3.5 w-3.5" aria-hidden />
           </span>
-          <span className="line-clamp-2 text-[9px] font-semibold uppercase leading-snug tracking-wide text-blue-900/85 sm:text-[10px] dark:text-blue-200/90">
-            Informes detallados
+          <span className="line-clamp-2 text-[8px] font-semibold uppercase leading-tight tracking-wide text-blue-900/85 sm:text-[9px] dark:text-blue-200/90">
+            Informes
           </span>
         </NavLink>
       </div>
 
-      <section className="mt-5 rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-4 shadow-sm dark:shadow-none">
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-          Ventas por mes
-        </h2>
-        <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
-          Ingresos (USD) y volumen de pedidos por mes
-        </p>
-        <div className="mt-4 h-[280px] w-full min-w-0">
-          {chartBars.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={chartBars}
-                margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+      <div className="grid min-h-0 shrink-0 grid-cols-1 gap-3 lg:grid-cols-2">
+        <section className="flex min-h-0 flex-col rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 shadow-sm dark:shadow-none">
+          <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h2
+                id="chart-monthly-title"
+                className="text-sm font-semibold text-zinc-900 dark:text-zinc-50"
               >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="rgb(0 0 0 / 0.06)"
-                  className="dark:stroke-night-700"
-                />
-                <XAxis
-                  dataKey="mesCorto"
-                  tick={{ fontSize: 11, fill: '#71717a' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  yAxisId="left"
-                  tick={{ fontSize: 11, fill: '#71717a' }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(v) =>
-                    v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)
-                  }
-                />
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  tick={{ fontSize: 11, fill: '#71717a' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip
-                  formatter={(value: number, name: string) =>
-                    name === 'ingresos'
-                      ? [formatPrice(value), 'Ingresos']
-                      : [value, 'Pedidos']
-                  }
-                  labelFormatter={(label, payload) => {
-                    const row = payload?.[0]?.payload as
-                      | { mes?: string }
-                      | undefined;
-                    return row?.mes ?? String(label);
-                  }}
-                  contentStyle={{
-                    borderRadius: 6,
-                    border: '1px solid rgb(0 0 0 / 0.08)',
-                    boxShadow: '0 12px 40px -12px rgb(0 0 0 / 0.2)',
-                  }}
-                />
-                <Legend />
-                <Bar
-                  yAxisId="left"
-                  dataKey="ingresos"
-                  name="Ingresos"
-                  fill="#3b82f6"
-                  radius={[6, 6, 0, 0]}
-                  maxBarSize={36}
-                />
-                <Bar
-                  yAxisId="right"
-                  dataKey="pedidos"
-                  name="Pedidos"
-                  fill="#f97316"
-                  radius={[6, 6, 0, 0]}
-                  maxBarSize={36}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="flex h-full items-center justify-center text-sm text-zinc-500">
-              Sin datos mensuales todavía
+                Ingresos por mes
+              </h2>
+              <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                Barras: importe · línea: pedidos
+              </p>
             </div>
-          )}
-        </div>
-      </section>
-
-      <div className="mt-5 grid gap-4 lg:grid-cols-2">
-        <section className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-4 shadow-sm dark:shadow-none">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-            Ingresos por producto
-          </h2>
-          <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
-            Participación según pedidos de la plataforma
-          </p>
-          <div className="mt-3 flex flex-col items-center gap-3 lg:flex-row lg:items-center">
-            <div className="h-[236px] w-full max-w-[280px]">
-              {donutData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={donutData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={62}
-                      outerRadius={88}
-                      paddingAngle={2}
-                      dataKey="value"
-                      nameKey="name"
-                    >
-                      {donutData.map((_, i) => (
-                        <Cell
-                          key={`cell-${i}`}
-                          fill={DONUT_COLORS[i % DONUT_COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(value: number) => formatPrice(value)}
-                      contentStyle={{ borderRadius: 6 }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="flex h-full items-center justify-center text-sm text-zinc-500">
-                  Sin ventas por producto
-                </div>
-              )}
-            </div>
-            {donutData.length > 0 ? (
-              <ul className="w-full max-w-sm flex-1 space-y-1.5 text-sm">
-                {donutData.map((d, i) => {
-                  const total = donutData.reduce((s, x) => s + x.value, 0);
-                  const pct = total ? (d.value / total) * 100 : 0;
-                  return (
-                    <li key={d.name} className="flex items-center gap-3">
-                      <span
-                        className="h-3 w-3 shrink-0 rounded-md"
-                        style={{
-                          backgroundColor: DONUT_COLORS[i % DONUT_COLORS.length],
-                        }}
-                      />
-                      <span className="min-w-0 flex-1 truncate text-zinc-700 dark:text-zinc-300">
-                        {d.name}
-                      </span>
-                      <span className="shrink-0 tabular-nums text-zinc-500">
-                        {pct.toFixed(0)}%
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : null}
+            <ChartPeriodSelect
+              labelledBy="chart-monthly-title"
+              value={periodMonths}
+              onChange={setPeriodMonths}
+            />
+          </div>
+          <div
+            className="w-full min-w-0"
+            style={{ height: CHART_H }}
+            role="img"
+            aria-label="Gráfico de ingresos y pedidos por mes"
+          >
+            {chartBars.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={chartBars}
+                  margin={{ top: 4, right: 4, left: -18, bottom: 0 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="rgb(0 0 0 / 0.06)"
+                    className="dark:stroke-night-700"
+                  />
+                  <XAxis
+                    dataKey="mesCorto"
+                    tick={{ fontSize: 10, fill: '#71717a' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    yAxisId="left"
+                    tick={{ fontSize: 10, fill: '#71717a' }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={36}
+                    tickFormatter={(v) =>
+                      v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)
+                    }
+                  />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    tick={{ fontSize: 10, fill: '#71717a' }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={28}
+                  />
+                  <Tooltip
+                    formatter={(value: number, name: string) =>
+                      name === 'ingresos'
+                        ? [formatPrice(value), 'Ingresos']
+                        : [value, 'Pedidos']
+                    }
+                    labelFormatter={(_, payload) => {
+                      const row = payload?.[0]?.payload as { mes?: string } | undefined;
+                      return row?.mes ?? '';
+                    }}
+                    contentStyle={{
+                      borderRadius: 6,
+                      border: '1px solid rgb(0 0 0 / 0.08)',
+                      fontSize: 12,
+                    }}
+                  />
+                  <Bar
+                    yAxisId="left"
+                    dataKey="ingresos"
+                    name="ingresos"
+                    fill="#3b82f6"
+                    radius={[4, 4, 0, 0]}
+                    maxBarSize={28}
+                  />
+                  <Bar
+                    yAxisId="right"
+                    dataKey="pedidos"
+                    name="pedidos"
+                    fill="#f97316"
+                    radius={[4, 4, 0, 0]}
+                    maxBarSize={28}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex h-full items-center justify-center text-xs text-zinc-500">
+                Sin datos mensuales
+              </div>
+            )}
           </div>
         </section>
 
-        <section className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-4 shadow-sm dark:shadow-none">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-            Ventas por tienda
-          </h2>
-          <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
-            Reparto de ingresos entre las tiendas con más actividad
-          </p>
-          <div className="mt-3 space-y-3">
-            {storeShare.length > 0 ? (
-              storeShare.slice(0, 8).map((s) => (
-                <div key={s.id}>
-                  <div className="mb-1 flex justify-between text-sm">
-                    <span className="truncate font-medium text-zinc-800 dark:text-zinc-200">
-                      {s.name}
-                    </span>
-                    <span className="shrink-0 tabular-nums text-zinc-500">
-                      {s.pct.toFixed(0)}% · {formatPrice(s.revenue)}
-                    </span>
-                  </div>
-                  <div className="h-2 overflow-hidden rounded-md bg-zinc-100 dark:bg-night-800">
-                    <div
-                      className="h-full rounded-md bg-[var(--admin-primary)] transition-all"
-                      style={{ width: `${Math.min(100, s.pct)}%` }}
-                    />
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-zinc-500">Sin datos de tiendas aún</p>
-            )}
+        <section className="flex min-h-0 flex-col rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 shadow-sm dark:shadow-none">
+          <div className="mb-2 min-w-0">
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+              Top tiendas por ingresos
+            </h2>
+            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+              Hasta 6 tiendas con más ventas (sin cancelados)
+            </p>
           </div>
-          <div className="mt-4 rounded-md bg-[var(--admin-primary-soft)] p-3 text-center">
-            <p className="text-xs font-medium uppercase tracking-wide text-[var(--admin-primary)]">
-              Mapa / regiones
-            </p>
-            <p className="mt-0.5 text-sm text-zinc-600 dark:text-zinc-400">
-              Cuando tengas datos por país o región, podrás enlazarlos aquí. Por
-              ahora el reparto por tienda sustituye esa vista.
-            </p>
+          <div
+            className="w-full min-w-0"
+            style={{ height: CHART_H }}
+            role="img"
+            aria-label="Gráfico horizontal de ingresos por tienda"
+          >
+            {topStoresChart.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  layout="vertical"
+                  data={topStoresChart}
+                  margin={{ top: 2, right: 8, left: 4, bottom: 2 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    horizontal={false}
+                    stroke="rgb(0 0 0 / 0.06)"
+                    className="dark:stroke-night-700"
+                  />
+                  <XAxis
+                    type="number"
+                    tick={{ fontSize: 10, fill: '#71717a' }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(v) =>
+                      v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)
+                    }
+                  />
+                  <YAxis
+                    type="category"
+                    dataKey="nombre"
+                    width={92}
+                    tick={{ fontSize: 10, fill: '#71717a' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip
+                    formatter={(value: number) => formatPrice(value)}
+                    labelFormatter={(_, payload) => {
+                      const row = payload?.[0]?.payload as
+                        | { nombreCompleto?: string }
+                        | undefined;
+                      return row?.nombreCompleto ?? '';
+                    }}
+                    contentStyle={{
+                      borderRadius: 6,
+                      border: '1px solid rgb(0 0 0 / 0.08)',
+                      fontSize: 12,
+                    }}
+                  />
+                  <Bar
+                    dataKey="ingresos"
+                    name="Ingresos"
+                    fill="var(--admin-primary, #2563eb)"
+                    radius={[0, 4, 4, 0]}
+                    maxBarSize={14}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex h-full items-center justify-center text-xs text-zinc-500">
+                Sin datos de tiendas
+              </div>
+            )}
           </div>
         </section>
       </div>

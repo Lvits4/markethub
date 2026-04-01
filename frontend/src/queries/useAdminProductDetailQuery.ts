@@ -9,7 +9,7 @@ export function useAdminProductDetailQuery(productId: string | null) {
     Boolean(productId) &&
     isAuthenticated &&
     Boolean(token) &&
-    user?.role === 'ADMIN';
+    (user?.role === 'ADMIN' || user?.role === 'SELLER');
 
   return useQuery({
     queryKey: queryKeys.product(productId ?? ''),

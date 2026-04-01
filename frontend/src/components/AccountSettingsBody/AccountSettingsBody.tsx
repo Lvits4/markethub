@@ -210,8 +210,8 @@ export function AccountSettingsBody({
               </Button>
               <Button
                 type="button"
-                variant="primary"
-                className="h-11 min-h-11 w-full justify-center border-0 px-3 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e] sm:min-w-0 sm:flex-1"
+                variant="cta"
+                className="h-11 min-h-11 w-full justify-center px-3 sm:min-w-0 sm:flex-1"
                 onClick={handleLogout}
               >
                 Cerrar sesión
@@ -225,8 +225,8 @@ export function AccountSettingsBody({
             </p>
             <Button
               type="button"
-              variant="primary"
-              className="mt-4 h-11 w-full justify-center border-0 px-3 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e]"
+              variant="cta"
+              className="mt-4 h-11 w-full justify-center px-3"
               onClick={() => navigate(routePaths.login)}
             >
               Iniciar sesión

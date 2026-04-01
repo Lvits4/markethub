@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
 import {
@@ -28,17 +29,38 @@ import { Modal } from '../../components/Modal/Modal';
 import { AdminEditStoreForm } from '../../components/AdminEditStoreForm/AdminEditStoreForm';
 import { useSellerCreateStoreModal } from '../../context/SellerCreateStoreModalProvider/SellerCreateStoreModalProvider';
 import { useAuth } from '../../hooks/useAuth';
+import { useDeleteStoreMutation } from '../../hooks/useStoreMutations';
 import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc';
 import { formatPrice } from '../../helpers/formatPrice';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAdminDeleteStore } from '../../hooks/useAdminDeleteStore';
+import { queryKeys } from '../../helpers/queryKeys';
 import { useAdminStoreDetailQuery } from '../../queries/useAdminStoreDetailQuery';
 import { useAdminStoresQuery } from '../../queries/useAdminStoresQuery';
+import { useMyStoresQuery } from '../../queries/useMyStoresQuery';
+import { useSellerStoreDetailQuery } from '../../queries/useSellerStoreDetailQuery';
 import type {
   AdminStoreDetail,
   AdminStoreDetailStats,
   AdminStoreRow,
 } from '../../types/admin';
+import type { Store } from '../../types/store';
+
+function mapMyStoreToAdminRow(s: Store): AdminStoreRow {
+  return {
+    id: s.id,
+    name: s.name,
+    slug: s.slug,
+    description: s.description,
+    contactEmail: s.contactEmail,
+    contactPhone: s.contactPhone,
+    isApproved: s.isApproved,
+    isRejected: s.isRejected ?? false,
+    isActive: s.isActive,
+    commission: s.commission ?? 5,
+    userId: s.userId,
+  };
+}
 
 function numOrZero(v: string | number) {
   const n = typeof v === 'string' ? Number.parseFloat(v) : v;
@@ -56,14 +78,12 @@ type SortDir = 'asc' | 'desc';
 
 const DEFAULT_PAGE_SIZE = 10;
 
-/** Mismo ancho relativo en las 7 columnas (cabecera y cuerpo comparten colgroup). */
-const ADMIN_STORES_COL_WIDTH = `${100 / 7}%`;
-
-function AdminStoresTableColgroup() {
+function AdminStoresTableColgroup({ count }: { count: number }) {
+  const w = `${100 / count}%`;
   return (
     <colgroup>
-      {Array.from({ length: 7 }, (__, i) => (
-        <col key={i} style={{ width: ADMIN_STORES_COL_WIDTH }} />
+      {Array.from({ length: count }, (__, i) => (
+        <col key={i} style={{ width: w }} />
       ))}
     </colgroup>
   );
@@ -129,10 +149,11 @@ function matchesSearch(s: AdminStoreRow, q: string): boolean {
 
 function StoreDetailLogo({
   logo,
-  compact,
+  imageClassName = 'max-h-28',
 }: {
   logo: string | null;
-  compact?: boolean;
+  /** Clases Tailwind para el tamaño del logo (p. ej. `max-h-44` en panel). */
+  imageClassName?: string;
 }) {
   const { token } = useAuth();
   const { src, loading, error } = useProtectedImageSrc(logo, token);
@@ -149,7 +170,7 @@ function StoreDetailLogo({
     <img
       src={src}
       alt=""
-      className={`mx-auto w-auto max-w-full object-contain ${compact ? 'max-h-12' : 'max-h-28'}`}
+      className={`mx-auto h-auto w-auto max-w-full object-contain ${imageClassName}`}
     />
   );
 }
@@ -192,7 +213,13 @@ function StatTile({
   );
 }
 
-function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
+function StoreDetailsPanel({
+  store,
+  variant = 'admin',
+}: {
+  store: AdminStoreDetail;
+  variant?: 'admin' | 'seller';
+}) {
   const [detailTab, setDetailTab] = useState<'datos' | 'politicas'>('datos');
   const ownerName = store.user
     ? `${store.user.firstName} ${store.user.lastName}`.trim()
@@ -210,8 +237,8 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
   const retText = store.returnPolicy?.trim() || 'No definida';
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden px-3 py-2">
-      <div className="shrink-0 space-y-2">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden px-4 py-3">
+      <div className="shrink-0 space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="min-w-0">
             <h3 className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
@@ -222,9 +249,11 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
             </p>
           </div>
           <div className="flex flex-wrap justify-end gap-1">
-            <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
-              {numOrZero(store.commission)}% comisión
-            </span>
+            {variant === 'admin' ? (
+              <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
+                {numOrZero(store.commission)}% comisión
+              </span>
+            ) : null}
             {store.isRejected ? (
               <AdminStatusBadge tone="danger">Rechazada</AdminStatusBadge>
             ) : store.isApproved ? (
@@ -250,24 +279,28 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
         </div>
 
         <div className="grid grid-cols-2 gap-1.5 border-t border-slate-200/80 pt-2 dark:border-sky-500/20">
-          <div className="min-w-0">
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Vendedor
-            </p>
-            <p className="flex items-center gap-1 truncate text-[11px] text-slate-800 dark:text-slate-200">
-              <FiUser className="h-3 w-3 shrink-0 text-slate-400" aria-hidden />
-              <span className="truncate">{ownerName || '—'}</span>
-            </p>
-          </div>
-          <div className="min-w-0">
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Correo vendedor
-            </p>
-            <p className="flex items-center gap-1 truncate text-[11px] text-slate-800 dark:text-slate-200">
-              <FiMail className="h-3 w-3 shrink-0 text-slate-400" aria-hidden />
-              <span className="truncate">{store.user?.email ?? '—'}</span>
-            </p>
-          </div>
+          {variant === 'admin' ? (
+            <>
+              <div className="min-w-0">
+                <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Vendedor
+                </p>
+                <p className="flex items-center gap-1 truncate text-[11px] text-slate-800 dark:text-slate-200">
+                  <FiUser className="h-3 w-3 shrink-0 text-slate-400" aria-hidden />
+                  <span className="truncate">{ownerName || '—'}</span>
+                </p>
+              </div>
+              <div className="min-w-0">
+                <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Correo vendedor
+                </p>
+                <p className="flex items-center gap-1 truncate text-[11px] text-slate-800 dark:text-slate-200">
+                  <FiMail className="h-3 w-3 shrink-0 text-slate-400" aria-hidden />
+                  <span className="truncate">{store.user?.email ?? '—'}</span>
+                </p>
+              </div>
+            </>
+          ) : null}
           <div className="min-w-0">
             <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
               Correo tienda
@@ -289,9 +322,9 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
         </div>
       </div>
 
-      <section className="mt-2 flex min-h-0 flex-1 flex-col overflow-hidden border-t border-slate-200/80 pt-2 dark:border-sky-500/20">
+      <section className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
         <div
-          className="inline-flex shrink-0 rounded-md bg-slate-100 p-0.5 dark:bg-[#0f1a38]"
+          className="inline-flex shrink-0 rounded-lg bg-slate-100 p-0.5 dark:bg-[#0f1a38]"
           role="tablist"
           aria-label="Datos y políticas"
         >
@@ -300,9 +333,9 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
             role="tab"
             aria-selected={detailTab === 'datos'}
             onClick={() => setDetailTab('datos')}
-            className={`cursor-pointer rounded px-2 py-0.5 text-[11px] font-semibold transition-colors ${
+            className={`cursor-pointer rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
               detailTab === 'datos'
-                ? 'bg-white text-slate-700 shadow-sm dark:bg-[#162647] dark:text-slate-100'
+                ? 'bg-white text-slate-800 shadow-sm dark:bg-[#162647] dark:text-slate-100'
                 : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
@@ -313,59 +346,55 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
             role="tab"
             aria-selected={detailTab === 'politicas'}
             onClick={() => setDetailTab('politicas')}
-            className={`cursor-pointer rounded px-2 py-0.5 text-[11px] font-semibold transition-colors ${
+            className={`cursor-pointer rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
               detailTab === 'politicas'
-                ? 'bg-white text-slate-700 shadow-sm dark:bg-[#162647] dark:text-slate-100'
+                ? 'bg-white text-slate-800 shadow-sm dark:bg-[#162647] dark:text-slate-100'
                 : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
             Políticas
           </button>
         </div>
-        <div className="mt-1.5 min-h-0 flex-1 overflow-hidden">
+        <div className="market-scroll mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain pr-0.5">
           {detailTab === 'datos' ? (
-            <div className="flex h-full min-h-0 gap-2">
-              <div className="flex w-[4.5rem] shrink-0 flex-col rounded-md border border-slate-200/80 bg-white p-1 dark:border-sky-500/20 dark:bg-[#0f1a38]">
-                <p className="text-[9px] font-semibold uppercase text-slate-500 dark:text-slate-400">
-                  Logo
+            <div className="space-y-3 pb-1">
+              <div className="overflow-hidden rounded-lg border border-slate-200/80 bg-white dark:border-sky-500/20 dark:bg-[#0f1a38]">
+                <p className="border-b border-slate-100 px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:border-sky-500/15 dark:text-slate-400">
+                  Logo de la tienda
                 </p>
-                <div className="flex flex-1 items-center justify-center overflow-hidden">
-                  <StoreDetailLogo logo={store.logo} compact />
+                <div className="flex justify-center px-3 py-4">
+                  <div className="inline-flex max-w-full items-center justify-center rounded-lg bg-slate-50/90 px-3 py-3 ring-1 ring-slate-200/60 dark:bg-[#0a1228] dark:ring-sky-500/20">
+                    <StoreDetailLogo
+                      logo={store.logo}
+                      imageClassName="max-h-48 w-auto max-w-[min(100%,20rem)] rounded-md shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                    />
+                  </div>
                 </div>
               </div>
-              <div className="min-w-0 flex-1 rounded-md border border-slate-200/80 bg-white p-2 dark:border-sky-500/20 dark:bg-[#0f1a38]">
-                <p className="text-[9px] font-semibold uppercase text-slate-500 dark:text-slate-400">
+              <div className="rounded-lg border border-slate-200/80 bg-white p-3 dark:border-sky-500/20 dark:bg-[#0f1a38]">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                   Descripción
                 </p>
-                <p
-                  className="mt-0.5 line-clamp-4 text-[11px] leading-snug text-slate-700 dark:text-slate-200"
-                  title={descText.length > 120 ? descText : undefined}
-                >
+                <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
                   {descText}
                 </p>
               </div>
             </div>
           ) : (
-            <div className="grid h-full min-h-0 grid-rows-2 gap-1.5">
-              <div className="min-h-0 overflow-hidden rounded-md border border-slate-200/80 bg-white p-2 dark:border-sky-500/20 dark:bg-[#0f1a38]">
-                <p className="text-[9px] font-semibold uppercase text-slate-500 dark:text-slate-400">
-                  Envíos
+            <div className="space-y-3 pb-1">
+              <div className="rounded-lg border border-slate-200/80 bg-white p-3 dark:border-sky-500/20 dark:bg-[#0f1a38]">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Política de envíos
                 </p>
-                <p
-                  className="mt-0.5 line-clamp-3 text-[11px] leading-snug text-slate-700 dark:text-slate-200"
-                  title={shipText.length > 100 ? shipText : undefined}
-                >
+                <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
                   {shipText}
                 </p>
               </div>
-              <div className="min-h-0 overflow-hidden rounded-md border border-slate-200/80 bg-white p-2 dark:border-sky-500/20 dark:bg-[#0f1a38]">
-                <p className="text-[9px] font-semibold uppercase text-slate-500 dark:text-slate-400">
-                  Devoluciones
+              <div className="rounded-lg border border-slate-200/80 bg-white p-3 dark:border-sky-500/20 dark:bg-[#0f1a38]">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                  Política de devoluciones
                 </p>
-                <p
-                  className="mt-0.5 line-clamp-3 text-[11px] leading-snug text-slate-700 dark:text-slate-200"
-                  title={retText.length > 100 ? retText : undefined}
-                >
+                <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
                   {retText}
                 </p>
               </div>
@@ -383,12 +412,14 @@ function StoreDetailsDrawer({
   isLoading,
   isError,
   store,
+  variant = 'admin',
 }: {
   open: boolean;
   onClose: () => void;
   isLoading: boolean;
   isError: boolean;
   store?: AdminStoreDetail;
+  variant?: 'admin' | 'seller';
 }) {
   useEffect(() => {
     if (!open) return;
@@ -449,7 +480,7 @@ function StoreDetailsDrawer({
               No se pudo cargar el detalle de la tienda.
             </p>
           ) : store ? (
-            <StoreDetailsPanel store={store} />
+            <StoreDetailsPanel store={store} variant={variant} />
           ) : (
             <p className="px-4 py-4 text-sm text-slate-500">
               No hay datos de la tienda.
@@ -510,9 +541,15 @@ function SortHeader({
 }
 
 export function AdminStoresPage() {
+  const { user } = useAuth();
+  const isSeller = user?.role === 'SELLER';
+  const colCount = isSeller ? 5 : 7;
+  const queryClient = useQueryClient();
   const { openCreateStoreModal } = useSellerCreateStoreModal();
-  const { data, isLoading, isError } = useAdminStoresQuery();
-  const deleteStore = useAdminDeleteStore();
+  const adminStoresQ = useAdminStoresQuery();
+  const myStoresQ = useMyStoresQuery();
+  const adminDelete = useAdminDeleteStore();
+  const sellerDelete = useDeleteStoreMutation();
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
@@ -521,7 +558,9 @@ export function AdminStoresPage() {
   const [viewStoreId, setViewStoreId] = useState<string | null>(null);
   const [storeToDelete, setStoreToDelete] = useState<AdminStoreRow | null>(null);
   const [mode, setMode] = useState<'view' | 'edit'>('view');
-  const storeDetailQuery = useAdminStoreDetailQuery(viewStoreId);
+  const adminDetailQ = useAdminStoreDetailQuery(viewStoreId);
+  const sellerDetailQ = useSellerStoreDetailQuery(viewStoreId);
+  const storeDetailQuery = isSeller ? sellerDetailQ : adminDetailQ;
   const tableHeaderScrollRef = useRef<HTMLDivElement>(null);
   const tableBodyScrollRef = useRef<HTMLDivElement>(null);
 
@@ -543,7 +582,21 @@ export function AdminStoresPage() {
     [],
   );
 
-  const stores = Array.isArray(data) ? data : [];
+  const isLoading = isSeller ? myStoresQ.isLoading : adminStoresQ.isLoading;
+  const isError = isSeller ? myStoresQ.isError : adminStoresQ.isError;
+
+  const stores = useMemo(() => {
+    if (isSeller) {
+      const raw = myStoresQ.data;
+      return Array.isArray(raw) ? raw.map(mapMyStoreToAdminRow) : [];
+    }
+    const raw = adminStoresQ.data;
+    return Array.isArray(raw) ? raw : [];
+  }, [isSeller, myStoresQ.data, adminStoresQ.data]);
+
+  const deletePending = isSeller
+    ? sellerDelete.isPending
+    : adminDelete.isPending;
 
   const filteredSorted = useMemo(() => {
     const q = search.trim();
@@ -576,7 +629,21 @@ export function AdminStoresPage() {
 
   const handleConfirmDelete = () => {
     if (!storeToDelete) return;
-    deleteStore.mutate(storeToDelete.id, {
+    const id = storeToDelete.id;
+    if (isSeller) {
+      sellerDelete.mutate(id, {
+        onSuccess: () => {
+          toast.success('Tienda eliminada');
+          setStoreToDelete(null);
+          void queryClient.invalidateQueries({
+            queryKey: queryKeys.sellerStore(id),
+          });
+        },
+        onError: (e) => toast.error(getErrorMessage(e)),
+      });
+      return;
+    }
+    adminDelete.mutate(id, {
       onSuccess: () => {
         toast.success('Tienda eliminada');
         setStoreToDelete(null);
@@ -610,7 +677,11 @@ export function AdminStoresPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar por tienda, slug, correo, teléfono o vendedor…"
+                placeholder={
+                  isSeller
+                    ? 'Buscar por tienda, slug, correo o teléfono…'
+                    : 'Buscar por tienda, slug, correo, teléfono o vendedor…'
+                }
                 className={`box-border h-11 w-full rounded-md border border-zinc-200 bg-white py-0 pl-10 text-sm leading-normal text-zinc-900 shadow-sm ring-zinc-200 placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:outline-none focus:ring-2 focus:ring-[var(--color-forest)]/25 dark:border-night-700 dark:bg-night-950 dark:text-zinc-50 dark:ring-night-800 ${search ? 'pr-11' : 'pr-4'}`}
                 aria-label="Buscar tiendas"
               />
@@ -627,8 +698,8 @@ export function AdminStoresPage() {
             </div>
             <Button
               type="button"
-              variant="primary"
-              className="h-11 min-h-11 shrink-0 border-0 px-6 py-0 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e]"
+              variant="cta"
+              className="h-11 min-h-11 shrink-0 px-6 py-0"
               onClick={() => openCreateStoreModal()}
             >
               Crear tienda
@@ -643,7 +714,7 @@ export function AdminStoresPage() {
                 className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-sky-500/20"
               >
                 <table className="table-fixed w-full min-w-[900px] border-collapse text-left text-sm">
-                  <AdminStoresTableColgroup />
+                  <AdminStoresTableColgroup count={colCount} />
                   <thead className="bg-slate-100/92 backdrop-blur-md dark:bg-[#0f1a38]/95 dark:backdrop-blur-md">
                     <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
                       <SortHeader
@@ -653,13 +724,15 @@ export function AdminStoresPage() {
                         dir={sortDir}
                         onSort={handleSort}
                       />
-                      <SortHeader
-                        label="Vendedor"
-                        sortKey="vendor"
-                        activeKey={sortKey}
-                        dir={sortDir}
-                        onSort={handleSort}
-                      />
+                      {!isSeller ? (
+                        <SortHeader
+                          label="Vendedor"
+                          sortKey="vendor"
+                          activeKey={sortKey}
+                          dir={sortDir}
+                          onSort={handleSort}
+                        />
+                      ) : null}
                       <SortHeader
                         label="Correo tienda"
                         sortKey="contactEmail"
@@ -681,9 +754,11 @@ export function AdminStoresPage() {
                         dir={sortDir}
                         onSort={handleSort}
                       />
-                      <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                        Comisión
-                      </th>
+                      {!isSeller ? (
+                        <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+                          Comisión
+                        </th>
+                      ) : null}
                       <th className="px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
                         Acción
                       </th>
@@ -697,12 +772,12 @@ export function AdminStoresPage() {
                 className="market-scroll min-h-0 flex-1 overflow-y-auto overflow-x-auto"
               >
                 <table className="table-fixed w-full min-w-[900px] border-collapse text-left text-sm">
-                  <AdminStoresTableColgroup />
+                  <AdminStoresTableColgroup count={colCount} />
                   <tbody>
                     {pageRows.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={7}
+                          colSpan={colCount}
                           className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400"
                         >
                           {stores.length === 0
@@ -724,20 +799,22 @@ export function AdminStoresPage() {
                               {s.slug}
                             </p>
                           </td>
-                          <td className="px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
-                            {s.user ? (
-                              <>
-                                <p className="leading-tight">
-                                  {s.user.firstName} {s.user.lastName}
-                                </p>
-                                <p className="mt-0.5 text-xs leading-tight text-slate-500 dark:text-slate-500">
-                                  {s.user.email}
-                                </p>
-                              </>
-                            ) : (
-                              '—'
-                            )}
-                          </td>
+                          {!isSeller ? (
+                            <td className="px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
+                              {s.user ? (
+                                <>
+                                  <p className="leading-tight">
+                                    {s.user.firstName} {s.user.lastName}
+                                  </p>
+                                  <p className="mt-0.5 text-xs leading-tight text-slate-500 dark:text-slate-500">
+                                    {s.user.email}
+                                  </p>
+                                </>
+                              ) : (
+                                '—'
+                              )}
+                            </td>
+                          ) : null}
                           <td className="min-w-0 truncate px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
                             {s.contactEmail ?? '—'}
                           </td>
@@ -766,9 +843,11 @@ export function AdminStoresPage() {
                               </AdminStatusBadge>
                             </div>
                           </td>
-                          <td className="px-4 py-2 align-middle text-slate-700 tabular-nums dark:text-slate-300">
-                            {numOrZero(s.commission)}%
-                          </td>
+                          {!isSeller ? (
+                            <td className="px-4 py-2 align-middle text-slate-700 tabular-nums dark:text-slate-300">
+                              {numOrZero(s.commission)}%
+                            </td>
+                          ) : null}
                           <td className="px-4 py-2 align-middle text-center">
                             <div className="flex flex-nowrap items-center justify-center gap-1.5">
                               <Button
@@ -786,7 +865,7 @@ export function AdminStoresPage() {
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="!text-[#1d4ed8] hover:bg-blue-500/10 dark:!text-sky-300 dark:hover:bg-sky-500/15"
+                                className="!text-yellow-600 hover:bg-yellow-500/15 dark:!text-sky-300 dark:hover:bg-sky-500/15"
                                 aria-label={`Editar ${s.name}`}
                                 onClick={() => {
                                   setMode('edit');
@@ -799,7 +878,7 @@ export function AdminStoresPage() {
                                 type="button"
                                 variant="icon"
                                 className="!text-red-600 hover:bg-red-500/10 dark:!text-red-400 dark:hover:bg-red-950/35"
-                                disabled={deleteStore.isPending}
+                                disabled={deletePending}
                                 aria-label={`Eliminar ${s.name}`}
                                 onClick={() => setStoreToDelete(s)}
                               >
@@ -900,6 +979,7 @@ export function AdminStoresPage() {
                 mode === 'edit' ? (
                   <AdminEditStoreForm
                     store={storeDetailQuery.data}
+                    allowCommissionEdit={!isSeller}
                     onSuccess={() => {
                       setViewStoreId(null);
                       setMode('view');
@@ -909,7 +989,10 @@ export function AdminStoresPage() {
                     }}
                   />
                 ) : (
-                  <StoreDetailsPanel store={storeDetailQuery.data} />
+                  <StoreDetailsPanel
+                    store={storeDetailQuery.data}
+                    variant={isSeller ? 'seller' : 'admin'}
+                  />
                 )
               ) : null}
             </div>
@@ -923,6 +1006,7 @@ export function AdminStoresPage() {
             isLoading={storeDetailQuery.isLoading}
             isError={storeDetailQuery.isError}
             store={storeDetailQuery.data}
+            variant={isSeller ? 'seller' : 'admin'}
           />
           <Modal
             open={storeToDelete != null}
@@ -945,7 +1029,7 @@ export function AdminStoresPage() {
                 variant="ghost"
                 className="h-10 w-40 justify-center border border-zinc-300 bg-white px-4 text-sm text-zinc-800 hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700"
                 onClick={() => setStoreToDelete(null)}
-                disabled={deleteStore.isPending}
+                disabled={deletePending}
               >
                 Cancelar
               </Button>
@@ -954,9 +1038,9 @@ export function AdminStoresPage() {
                 variant="primary"
                 className="h-10 w-40 justify-center border-0 bg-rose-700/90 px-4 text-sm text-white hover:bg-rose-800 dark:bg-rose-700/90 dark:hover:bg-rose-800"
                 onClick={handleConfirmDelete}
-                disabled={deleteStore.isPending}
+                disabled={deletePending}
               >
-                {deleteStore.isPending ? 'Eliminando…' : 'Eliminar tienda'}
+                {deletePending ? 'Eliminando…' : 'Eliminar tienda'}
               </Button>
             </div>
           </Modal>

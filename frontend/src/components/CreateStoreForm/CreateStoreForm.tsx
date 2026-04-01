@@ -335,10 +335,10 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
           {step < lastIndex ? (
             <Button
               type="button"
-              variant="primary"
+              variant="cta"
               disabled={disabledNav}
               onClick={goNext}
-              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 border-0 px-3 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e] sm:min-w-[11rem]"
+              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 px-3 sm:min-w-[11rem]"
             >
               Siguiente
               <FiChevronRight className="h-4 w-4 shrink-0" aria-hidden />
@@ -346,10 +346,10 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
           ) : (
             <Button
               type="button"
-              variant="primary"
+              variant="cta"
               disabled={disabledNav}
               onClick={() => void handleCreateStore()}
-              className="h-11 min-h-11 min-w-0 flex-1 justify-center border-0 px-3 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e] sm:min-w-[11rem]"
+              className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:min-w-[11rem]"
             >
               {createMut.isPending ? 'Creando…' : 'Crear tienda'}
             </Button>

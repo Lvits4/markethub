@@ -25,4 +25,9 @@ export const queryKeys = {
   adminSalesReport: ['admin', 'reports', 'sales'] as const,
   adminPlatformReport: ['admin', 'orders', 'store-report'] as const,
   storesRejected: ['stores', 'rejected'] as const,
+  sellerDashboard: ['seller', 'dashboard'] as const,
+  sellerProducts: ['seller', 'products'] as const,
+  sellerStore: (id: string) => ['seller', 'stores', id] as const,
+  sellerSalesReport: ['seller', 'reports', 'sales'] as const,
+  sellerStoreReport: ['seller', 'orders', 'store-report'] as const,
 };

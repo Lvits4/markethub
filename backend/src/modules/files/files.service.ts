@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  StreamableFile,
+} from '@nestjs/common';
 import { StorageService } from 's3-client-dtb/nestjs';
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
@@ -52,8 +57,14 @@ export class FilesService {
     if (!exists) {
       throw new NotFoundException('Archivo no encontrado');
     }
-    const stream = await this.storage.downloadFile(filePath);
-    return stream as unknown as Readable;
+    const wrapped = await this.storage.downloadFile(filePath);
+    // `StorageService.downloadFile` ya devuelve `StreamableFile`; el controlador
+    // vuelve a envolver en `new StreamableFile(...)`. Anidar StreamableFile deja
+    // el stream interno indefinido y rompe GET /files/download (p. ej. imágenes en panel admin).
+    if (wrapped instanceof StreamableFile) {
+      return wrapped.getStream();
+    }
+    return wrapped as Readable;
   }
 
   async delete(filePath: string): Promise<void> {

@@ -45,7 +45,7 @@ export function LoginPage() {
           return;
         }
         if (data.user.role === 'SELLER') {
-          navigate(routePaths.seller, { replace: true });
+          navigate(routePaths.admin, { replace: true });
           return;
         }
         navigate(from, { replace: true });

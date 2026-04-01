@@ -32,6 +32,7 @@ import { getErrorMessage } from '../../helpers/mapApiError';
 import { useDeleteProductMutation } from '../../hooks/useProductSellerMutations';
 import { useAdminProductDetailQuery } from '../../queries/useAdminProductDetailQuery';
 import { useAdminProductsQuery } from '../../queries/useAdminProductsQuery';
+import { useSellerProductsQuery } from '../../queries/useSellerProductsQuery';
 import type { AdminProductRow } from '../../types/admin';
 import type { Product } from '../../types/product';
 
@@ -349,7 +350,13 @@ function SortHeader({
 }
 
 export function AdminProductsPage() {
-  const { data, isLoading, isError } = useAdminProductsQuery();
+  const { user } = useAuth();
+  const isSeller = user?.role === 'SELLER';
+  const adminProductsQ = useAdminProductsQuery();
+  const sellerProductsQ = useSellerProductsQuery();
+  const data = isSeller ? sellerProductsQ.data : adminProductsQ.data;
+  const isLoading = isSeller ? sellerProductsQ.isLoading : adminProductsQ.isLoading;
+  const isError = isSeller ? sellerProductsQ.isError : adminProductsQ.isError;
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
@@ -480,8 +487,8 @@ export function AdminProductsPage() {
             </div>
             <Button
               type="button"
-              variant="primary"
-              className="h-11 min-h-11 shrink-0 border-0 px-6 py-0 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e]"
+              variant="cta"
+              className="h-11 min-h-11 shrink-0 px-6 py-0"
               onClick={() => setCreateProductOpen(true)}
             >
               Crear producto
@@ -615,7 +622,7 @@ export function AdminProductsPage() {
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="!text-[#1d4ed8] hover:bg-blue-500/10 dark:!text-sky-300 dark:hover:bg-sky-500/15"
+                                className="!text-yellow-600 hover:bg-yellow-500/15 dark:!text-sky-300 dark:hover:bg-sky-500/15"
                                 aria-label={`Editar ${p.name}`}
                                 onClick={() => {
                                   setMode('edit');

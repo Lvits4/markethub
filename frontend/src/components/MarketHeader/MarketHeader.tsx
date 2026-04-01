@@ -71,7 +71,7 @@ export function MarketHeader() {
           ) : null}
           {showSeller ? (
             <NavLink
-              to={routePaths.seller}
+              to={routePaths.admin}
               className={({ isActive }) => (isActive ? navActive : navInactive)}
             >
               <FiGrid className="h-4 w-4" aria-hidden />

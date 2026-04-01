@@ -17,6 +17,8 @@ export type Store = {
   contactEmail: string | null;
   contactPhone: string | null;
   isApproved: boolean;
+  /** Presente en respuestas del vendedor / admin */
+  isRejected?: boolean;
   isActive: boolean;
   commission?: string | number;
   userId: string;

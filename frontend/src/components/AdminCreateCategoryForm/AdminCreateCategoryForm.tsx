@@ -122,10 +122,10 @@ export function AdminCreateCategoryForm({
           ) : null}
           <Button
             type="button"
-            variant="primary"
+            variant="cta"
             disabled={busy}
             onClick={handleSubmit}
-            className="h-11 min-h-11 min-w-0 flex-1 justify-center border-0 px-3 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e] sm:min-w-[11rem]"
+            className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:min-w-[11rem]"
           >
             {busy ? 'Creando…' : 'Crear categoría'}
           </Button>

@@ -5,12 +5,11 @@ import { fetchStoreOrders } from '../requests/orderRequests';
 
 export function useStoreOrdersSellerQuery() {
   const { token, isAuthenticated, user } = useAuth();
-  const sellerOrAdmin =
-    user?.role === 'SELLER' || user?.role === 'ADMIN';
 
   return useQuery({
     queryKey: queryKeys.ordersStore,
     queryFn: () => fetchStoreOrders(token!),
-    enabled: isAuthenticated && Boolean(token) && sellerOrAdmin,
+    enabled:
+      isAuthenticated && Boolean(token) && user?.role === 'SELLER',
   });
 }

@@ -10,7 +10,7 @@ import { DataSource, EntityManager, In, Repository } from 'typeorm';
 import { Store } from './entities/store.entity';
 import { CreateStoreDto, UpdateStoreDto } from './dto';
 import { User } from '../users/entities/user.entity';
-import { Role } from '../../common/enums';
+import { OrderStatus, Role } from '../../common/enums';
 import { Product } from '../products/entities/product.entity';
 import { ProductImage } from '../products/entities/product-image.entity';
 import { CartItem } from '../cart/entities/cart-item.entity';
@@ -27,6 +27,10 @@ export class StoresService {
   constructor(
     @InjectRepository(Store)
     private readonly storesRepository: Repository<Store>,
+    @InjectRepository(Product)
+    private readonly productsRepository: Repository<Product>,
+    @InjectRepository(Order)
+    private readonly ordersRepository: Repository<Order>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -262,6 +266,73 @@ export class StoresService {
       relations: ['user'],
       order: { createdAt: 'DESC' },
     });
+  }
+
+  /** Detalle de tienda con agregados de productos y pedidos (panel admin / vendedor). */
+  async getStoreWithStats(storeId: string) {
+    const store = await this.storesRepository.findOne({
+      where: { id: storeId },
+      relations: ['user'],
+    });
+    if (!store) {
+      throw new NotFoundException('Tienda no encontrada');
+    }
+
+    const [productsTotal, productsActive, rawStats] = await Promise.all([
+      this.productsRepository.count({ where: { storeId } }),
+      this.productsRepository.count({ where: { storeId, isActive: true } }),
+      this.ordersRepository
+        .createQueryBuilder('o')
+        .select('COUNT(o.id)', 'ordersTotal')
+        .addSelect(
+          'COALESCE(SUM(CASE WHEN o.status != :cancelled THEN o.total_amount ELSE 0 END), 0)',
+          'revenue',
+        )
+        .addSelect(
+          'COALESCE(SUM(CASE WHEN o.status = :delivered THEN 1 ELSE 0 END), 0)',
+          'ordersDelivered',
+        )
+        .where('o.store_id = :storeId', { storeId })
+        .setParameters({
+          cancelled: OrderStatus.CANCELLED,
+          delivered: OrderStatus.DELIVERED,
+        })
+        .getRawOne<{
+          ordersTotal: string;
+          revenue: string | null;
+          ordersDelivered: string | null;
+        }>(),
+    ]);
+
+    const ordersTotal =
+      Number.parseInt(String(rawStats?.ordersTotal ?? '0'), 10) || 0;
+    const ordersDelivered =
+      Number.parseInt(String(rawStats?.ordersDelivered ?? '0'), 10) || 0;
+    const revenue = parseFloat(String(rawStats?.revenue ?? '0')) || 0;
+
+    const stats = {
+      productsTotal,
+      productsActive,
+      ordersTotal,
+      ordersDelivered,
+      revenue,
+    };
+
+    const u = store.user;
+    if (u) {
+      const {
+        password: _p,
+        passwordResetToken: _t,
+        passwordResetExpires: _e,
+        ...safeUser
+      } = u as User & {
+        password?: string;
+        passwordResetToken?: string | null;
+        passwordResetExpires?: Date | null;
+      };
+      return { ...store, user: safeUser, stats };
+    }
+    return { ...store, stats };
   }
 
   private generateSlug(name: string): string {

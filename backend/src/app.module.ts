@@ -19,6 +19,7 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { SellerModule } from './modules/seller/seller.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { AdminModule } from './modules/admin/admin.module';
     PaymentsModule,
     FavoritesModule,
     AdminModule,
+    SellerModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },

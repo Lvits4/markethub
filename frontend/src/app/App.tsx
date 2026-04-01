@@ -1,16 +1,17 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { HashRouter, Route, Routes } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '../context/AuthProvider/AuthProvider';
 import { ThemeProvider } from '../context/ThemeProvider/ThemeProvider';
 import { useTheme } from '../hooks/useTheme';
-import { AuthLayout } from '../layouts/AuthLayout/AuthLayout';
+import { AuthPage } from '../views/AuthPage/AuthPage';
 import { MainLayout } from '../layouts/MainLayout/MainLayout';
+import { AdminOnlyRoute } from '../components/AdminOnlyRoute/AdminOnlyRoute';
 import { AdminRoute } from '../components/AdminRoute/AdminRoute';
 import { ProtectedRoute } from '../components/ProtectedRoute/ProtectedRoute';
 import { SellerRoute } from '../components/SellerRoute/SellerRoute';
 import { AdminLayout } from '../layouts/AdminLayout/AdminLayout';
-import { SellerLayout } from '../layouts/SellerLayout/SellerLayout';
+import { routePaths } from '../config/routes';
 import { AdminCategoriesPage } from '../views/AdminCategoriesPage/AdminCategoriesPage';
 import { AdminDashboardPage } from '../views/AdminDashboardPage/AdminDashboardPage';
 import { AdminModerationPage } from '../views/AdminModerationPage/AdminModerationPage';
@@ -31,12 +32,6 @@ import { ForgotPasswordPage } from '../views/ForgotPasswordPage/ForgotPasswordPa
 import { ResetPasswordPage } from '../views/ResetPasswordPage/ResetPasswordPage';
 import { OrdersPage } from '../views/OrdersPage/OrdersPage';
 import { OrderDetailPage } from '../views/OrderDetailPage/OrderDetailPage';
-import { SellerDashboardPage } from '../views/SellerDashboardPage/SellerDashboardPage';
-import { SellerStoreProductsPage } from '../views/SellerStoreProductsPage/SellerStoreProductsPage';
-import { SellerProductFormPage } from '../views/SellerProductFormPage/SellerProductFormPage';
-import { SellerOrdersPage } from '../views/SellerOrdersPage/SellerOrdersPage';
-import { SellerReportPage } from '../views/SellerReportPage/SellerReportPage';
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -89,38 +84,47 @@ export default function App() {
                 }
               >
                 <Route index element={<AdminDashboardPage />} />
-                <Route path="users" element={<AdminUsersPage />} />
-                <Route path="moderation" element={<AdminModerationPage />} />
+                <Route
+                  path="users"
+                  element={
+                    <AdminOnlyRoute>
+                      <AdminUsersPage />
+                    </AdminOnlyRoute>
+                  }
+                />
+                <Route
+                  path="moderation"
+                  element={
+                    <AdminOnlyRoute>
+                      <AdminModerationPage />
+                    </AdminOnlyRoute>
+                  }
+                />
                 <Route path="stores" element={<AdminStoresPage />} />
                 <Route path="products" element={<AdminProductsPage />} />
                 <Route path="orders" element={<AdminOrdersPage />} />
                 <Route path="sales" element={<AdminSalesPage />} />
-                <Route path="categories" element={<AdminCategoriesPage />} />
+                <Route
+                  path="categories"
+                  element={
+                    <AdminOnlyRoute>
+                      <AdminCategoriesPage />
+                    </AdminOnlyRoute>
+                  }
+                />
               </Route>
               <Route
-                path="/seller"
+                path="/seller/*"
                 element={
                   <ProtectedRoute>
                     <SellerRoute>
-                      <SellerLayout />
+                      <Navigate to={routePaths.admin} replace />
                     </SellerRoute>
                   </ProtectedRoute>
                 }
-              >
-                <Route index element={<SellerDashboardPage />} />
-                <Route
-                  path="stores/:storeId/products"
-                  element={<SellerStoreProductsPage />}
-                />
-                <Route path="products/new" element={<SellerProductFormPage />} />
-                <Route
-                  path="products/:productId/edit"
-                  element={<SellerProductFormPage />}
-                />
-                <Route path="orders" element={<SellerOrdersPage />} />
-                <Route path="report" element={<SellerReportPage />} />
-              </Route>
-              <Route path="/auth" element={<AuthLayout />}>
+              />
+              <Route path="/auth" element={<AuthPage />}>
+                <Route index element={<Navigate to="login" replace />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="register" element={<RegisterPage />} />
                 <Route path="forgot-password" element={<ForgotPasswordPage />} />

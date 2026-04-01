@@ -1,6 +1,9 @@
 import { formatPrice } from '../../helpers/formatPrice';
+import { useAuth } from '../../hooks/useAuth';
 import { useAdminPlatformReportQuery } from '../../queries/useAdminPlatformReportQuery';
 import { useAdminSalesReportQuery } from '../../queries/useAdminSalesReportQuery';
+import { useSellerSalesReportQuery } from '../../queries/useSellerSalesReportQuery';
+import { useSellerStoreReportQuery } from '../../queries/useSellerStoreReportQuery';
 
 function StatBlock({
   label,
@@ -27,8 +30,14 @@ function StatBlock({
 }
 
 export function AdminSalesPage() {
-  const sales = useAdminSalesReportQuery();
-  const platform = useAdminPlatformReportQuery();
+  const { user } = useAuth();
+  const isSeller = user?.role === 'SELLER';
+  const adminSales = useAdminSalesReportQuery();
+  const sellerSales = useSellerSalesReportQuery();
+  const adminPlatform = useAdminPlatformReportQuery();
+  const sellerPlatform = useSellerStoreReportQuery();
+  const sales = isSeller ? sellerSales : adminSales;
+  const platform = isSeller ? sellerPlatform : adminPlatform;
 
   const loading = sales.isLoading || platform.isLoading;
   const err = sales.isError || platform.isError;
@@ -39,15 +48,31 @@ export function AdminSalesPage() {
         Ventas y reportes
       </h2>
       <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-        Combina el reporte administrativo (
-        <code className="rounded-md bg-zinc-100 px-1 text-xs dark:bg-night-800">
-          GET /admin/reports/sales
-        </code>
-        ) con el agregado de pedidos para admin (
-        <code className="rounded-md bg-zinc-100 px-1 text-xs dark:bg-night-800">
-          GET /orders/store/report
-        </code>
-        ).
+        {isSeller ? (
+          <>
+            Datos de{' '}
+            <code className="rounded-md bg-zinc-100 px-1 text-xs dark:bg-night-800">
+              GET /seller/reports/sales
+            </code>{' '}
+            y{' '}
+            <code className="rounded-md bg-zinc-100 px-1 text-xs dark:bg-night-800">
+              GET /orders/store/report
+            </code>{' '}
+            (solo tus tiendas).
+          </>
+        ) : (
+          <>
+            Combina el reporte administrativo (
+            <code className="rounded-md bg-zinc-100 px-1 text-xs dark:bg-night-800">
+              GET /admin/reports/sales
+            </code>
+            ) con el agregado de pedidos (
+            <code className="rounded-md bg-zinc-100 px-1 text-xs dark:bg-night-800">
+              GET /orders/store/report
+            </code>
+            ).
+          </>
+        )}
       </p>
 
       {loading ? (
@@ -61,7 +86,7 @@ export function AdminSalesPage() {
           {platform.data ? (
             <section className="mt-8">
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                Resumen de plataforma
+                {isSeller ? 'Resumen de tus tiendas' : 'Resumen de plataforma'}
               </h3>
               <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <StatBlock
@@ -114,7 +139,9 @@ export function AdminSalesPage() {
           {sales.data ? (
             <section className="mt-12">
               <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                Histórico mensual y top tiendas
+                {isSeller
+                  ? 'Histórico mensual y rendimiento por tienda'
+                  : 'Histórico mensual y top tiendas'}
               </h3>
               <div className="mt-4 grid gap-8 lg:grid-cols-2">
                 <div className="overflow-x-auto rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">

@@ -38,6 +38,8 @@ export type AdminEditStoreFormProps = {
   store: AdminStoreDetail;
   onSuccess?: () => void;
   onCancel?: () => void;
+  /** Si es false (vendedor), no se muestra ni envía la comisión. */
+  allowCommissionEdit?: boolean;
 };
 
 type AdminEditStoreFormErrors = {
@@ -50,6 +52,7 @@ export function AdminEditStoreForm({
   store,
   onSuccess,
   onCancel,
+  allowCommissionEdit = true,
 }: AdminEditStoreFormProps) {
   const { token } = useAuth();
   const updateMut = useUpdateStoreMutation();
@@ -97,10 +100,12 @@ export function AdminEditStoreForm({
       if (!name.trim()) {
         nextErrors.name = 'El nombre es obligatorio.';
       }
-      const commRaw = commission.trim().replace(',', '.');
-      const commNum = Number.parseFloat(commRaw);
-      if (!Number.isFinite(commNum) || commNum < 0 || commNum > 100) {
-        nextErrors.commission = 'La comisión debe ser un número entre 0 y 100.';
+      if (allowCommissionEdit) {
+        const commRaw = commission.trim().replace(',', '.');
+        const commNum = Number.parseFloat(commRaw);
+        if (!Number.isFinite(commNum) || commNum < 0 || commNum > 100) {
+          nextErrors.commission = 'La comisión debe ser un número entre 0 y 100.';
+        }
       }
       setErrors((prev) => ({
         ...prev,
@@ -183,12 +188,14 @@ export function AdminEditStoreForm({
 
     try {
       await updateMut.mutateAsync({ id: store.id, body });
-      const prevComm = numOrZero(store.commission);
-      if (commNum !== prevComm) {
-        await patchCommission.mutateAsync({
-          storeId: store.id,
-          commission: commNum,
-        });
+      if (allowCommissionEdit) {
+        const prevComm = numOrZero(store.commission);
+        if (commNum !== prevComm) {
+          await patchCommission.mutateAsync({
+            storeId: store.id,
+            commission: commNum,
+          });
+        }
       }
       toast.success('Tienda actualizada');
       onSuccess?.();
@@ -266,34 +273,36 @@ export function AdminEditStoreForm({
                 />
               </div>
 
-              <div>
-                <label htmlFor="edit-store-commission" className={labelClass}>
-                  Comisión (%)
-                </label>
-                <input
-                  id="edit-store-commission"
-                  type="text"
-                  inputMode="decimal"
-                  value={commission}
-                  onChange={(e) => {
-                    setCommission(e.target.value);
-                    setErrors((prev) => ({ ...prev, commission: undefined }));
-                  }}
-                  className={`${fieldClass} ${errors.commission ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400/20' : ''}`}
-                  aria-describedby="edit-store-commission-hint"
-                />
-                {errors.commission ? (
-                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                    {errors.commission}
+              {allowCommissionEdit ? (
+                <div>
+                  <label htmlFor="edit-store-commission" className={labelClass}>
+                    Comisión (%)
+                  </label>
+                  <input
+                    id="edit-store-commission"
+                    type="text"
+                    inputMode="decimal"
+                    value={commission}
+                    onChange={(e) => {
+                      setCommission(e.target.value);
+                      setErrors((prev) => ({ ...prev, commission: undefined }));
+                    }}
+                    className={`${fieldClass} ${errors.commission ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400/20' : ''}`}
+                    aria-describedby="edit-store-commission-hint"
+                  />
+                  {errors.commission ? (
+                    <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                      {errors.commission}
+                    </p>
+                  ) : null}
+                  <p
+                    id="edit-store-commission-hint"
+                    className="mt-1 text-xs text-zinc-500 dark:text-zinc-400"
+                  >
+                    Porcentaje de comisión de la plataforma (0–100).
                   </p>
-                ) : null}
-                <p
-                  id="edit-store-commission-hint"
-                  className="mt-1 text-xs text-zinc-500 dark:text-zinc-400"
-                >
-                  Porcentaje de comisión de la plataforma (0–100).
-                </p>
-              </div>
+                </div>
+              ) : null}
             </>
           ) : null}
 
@@ -409,10 +418,10 @@ export function AdminEditStoreForm({
           {step < lastIndex ? (
             <Button
               type="button"
-              variant="primary"
+              variant="cta"
               disabled={busy}
               onClick={goNext}
-              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 border-0 px-3 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e] sm:min-w-[11rem]"
+              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 px-3 sm:min-w-[11rem]"
             >
               Siguiente
               <FiChevronRight className="h-4 w-4 shrink-0" aria-hidden />
@@ -420,10 +429,10 @@ export function AdminEditStoreForm({
           ) : (
             <Button
               type="button"
-              variant="primary"
+              variant="cta"
               disabled={busy}
               onClick={handleSaveStore}
-              className="h-11 min-h-11 min-w-0 flex-1 justify-center border-0 px-3 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e] sm:min-w-[11rem]"
+              className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:min-w-[11rem]"
             >
               {busy ? 'Guardando…' : 'Guardar cambios'}
             </Button>

@@ -3,15 +3,15 @@ import { Navigate } from 'react-router-dom';
 import { routePaths } from '../../config/routes';
 import { useAuth } from '../../hooks/useAuth';
 
-type AdminRouteProps = {
+type AdminOnlyRouteProps = {
   children: ReactNode;
 };
 
-export function AdminRoute({ children }: AdminRouteProps) {
+export function AdminOnlyRoute({ children }: AdminOnlyRouteProps) {
   const { user } = useAuth();
 
-  if (user?.role !== 'ADMIN' && user?.role !== 'SELLER') {
-    return <Navigate to={routePaths.catalog} replace />;
+  if (user?.role !== 'ADMIN') {
+    return <Navigate to={routePaths.admin} replace />;
   }
 
   return <>{children}</>;

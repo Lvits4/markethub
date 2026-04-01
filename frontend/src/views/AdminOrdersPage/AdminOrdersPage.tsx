@@ -27,8 +27,10 @@ import { Modal } from '../../components/Modal/Modal';
 import { AdminEditOrderForm } from '../../components/AdminEditOrderForm/AdminEditOrderForm';
 import { formatOrderStatus } from '../../helpers/orderStatus';
 import { formatPrice } from '../../helpers/formatPrice';
+import { useAuth } from '../../hooks/useAuth';
 import { useAdminOrdersQuery } from '../../queries/useAdminOrdersQuery';
 import { useOrderDetailQuery } from '../../queries/useOrderDetailQuery';
+import { useStoreOrdersSellerQuery } from '../../queries/useStoreOrdersSellerQuery';
 import type { AdminOrderRow } from '../../types/admin';
 import type { Order } from '../../types/order';
 
@@ -43,6 +45,32 @@ type SortDir = 'asc' | 'desc';
 const DEFAULT_PAGE_SIZE = 10;
 const NUM_COLS = 6;
 const COL_WIDTH = `${100 / NUM_COLS}%`;
+
+function orderToAdminRow(
+  o: Order & { createdAt?: string; updatedAt?: string },
+): AdminOrderRow {
+  return {
+    id: o.id,
+    status: o.status,
+    totalAmount: o.totalAmount,
+    shippingAddress: o.shippingAddress,
+    userId: o.userId,
+    storeId: o.storeId,
+    user: o.user,
+    store: o.store,
+    createdAt: o.createdAt,
+    updatedAt: o.updatedAt,
+    items: o.items?.map((item, i) => ({
+      id: item.id ?? `${item.productId}-${i}`,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      productId: item.productId,
+      product: item.product
+        ? { id: item.product.id, name: item.product.name }
+        : undefined,
+    })),
+  };
+}
 
 function OrdersTableColgroup() {
   return (
@@ -373,7 +401,13 @@ function SortHeader({
 }
 
 export function AdminOrdersPage() {
-  const { data, isLoading, isError } = useAdminOrdersQuery();
+  const { user } = useAuth();
+  const isSeller = user?.role === 'SELLER';
+  const adminOrdersQ = useAdminOrdersQuery();
+  const sellerOrdersQ = useStoreOrdersSellerQuery();
+  const data = isSeller ? sellerOrdersQ.data : adminOrdersQ.data;
+  const isLoading = isSeller ? sellerOrdersQ.isLoading : adminOrdersQ.isLoading;
+  const isError = isSeller ? sellerOrdersQ.isError : adminOrdersQ.isError;
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('date');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
@@ -407,7 +441,13 @@ export function AdminOrdersPage() {
     [],
   );
 
-  const orders = Array.isArray(data) ? data : [];
+  const orders = useMemo(() => {
+    const raw = Array.isArray(data) ? data : [];
+    if (isSeller) {
+      return (raw as (Order & { createdAt?: string })[]).map(orderToAdminRow);
+    }
+    return raw as AdminOrderRow[];
+  }, [data, isSeller]);
 
   const filteredSorted = useMemo(() => {
     const q = search.trim();
@@ -613,7 +653,7 @@ export function AdminOrdersPage() {
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="!text-[#1d4ed8] hover:bg-blue-500/10 dark:!text-sky-300 dark:hover:bg-sky-500/15"
+                                className="!text-yellow-600 hover:bg-yellow-500/15 dark:!text-sky-300 dark:hover:bg-sky-500/15"
                                 aria-label={`Editar pedido ${o.id.slice(0, 8)}`}
                                 onClick={() => {
                                   setMode('edit');
