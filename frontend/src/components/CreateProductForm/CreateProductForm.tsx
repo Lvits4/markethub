@@ -1,7 +1,8 @@
-import { useState, type ChangeEvent } from 'react';
+import { useMemo, useState, type ChangeEvent } from 'react';
 import toast from 'react-hot-toast';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { Button } from '../Button/Button';
+import { FormSelect } from './FormSelect';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAuth } from '../../hooks/useAuth';
 import { useCreateProductMutation } from '../../hooks/useProductSellerMutations';
@@ -55,7 +56,22 @@ export function CreateProductForm({
   const createMut = useCreateProductMutation(storeId || undefined);
 
   const lastIndex = STEPS.length - 1;
-  const storeList = Array.isArray(stores) ? stores : [];
+
+  const storeOptions = useMemo(() => {
+    const list = Array.isArray(stores) ? stores : [];
+    return [
+      { value: '', label: '— Selecciona una tienda —' },
+      ...list.map((s) => ({ value: s.id, label: s.name })),
+    ];
+  }, [stores]);
+
+  const categoryOptions = useMemo(
+    () => [
+      { value: '', label: '— Sin categoría —' },
+      ...(categories ?? []).map((c) => ({ value: c.id, label: c.name })),
+    ],
+    [categories],
+  );
 
   const reset = () => {
     setStep(0);
@@ -194,22 +210,17 @@ export function CreateProductForm({
                   Tienda{' '}
                   <span className="text-red-600 dark:text-red-400">*</span>
                 </label>
-                <select
+                <FormSelect
                   id="create-product-store"
                   value={storeId}
-                  onChange={(e) => {
-                    setStoreId(e.target.value);
+                  onChange={(v) => {
+                    setStoreId(v);
                     setErrors((prev) => ({ ...prev, storeId: undefined }));
                   }}
-                  className={`${fieldClass} ${errors.storeId ? errorFieldClass : ''}`}
-                >
-                  <option value="">— Selecciona una tienda —</option>
-                  {storeList.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
+                  options={storeOptions}
+                  placeholder="— Selecciona una tienda —"
+                  error={Boolean(errors.storeId)}
+                />
                 {errors.storeId ? (
                   <p className="mt-1 text-xs text-red-600 dark:text-red-400">
                     {errors.storeId}
@@ -260,19 +271,13 @@ export function CreateProductForm({
                 >
                   Categoría
                 </label>
-                <select
+                <FormSelect
                   id="create-product-category"
                   value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                  className={fieldClass}
-                >
-                  <option value="">—</option>
-                  {(categories ?? []).map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setCategoryId}
+                  options={categoryOptions}
+                  placeholder="— Sin categoría —"
+                />
               </div>
             </>
           ) : null}
