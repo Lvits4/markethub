@@ -18,9 +18,12 @@ export function useAdminPatchCommission() {
       if (!token) throw new Error('No autenticado');
       return patchAdminStoreCommission(token, storeId, commission);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.adminStores });
-      queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard });
+    onSuccess: (_data, { storeId }) => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.adminStores });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard });
+      void queryClient.invalidateQueries({
+        queryKey: queryKeys.adminStore(storeId),
+      });
     },
   });
 }

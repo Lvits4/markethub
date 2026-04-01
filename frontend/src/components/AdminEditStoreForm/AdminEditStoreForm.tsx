@@ -1,11 +1,13 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import toast from 'react-hot-toast';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { Button } from '../Button/Button';
 import { LogoUploadField } from '../LogoUploadField/LogoUploadField';
 import { getErrorMessage } from '../../helpers/mapApiError';
-import { useCreateStoreMutation } from '../../hooks/useStoreMutations';
-import type { CreateStorePayload } from '../../requests/storeRequests';
+import { useAdminPatchCommission } from '../../hooks/useAdminPatchCommission';
+import { useUpdateStoreMutation } from '../../hooks/useStoreMutations';
+import type { AdminStoreDetail } from '../../types/admin';
+import type { UpdateStorePayload } from '../../requests/storeRequests';
 
 const fieldClass =
   'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';
@@ -15,10 +17,15 @@ const textareaClass = `${fieldClass} resize-none`;
 const labelClass = 'text-xs font-medium text-zinc-600 dark:text-zinc-300';
 
 const STEPS = [
-  { title: 'Identidad y presentación' },
-  { title: 'Contacto público' },
+  { title: 'Datos de la tienda' },
   { title: 'Políticas' },
+  { title: 'Contacto y marca' },
 ] as const;
+
+function numOrZero(v: string | number) {
+  const n = typeof v === 'string' ? Number.parseFloat(v) : v;
+  return Number.isFinite(n) ? n : 0;
+}
 
 function isValidEmail(value: string): boolean {
   const v = value.trim();
@@ -26,37 +33,51 @@ function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 }
 
-export type CreateStoreFormProps = {
+export type AdminEditStoreFormProps = {
+  store: AdminStoreDetail;
   onSuccess?: () => void;
   onCancel?: () => void;
 };
 
-export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
-  const createMut = useCreateStoreMutation();
+export function AdminEditStoreForm({
+  store,
+  onSuccess,
+  onCancel,
+}: AdminEditStoreFormProps) {
+  const updateMut = useUpdateStoreMutation();
+  const patchCommission = useAdminPatchCommission();
 
   const [step, setStep] = useState(0);
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [logo, setLogo] = useState('');
-  const [shippingPolicy, setShippingPolicy] = useState('');
-  const [returnPolicy, setReturnPolicy] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [contactPhone, setContactPhone] = useState('');
+  const [name, setName] = useState(store.name);
+  const [description, setDescription] = useState(store.description ?? '');
+  const [logo, setLogo] = useState(store.logo ?? '');
+  const [shippingPolicy, setShippingPolicy] = useState(
+    store.shippingPolicy ?? '',
+  );
+  const [returnPolicy, setReturnPolicy] = useState(store.returnPolicy ?? '');
+  const [contactEmail, setContactEmail] = useState(store.contactEmail ?? '');
+  const [contactPhone, setContactPhone] = useState(store.contactPhone ?? '');
+  const [commission, setCommission] = useState(
+    String(numOrZero(store.commission)),
+  );
   const [logoUploading, setLogoUploading] = useState(false);
 
   const lastIndex = STEPS.length - 1;
 
-  const reset = () => {
+  useEffect(() => {
     setStep(0);
-    setName('');
-    setDescription('');
-    setLogo('');
-    setShippingPolicy('');
-    setReturnPolicy('');
-    setContactEmail('');
-    setContactPhone('');
-    setLogoUploading(false);
-  };
+    setName(store.name);
+    setDescription(store.description ?? '');
+    setLogo(store.logo ?? '');
+    setShippingPolicy(store.shippingPolicy ?? '');
+    setReturnPolicy(store.returnPolicy ?? '');
+    setContactEmail(store.contactEmail ?? '');
+    setContactPhone(store.contactPhone ?? '');
+    setCommission(String(numOrZero(store.commission)));
+  }, [store]);
+
+  const busy =
+    updateMut.isPending || patchCommission.isPending || logoUploading;
 
   const validateStep = (index: number): boolean => {
     if (index === 0) {
@@ -64,9 +85,15 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
         toast.error('El nombre es obligatorio');
         return false;
       }
+      const commRaw = commission.trim().replace(',', '.');
+      const commNum = Number.parseFloat(commRaw);
+      if (!Number.isFinite(commNum) || commNum < 0 || commNum > 100) {
+        toast.error('La comisión debe ser un número entre 0 y 100');
+        return false;
+      }
       return true;
     }
-    if (index === 1) {
+    if (index === 2) {
       const emailTrim = contactEmail.trim();
       if (emailTrim && !isValidEmail(emailTrim)) {
         toast.error('Introduce un correo válido');
@@ -84,7 +111,7 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
 
   const goBack = () => setStep((s) => Math.max(0, s - 1));
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (logoUploading) {
       toast.error('Espera a que termine la subida del logo');
@@ -94,49 +121,61 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
       setStep(0);
       return;
     }
-    if (!validateStep(1)) {
-      setStep(1);
+    if (!validateStep(2)) {
+      setStep(2);
       return;
     }
     const n = name.trim();
     const emailTrim = contactEmail.trim();
     if (emailTrim && !isValidEmail(emailTrim)) {
       toast.error('Introduce un correo válido');
-      setStep(1);
+      setStep(2);
       return;
     }
 
-    const body: CreateStorePayload = { name: n };
+    const commRaw = commission.trim().replace(',', '.');
+    const commNum = Number.parseFloat(commRaw);
+    if (!Number.isFinite(commNum) || commNum < 0 || commNum > 100) {
+      toast.error('La comisión debe ser un número entre 0 y 100');
+      setStep(0);
+      return;
+    }
+
+    const body: UpdateStorePayload = { name: n };
     const d = description.trim();
-    if (d) body.description = d;
+    body.description = d || undefined;
     const l = logo.trim();
-    if (l) body.logo = l;
+    body.logo = l || undefined;
     const sp = shippingPolicy.trim();
-    if (sp) body.shippingPolicy = sp;
+    body.shippingPolicy = sp || undefined;
     const rp = returnPolicy.trim();
-    if (rp) body.returnPolicy = rp;
-    if (emailTrim) body.contactEmail = emailTrim;
+    body.returnPolicy = rp || undefined;
+    body.contactEmail = emailTrim || undefined;
     const ph = contactPhone.trim();
-    if (ph) body.contactPhone = ph;
+    body.contactPhone = ph || undefined;
 
-    createMut.mutate(body, {
-      onSuccess: () => {
-        toast.success('Tienda creada');
-        reset();
-        onSuccess?.();
-      },
-      onError: (err) => toast.error(getErrorMessage(err)),
-    });
+    try {
+      await updateMut.mutateAsync({ id: store.id, body });
+      const prevComm = numOrZero(store.commission);
+      if (commNum !== prevComm) {
+        await patchCommission.mutateAsync({
+          storeId: store.id,
+          commission: commNum,
+        });
+      }
+      toast.success('Tienda actualizada');
+      onSuccess?.();
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
   };
-
-  const disabledNav = createMut.isPending || logoUploading;
 
   return (
     <form
       onSubmit={handleSubmit}
       className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
     >
-      <div className="market-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4">
+      <div className="market-scroll min-h-0 max-h-[min(60vh,520px)] flex-1 overflow-y-auto overscroll-contain px-5 py-4 sm:max-h-[min(65vh,580px)]">
         <div className="mb-4 flex flex-col gap-2">
           <div className="flex gap-1.5" role="list" aria-label="Progreso del formulario">
             {STEPS.map((_, i) => (
@@ -160,69 +199,87 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
           {step === 0 ? (
             <>
               <div>
-                <label htmlFor="create-store-name" className={labelClass}>
+                <label htmlFor="edit-store-name" className={labelClass}>
                   Nombre <span className="text-red-600 dark:text-red-400">*</span>
                 </label>
                 <input
-                  id="create-store-name"
+                  id="edit-store-name"
                   required
                   autoComplete="organization"
-                  placeholder="Ej. Mi tienda online"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className={fieldClass}
                 />
+                <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                  Slug actual:{' '}
+                  <span className="font-mono text-zinc-700 dark:text-zinc-300">
+                    {store.slug}
+                  </span>
+                  . Si cambias el nombre, el slug se regenerará al guardar.
+                </p>
               </div>
+
               <div>
-                <label htmlFor="create-store-description" className={labelClass}>
+                <label htmlFor="edit-store-description" className={labelClass}>
                   Descripción
                 </label>
                 <textarea
-                  id="create-store-description"
+                  id="edit-store-description"
                   rows={3}
-                  placeholder="Qué vendes, para quién…"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className={textareaClass}
                 />
               </div>
-              <LogoUploadField
-                value={logo}
-                onChange={setLogo}
-                disabled={createMut.isPending}
-                onUploadingChange={setLogoUploading}
-              />
+
+              <div>
+                <label htmlFor="edit-store-commission" className={labelClass}>
+                  Comisión (%)
+                </label>
+                <input
+                  id="edit-store-commission"
+                  type="text"
+                  inputMode="decimal"
+                  value={commission}
+                  onChange={(e) => setCommission(e.target.value)}
+                  className={fieldClass}
+                  aria-describedby="edit-store-commission-hint"
+                />
+                <p
+                  id="edit-store-commission-hint"
+                  className="mt-1 text-xs text-zinc-500 dark:text-zinc-400"
+                >
+                  Porcentaje de comisión de la plataforma (0–100).
+                </p>
+              </div>
             </>
           ) : null}
 
           {step === 1 ? (
             <>
               <div>
-                <label htmlFor="create-store-email" className={labelClass}>
-                  Correo de contacto
+                <label htmlFor="edit-store-shipping" className={labelClass}>
+                  Política de envíos
                 </label>
-                <input
-                  id="create-store-email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="tienda@ejemplo.com"
-                  value={contactEmail}
-                  onChange={(e) => setContactEmail(e.target.value)}
-                  className={fieldClass}
+                <textarea
+                  id="edit-store-shipping"
+                  rows={2}
+                  value={shippingPolicy}
+                  onChange={(e) => setShippingPolicy(e.target.value)}
+                  className={textareaClass}
                 />
               </div>
+
               <div>
-                <label htmlFor="create-store-phone" className={labelClass}>
-                  Teléfono de contacto
+                <label htmlFor="edit-store-returns" className={labelClass}>
+                  Política de devoluciones
                 </label>
-                <input
-                  id="create-store-phone"
-                  type="tel"
-                  autoComplete="tel"
-                  placeholder="+34 …"
-                  value={contactPhone}
-                  onChange={(e) => setContactPhone(e.target.value)}
-                  className={fieldClass}
+                <textarea
+                  id="edit-store-returns"
+                  rows={2}
+                  value={returnPolicy}
+                  onChange={(e) => setReturnPolicy(e.target.value)}
+                  className={textareaClass}
                 />
               </div>
             </>
@@ -231,31 +288,39 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
           {step === 2 ? (
             <>
               <div>
-                <label htmlFor="create-store-shipping" className={labelClass}>
-                  Política de envíos
+                <label htmlFor="edit-store-email" className={labelClass}>
+                  Correo de contacto
                 </label>
-                <textarea
-                  id="create-store-shipping"
-                  rows={2}
-                  placeholder="Plazos, costes, zonas…"
-                  value={shippingPolicy}
-                  onChange={(e) => setShippingPolicy(e.target.value)}
-                  className={textareaClass}
+                <input
+                  id="edit-store-email"
+                  type="email"
+                  autoComplete="email"
+                  value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                  className={fieldClass}
                 />
               </div>
+
               <div>
-                <label htmlFor="create-store-returns" className={labelClass}>
-                  Política de devoluciones
+                <label htmlFor="edit-store-phone" className={labelClass}>
+                  Teléfono de contacto
                 </label>
-                <textarea
-                  id="create-store-returns"
-                  rows={2}
-                  placeholder="Plazo, condiciones…"
-                  value={returnPolicy}
-                  onChange={(e) => setReturnPolicy(e.target.value)}
-                  className={textareaClass}
+                <input
+                  id="edit-store-phone"
+                  type="tel"
+                  autoComplete="tel"
+                  value={contactPhone}
+                  onChange={(e) => setContactPhone(e.target.value)}
+                  className={fieldClass}
                 />
               </div>
+
+              <LogoUploadField
+                value={logo}
+                onChange={setLogo}
+                disabled={busy}
+                onUploadingChange={setLogoUploading}
+              />
             </>
           ) : null}
         </div>
@@ -271,7 +336,7 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
             <Button
               type="button"
               variant="ghost"
-              disabled={disabledNav}
+              disabled={busy}
               onClick={onCancel}
               className="h-11 min-h-11 min-w-0 flex-1 basis-0 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:min-w-[7.5rem]"
             >
@@ -282,7 +347,7 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
             <Button
               type="button"
               variant="ghost"
-              disabled={disabledNav}
+              disabled={busy}
               onClick={goBack}
               className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:min-w-[7.5rem]"
             >
@@ -296,7 +361,7 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
             <Button
               type="button"
               variant="primary"
-              disabled={disabledNav}
+              disabled={busy}
               onClick={goNext}
               className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 border-0 px-3 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e] sm:min-w-[11rem]"
             >
@@ -307,10 +372,10 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
             <Button
               type="submit"
               variant="primary"
-              disabled={disabledNav}
+              disabled={busy}
               className="h-11 min-h-11 min-w-0 flex-1 justify-center border-0 px-3 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e] sm:min-w-[11rem]"
             >
-              {createMut.isPending ? 'Creando…' : 'Crear tienda'}
+              {busy ? 'Guardando…' : 'Guardar cambios'}
             </Button>
           )}
         </div>

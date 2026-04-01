@@ -8,6 +8,7 @@ declare module 'react-icons/fi' {
   export const FiChevronLeft: I;
   export const FiChevronRight: I;
   export const FiChevronUp: I;
+  export const FiEdit2: I;
   export const FiEye: I;
   export const FiEyeOff: I;
   export const FiExternalLink: I;
@@ -16,11 +17,13 @@ declare module 'react-icons/fi' {
   export const FiHome: I;
   export const FiImage: I;
   export const FiLogOut: I;
+  export const FiMail: I;
   export const FiMenu: I;
   export const FiMessageCircle: I;
   export const FiMinus: I;
   export const FiMoon: I;
   export const FiPercent: I;
+  export const FiPhone: I;
   export const FiPackage: I;
   export const FiPlus: I;
   export const FiSearch: I;
@@ -28,11 +31,13 @@ declare module 'react-icons/fi' {
   export const FiStar: I;
   export const FiSun: I;
   export const FiTag: I;
+  export const FiTrash2: I;
   export const FiSettings: I;
   export const FiShield: I;
   export const FiShoppingBag: I;
   export const FiShoppingCart: I;
   export const FiUpload: I;
+  export const FiUser: I;
   export const FiUsers: I;
   export const FiX: I;
 }

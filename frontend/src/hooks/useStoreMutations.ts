@@ -34,10 +34,11 @@ export function useUpdateStoreMutation() {
       if (!token) throw new Error('No autenticado');
       return updateStore({ token }, id, body);
     },
-    onSuccess: () => {
+    onSuccess: (_data, { id }) => {
       void qc.invalidateQueries({ queryKey: queryKeys.myStores });
       void qc.invalidateQueries({ queryKey: queryKeys.publicStores });
       void qc.invalidateQueries({ queryKey: queryKeys.adminStores });
+      void qc.invalidateQueries({ queryKey: queryKeys.adminStore(id) });
     },
   });
 }
