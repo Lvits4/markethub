@@ -9,7 +9,6 @@ import {
 } from 'react-icons/fi';
 import { routePaths } from '../../config/routes';
 import { useAuth } from '../../hooks/useAuth';
-import { NotificationsBell } from '../NotificationsBell/NotificationsBell';
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
 
 const navInactive =
@@ -88,12 +87,6 @@ export function MarketHeader() {
           </NavLink>
         </nav>
 
-        {isAuthenticated ? (
-          <div className="hidden lg:block">
-            <NotificationsBell />
-          </div>
-        ) : null}
-
         <NavLink
           to={routePaths.cart}
           className="flex rounded-md p-2.5 text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800 lg:hidden"
@@ -109,11 +102,6 @@ export function MarketHeader() {
           >
             <FiPackage className="h-5 w-5" />
           </NavLink>
-        ) : null}
-        {isAuthenticated ? (
-          <div className="lg:hidden">
-            <NotificationsBell />
-          </div>
         ) : null}
         <ThemeToggle />
       </div>

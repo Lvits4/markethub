@@ -1,11 +1,13 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { Button } from '../Button/Button';
 import { LogoUploadField } from '../LogoUploadField/LogoUploadField';
 import { getErrorMessage } from '../../helpers/mapApiError';
+import { useAuth } from '../../hooks/useAuth';
 import { useAdminPatchCommission } from '../../hooks/useAdminPatchCommission';
 import { useUpdateStoreMutation } from '../../hooks/useStoreMutations';
+import { uploadFile } from '../../requests/fileRequests';
 import type { AdminStoreDetail } from '../../types/admin';
 import type { UpdateStorePayload } from '../../requests/storeRequests';
 
@@ -18,8 +20,7 @@ const labelClass = 'text-xs font-medium text-zinc-600 dark:text-zinc-300';
 
 const STEPS = [
   { title: 'Datos de la tienda' },
-  { title: 'Políticas' },
-  { title: 'Contacto y marca' },
+  { title: 'Contacto, marca y políticas' },
 ] as const;
 
 function numOrZero(v: string | number) {
@@ -39,11 +40,18 @@ export type AdminEditStoreFormProps = {
   onCancel?: () => void;
 };
 
+type AdminEditStoreFormErrors = {
+  name?: string;
+  commission?: string;
+  contactEmail?: string;
+};
+
 export function AdminEditStoreForm({
   store,
   onSuccess,
   onCancel,
 }: AdminEditStoreFormProps) {
+  const { token } = useAuth();
   const updateMut = useUpdateStoreMutation();
   const patchCommission = useAdminPatchCommission();
 
@@ -57,10 +65,12 @@ export function AdminEditStoreForm({
   const [returnPolicy, setReturnPolicy] = useState(store.returnPolicy ?? '');
   const [contactEmail, setContactEmail] = useState(store.contactEmail ?? '');
   const [contactPhone, setContactPhone] = useState(store.contactPhone ?? '');
+  const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null);
   const [commission, setCommission] = useState(
     String(numOrZero(store.commission)),
   );
   const [logoUploading, setLogoUploading] = useState(false);
+  const [errors, setErrors] = useState<AdminEditStoreFormErrors>({});
 
   const lastIndex = STEPS.length - 1;
 
@@ -73,7 +83,9 @@ export function AdminEditStoreForm({
     setReturnPolicy(store.returnPolicy ?? '');
     setContactEmail(store.contactEmail ?? '');
     setContactPhone(store.contactPhone ?? '');
+    setSelectedLogoFile(null);
     setCommission(String(numOrZero(store.commission)));
+    setErrors({});
   }, [store]);
 
   const busy =
@@ -81,25 +93,33 @@ export function AdminEditStoreForm({
 
   const validateStep = (index: number): boolean => {
     if (index === 0) {
+      const nextErrors: AdminEditStoreFormErrors = {};
       if (!name.trim()) {
-        toast.error('El nombre es obligatorio');
-        return false;
+        nextErrors.name = 'El nombre es obligatorio.';
       }
       const commRaw = commission.trim().replace(',', '.');
       const commNum = Number.parseFloat(commRaw);
       if (!Number.isFinite(commNum) || commNum < 0 || commNum > 100) {
-        toast.error('La comisión debe ser un número entre 0 y 100');
-        return false;
+        nextErrors.commission = 'La comisión debe ser un número entre 0 y 100.';
       }
-      return true;
+      setErrors((prev) => ({
+        ...prev,
+        name: nextErrors.name,
+        commission: nextErrors.commission,
+      }));
+      return Object.keys(nextErrors).length === 0;
     }
-    if (index === 2) {
+    if (index === 1) {
+      const nextErrors: AdminEditStoreFormErrors = {};
       const emailTrim = contactEmail.trim();
       if (emailTrim && !isValidEmail(emailTrim)) {
-        toast.error('Introduce un correo válido');
-        return false;
+        nextErrors.contactEmail = 'Introduce un correo válido.';
       }
-      return true;
+      setErrors((prev) => ({
+        ...prev,
+        contactEmail: nextErrors.contactEmail,
+      }));
+      return Object.keys(nextErrors).length === 0;
     }
     return true;
   };
@@ -111,8 +131,7 @@ export function AdminEditStoreForm({
 
   const goBack = () => setStep((s) => Math.max(0, s - 1));
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSaveStore = async () => {
     if (logoUploading) {
       toast.error('Espera a que termine la subida del logo');
       return;
@@ -121,31 +140,39 @@ export function AdminEditStoreForm({
       setStep(0);
       return;
     }
-    if (!validateStep(2)) {
-      setStep(2);
+    if (!validateStep(1)) {
+      setStep(1);
       return;
     }
     const n = name.trim();
     const emailTrim = contactEmail.trim();
-    if (emailTrim && !isValidEmail(emailTrim)) {
-      toast.error('Introduce un correo válido');
-      setStep(2);
-      return;
-    }
 
     const commRaw = commission.trim().replace(',', '.');
     const commNum = Number.parseFloat(commRaw);
-    if (!Number.isFinite(commNum) || commNum < 0 || commNum > 100) {
-      toast.error('La comisión debe ser un número entre 0 y 100');
-      setStep(0);
-      return;
+
+    let logoUrl = logo.trim();
+    if (selectedLogoFile) {
+      if (!token) {
+        toast.error('Inicia sesión para subir archivos');
+        return;
+      }
+      setLogoUploading(true);
+      try {
+        const uploadRes = await uploadFile(token, selectedLogoFile, 'stores');
+        logoUrl = uploadRes.url;
+        setLogo(uploadRes.url);
+      } catch (err) {
+        toast.error(getErrorMessage(err));
+        return;
+      } finally {
+        setLogoUploading(false);
+      }
     }
 
     const body: UpdateStorePayload = { name: n };
     const d = description.trim();
     body.description = d || undefined;
-    const l = logo.trim();
-    body.logo = l || undefined;
+    body.logo = logoUrl || undefined;
     const sp = shippingPolicy.trim();
     body.shippingPolicy = sp || undefined;
     const rp = returnPolicy.trim();
@@ -172,7 +199,7 @@ export function AdminEditStoreForm({
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={(e) => e.preventDefault()}
       className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
     >
       <div className="market-scroll min-h-0 max-h-[min(60vh,520px)] flex-1 overflow-y-auto overscroll-contain px-5 py-4 sm:max-h-[min(65vh,580px)]">
@@ -204,12 +231,19 @@ export function AdminEditStoreForm({
                 </label>
                 <input
                   id="edit-store-name"
-                  required
                   autoComplete="organization"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className={fieldClass}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setErrors((prev) => ({ ...prev, name: undefined }));
+                  }}
+                  className={`${fieldClass} ${errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400/20' : ''}`}
                 />
+                {errors.name ? (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                    {errors.name}
+                  </p>
+                ) : null}
                 <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                   Slug actual:{' '}
                   <span className="font-mono text-zinc-700 dark:text-zinc-300">
@@ -241,10 +275,18 @@ export function AdminEditStoreForm({
                   type="text"
                   inputMode="decimal"
                   value={commission}
-                  onChange={(e) => setCommission(e.target.value)}
-                  className={fieldClass}
+                  onChange={(e) => {
+                    setCommission(e.target.value);
+                    setErrors((prev) => ({ ...prev, commission: undefined }));
+                  }}
+                  className={`${fieldClass} ${errors.commission ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400/20' : ''}`}
                   aria-describedby="edit-store-commission-hint"
                 />
+                {errors.commission ? (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                    {errors.commission}
+                  </p>
+                ) : null}
                 <p
                   id="edit-store-commission-hint"
                   className="mt-1 text-xs text-zinc-500 dark:text-zinc-400"
@@ -257,6 +299,52 @@ export function AdminEditStoreForm({
 
           {step === 1 ? (
             <>
+              <div>
+                <label htmlFor="edit-store-email" className={labelClass}>
+                  Correo de contacto
+                </label>
+                <input
+                  id="edit-store-email"
+                  type="email"
+                  autoComplete="email"
+                  value={contactEmail}
+                  onChange={(e) => {
+                    setContactEmail(e.target.value);
+                    setErrors((prev) => ({ ...prev, contactEmail: undefined }));
+                  }}
+                  className={`${fieldClass} ${errors.contactEmail ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400/20' : ''}`}
+                />
+                {errors.contactEmail ? (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                    {errors.contactEmail}
+                  </p>
+                ) : null}
+              </div>
+
+              <div>
+                <label htmlFor="edit-store-phone" className={labelClass}>
+                  Teléfono de contacto
+                </label>
+                <input
+                  id="edit-store-phone"
+                  type="tel"
+                  autoComplete="tel"
+                  value={contactPhone}
+                  onChange={(e) => setContactPhone(e.target.value)}
+                  className={fieldClass}
+                />
+              </div>
+
+              <LogoUploadField
+                value={logo}
+                onChange={setLogo}
+                disabled={busy}
+                uploadOnSelect={false}
+                onFileChange={setSelectedLogoFile}
+                selectedFile={selectedLogoFile}
+                onUploadingChange={setLogoUploading}
+              />
+
               <div>
                 <label htmlFor="edit-store-shipping" className={labelClass}>
                   Política de envíos
@@ -282,45 +370,6 @@ export function AdminEditStoreForm({
                   className={textareaClass}
                 />
               </div>
-            </>
-          ) : null}
-
-          {step === 2 ? (
-            <>
-              <div>
-                <label htmlFor="edit-store-email" className={labelClass}>
-                  Correo de contacto
-                </label>
-                <input
-                  id="edit-store-email"
-                  type="email"
-                  autoComplete="email"
-                  value={contactEmail}
-                  onChange={(e) => setContactEmail(e.target.value)}
-                  className={fieldClass}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="edit-store-phone" className={labelClass}>
-                  Teléfono de contacto
-                </label>
-                <input
-                  id="edit-store-phone"
-                  type="tel"
-                  autoComplete="tel"
-                  value={contactPhone}
-                  onChange={(e) => setContactPhone(e.target.value)}
-                  className={fieldClass}
-                />
-              </div>
-
-              <LogoUploadField
-                value={logo}
-                onChange={setLogo}
-                disabled={busy}
-                onUploadingChange={setLogoUploading}
-              />
             </>
           ) : null}
         </div>
@@ -370,9 +419,10 @@ export function AdminEditStoreForm({
             </Button>
           ) : (
             <Button
-              type="submit"
+              type="button"
               variant="primary"
               disabled={busy}
+              onClick={handleSaveStore}
               className="h-11 min-h-11 min-w-0 flex-1 justify-center border-0 px-3 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e] sm:min-w-[11rem]"
             >
               {busy ? 'Guardando…' : 'Guardar cambios'}

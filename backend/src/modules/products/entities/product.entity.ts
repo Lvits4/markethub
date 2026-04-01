@@ -35,12 +35,6 @@ export class Product {
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
-  @Column({ name: 'average_rating', type: 'decimal', precision: 3, scale: 2, default: 0 })
-  averageRating: number;
-
-  @Column({ name: 'total_reviews', type: 'int', default: 0 })
-  totalReviews: number;
-
   @Column({ name: 'store_id', type: 'uuid' })
   storeId: string;
 

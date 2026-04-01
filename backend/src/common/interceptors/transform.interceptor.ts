@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   Injectable,
   NestInterceptor,
+  StreamableFile,
 } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
 
@@ -49,6 +50,17 @@ function stripAuditTimestamps(
   return result;
 }
 
+/** Evita fallos de `instanceof` si hubiera copias duplicadas de @nestjs/common en runtime. */
+function isStreamableFileBody(data: unknown): data is StreamableFile {
+  return (
+    data instanceof StreamableFile ||
+    (!!data &&
+      typeof data === 'object' &&
+      'getStream' in data &&
+      typeof (data as { getStream: unknown }).getStream === 'function')
+  );
+}
+
 @Injectable()
 export class TransformInterceptor<T>
   implements NestInterceptor<T, ApiResponse<T>>
@@ -57,13 +69,33 @@ export class TransformInterceptor<T>
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<ApiResponse<T>> {
+    if (context.getType() === 'http') {
+      const req = context.switchToHttp().getRequest<{
+        method?: string;
+        url?: string;
+        originalUrl?: string;
+      }>();
+      const pathWithQuery = req.originalUrl ?? req.url ?? '';
+      if (
+        req.method === 'GET' &&
+        pathWithQuery.includes('/files/download')
+      ) {
+        return next.handle() as Observable<ApiResponse<T>>;
+      }
+    }
+
     const statusCode = context.switchToHttp().getResponse().statusCode;
     return next.handle().pipe(
-      map((data) => ({
-        statusCode,
-        message: 'Success',
-        data: stripAuditTimestamps(data, new WeakMap()) as T,
-      })),
+      map((data) => {
+        if (isStreamableFileBody(data)) {
+          return data as unknown as ApiResponse<T>;
+        }
+        return {
+          statusCode,
+          message: 'Success',
+          data: stripAuditTimestamps(data, new WeakMap()) as T,
+        };
+      }),
     );
   }
 }

@@ -9,7 +9,6 @@ import {
   FiLogOut,
   FiMoon,
   FiPackage,
-  FiPercent,
   FiSettings,
   FiShield,
   FiShoppingBag,
@@ -166,7 +165,7 @@ export function AdminLayout() {
           </button>
         </div>
 
-        <nav className="min-h-0 flex-1 space-y-5 overflow-y-auto overflow-x-hidden p-3 overscroll-contain">
+        <nav className="market-scroll min-h-0 flex-1 space-y-5 overflow-y-auto overflow-x-hidden p-3 overscroll-contain">
           <div>
             <SectionLabel collapsed={collapsed}>Mercado</SectionLabel>
             <div className="space-y-0.5">
@@ -222,12 +221,6 @@ export function AdminLayout() {
             <SectionLabel collapsed={collapsed}>Pagos e informes</SectionLabel>
             <div className="space-y-0.5">
               <SidebarNavItem
-                to={routePaths.adminSales}
-                icon={FiPercent}
-                label="Ventas y comisiones"
-                collapsed={collapsed}
-              />
-              <SidebarNavItem
                 to={routePaths.adminCategories}
                 icon={FiTag}
                 label="Categorías"
@@ -268,10 +261,10 @@ export function AdminLayout() {
                       role="switch"
                       aria-checked={theme === 'dark'}
                       onClick={toggleTheme}
-                      className={`relative h-7 w-12 shrink-0 rounded-md transition-colors ${theme === 'dark' ? 'bg-[var(--admin-primary)]' : 'bg-zinc-200 dark:bg-night-700'}`}
+                      className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--admin-card)] dark:focus-visible:ring-offset-night-900 ${theme === 'dark' ? 'bg-[var(--admin-primary)]' : 'bg-zinc-200 dark:bg-night-700'}`}
                     >
                       <span
-                        className={`absolute top-1 h-5 w-5 rounded-md bg-white shadow transition-transform ${theme === 'dark' ? 'left-6' : 'left-1'}`}
+                        className={`h-3 w-3 rounded-full bg-white shadow-sm ring-1 ring-black/5 transition-transform duration-200 ease-out dark:ring-white/10 ${theme === 'dark' ? 'translate-x-5' : 'translate-x-0'}`}
                       />
                     </button>
                   </>
@@ -279,13 +272,13 @@ export function AdminLayout() {
                   <button
                     type="button"
                     onClick={toggleTheme}
-                    className="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-night-800"
+                    className="rounded-full p-1.5 text-zinc-500 transition-colors hover:bg-zinc-100 dark:hover:bg-night-800"
                     aria-label="Cambiar tema"
                   >
                     {theme === 'dark' ? (
-                      <FiSun className="h-5 w-5" />
+                      <FiSun className="h-4 w-4" />
                     ) : (
-                      <FiMoon className="h-5 w-5" />
+                      <FiMoon className="h-4 w-4" />
                     )}
                   </button>
                 )}

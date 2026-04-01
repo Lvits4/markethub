@@ -134,10 +134,6 @@ export class ProductsService {
     await this.productsRepository.save(product);
   }
 
-  async updateRating(productId: string, averageRating: number, totalReviews: number): Promise<void> {
-    await this.productsRepository.update(productId, { averageRating, totalReviews });
-  }
-
   private applyFilters(qb: SelectQueryBuilder<Product>, filters: FilterProductDto): void {
     if (filters.search) {
       qb.andWhere('(product.name ILIKE :search OR product.description ILIKE :search)', {
@@ -156,9 +152,6 @@ export class ProductsService {
     if (filters.maxPrice !== undefined) {
       qb.andWhere('product.price <= :maxPrice', { maxPrice: filters.maxPrice });
     }
-    if (filters.minRating !== undefined) {
-      qb.andWhere('product.averageRating >= :minRating', { minRating: filters.minRating });
-    }
   }
 
   private applySorting(qb: SelectQueryBuilder<Product>, sortBy?: ProductSortBy): void {
@@ -168,9 +161,6 @@ export class ProductsService {
         break;
       case ProductSortBy.PRICE_DESC:
         qb.orderBy('product.price', 'DESC');
-        break;
-      case ProductSortBy.RATING:
-        qb.orderBy('product.averageRating', 'DESC');
         break;
       case ProductSortBy.NEWEST:
       default:

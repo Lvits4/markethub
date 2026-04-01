@@ -15,7 +15,6 @@ import { Product } from '../products/entities/product.entity';
 import { ProductImage } from '../products/entities/product-image.entity';
 import { CartItem } from '../cart/entities/cart-item.entity';
 import { Favorite } from '../favorites/entities/favorite.entity';
-import { Review } from '../reviews/entities/review.entity';
 import { Order } from '../orders/entities/order.entity';
 import { OrderItem } from '../orders/entities/order-item.entity';
 import { Payment } from '../payments/entities/payment.entity';
@@ -216,7 +215,6 @@ export class StoresService {
       if (productIds.length > 0) {
         await em.delete(CartItem, { productId: In(productIds) });
         await em.delete(Favorite, { productId: In(productIds) });
-        await em.delete(Review, { productId: In(productIds) });
         await em.delete(ProductImage, { productId: In(productIds) });
         await em.delete(Product, { storeId: id });
       }

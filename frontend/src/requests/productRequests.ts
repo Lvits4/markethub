@@ -11,7 +11,6 @@ function toQuery(filters: ProductFilters): string {
   if (filters.storeId) p.set('storeId', filters.storeId);
   if (filters.minPrice != null) p.set('minPrice', String(filters.minPrice));
   if (filters.maxPrice != null) p.set('maxPrice', String(filters.maxPrice));
-  if (filters.minRating != null) p.set('minRating', String(filters.minRating));
   if (filters.sortBy) p.set('sortBy', filters.sortBy);
   const qs = p.toString();
   return qs ? `?${qs}` : '';

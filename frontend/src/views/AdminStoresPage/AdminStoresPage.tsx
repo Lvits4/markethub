@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
 import {
@@ -8,10 +15,10 @@ import {
   FiChevronUp,
   FiEdit2,
   FiEye,
-  FiHash,
   FiMail,
   FiPhone,
   FiSearch,
+  FiShoppingBag,
   FiTrash2,
   FiUser,
   FiX,
@@ -20,6 +27,8 @@ import { Button } from '../../components/Button/Button';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminEditStoreForm } from '../../components/AdminEditStoreForm/AdminEditStoreForm';
 import { useSellerCreateStoreModal } from '../../context/SellerCreateStoreModalProvider/SellerCreateStoreModalProvider';
+import { useAuth } from '../../hooks/useAuth';
+import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAdminDeleteStore } from '../../hooks/useAdminDeleteStore';
 import { useAdminStoreDetailQuery } from '../../queries/useAdminStoreDetailQuery';
@@ -40,7 +49,20 @@ type SortKey =
 
 type SortDir = 'asc' | 'desc';
 
-const PAGE_SIZE_OPTIONS = [10, 25, 50] as const;
+const DEFAULT_PAGE_SIZE = 10;
+
+/** Mismo ancho relativo en las 7 columnas (cabecera y cuerpo comparten colgroup). */
+const ADMIN_STORES_COL_WIDTH = `${100 / 7}%`;
+
+function AdminStoresTableColgroup() {
+  return (
+    <colgroup>
+      {Array.from({ length: 7 }, (__, i) => (
+        <col key={i} style={{ width: ADMIN_STORES_COL_WIDTH }} />
+      ))}
+    </colgroup>
+  );
+}
 
 function vendorSortValue(s: AdminStoreRow): string {
   if (!s.user) return '';
@@ -125,7 +147,29 @@ function DetailField({
   );
 }
 
+function StoreDetailLogo({ logo }: { logo: string | null }) {
+  const { token } = useAuth();
+  const { src, loading, error } = useProtectedImageSrc(logo, token);
+  if (!logo?.trim()) {
+    return <span className="text-slate-400 dark:text-slate-500">Sin logo</span>;
+  }
+  if (loading) {
+    return <span className="text-slate-400 dark:text-slate-500">Cargando imagen…</span>;
+  }
+  if (error || !src) {
+    return <span className="text-slate-400 dark:text-slate-500">No se pudo mostrar el logo</span>;
+  }
+  return (
+    <img
+      src={src}
+      alt=""
+      className="mx-auto max-h-28 w-auto max-w-full object-contain"
+    />
+  );
+}
+
 function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
+  const [detailTab, setDetailTab] = useState<'datos' | 'politicas'>('datos');
   const ownerName = store.user
     ? `${store.user.firstName} ${store.user.lastName}`.trim()
     : '';
@@ -174,7 +218,10 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
               </span>
             </DetailField>
             <DetailField label="Correo vendedor">
-              {store.user?.email ?? '—'}
+              <span className="inline-flex items-center gap-1.5">
+                <FiMail className="h-3.5 w-3.5 text-slate-400" aria-hidden />
+                {store.user?.email ?? '—'}
+              </span>
             </DetailField>
             <DetailField label="Correo tienda">
               <span className="inline-flex items-center gap-1.5">
@@ -192,23 +239,59 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
         </section>
 
         <section className="space-y-2 border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
-          <div className="inline-flex rounded-md bg-slate-100 p-0.5 dark:bg-[#0f1a38]">
-            <span className="rounded bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-sm dark:bg-[#162647] dark:text-slate-100">
+          <div
+            className="inline-flex rounded-md bg-slate-100 p-0.5 dark:bg-[#0f1a38]"
+            role="tablist"
+            aria-label="Datos y políticas"
+          >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={detailTab === 'datos'}
+              onClick={() => setDetailTab('datos')}
+              className={`cursor-pointer rounded px-2.5 py-1 text-xs font-semibold transition-colors ${
+                detailTab === 'datos'
+                  ? 'bg-white text-slate-700 shadow-sm dark:bg-[#162647] dark:text-slate-100'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+              }`}
+            >
               Datos
-            </span>
-            <span className="px-2.5 py-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={detailTab === 'politicas'}
+              onClick={() => setDetailTab('politicas')}
+              className={`cursor-pointer rounded px-2.5 py-1 text-xs font-semibold transition-colors ${
+                detailTab === 'politicas'
+                  ? 'bg-white text-slate-700 shadow-sm dark:bg-[#162647] dark:text-slate-100'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+              }`}
+            >
               Políticas
-            </span>
+            </button>
           </div>
-          <DetailField label="Descripción">
-            {store.description || 'Sin descripción'}
-          </DetailField>
-          <DetailField label="Política de envíos">
-            {store.shippingPolicy || 'No definida'}
-          </DetailField>
-          <DetailField label="Política de devoluciones">
-            {store.returnPolicy || 'No definida'}
-          </DetailField>
+          {detailTab === 'datos' ? (
+            <div className="space-y-2">
+              <DetailField label="Logo">
+                <div className="flex min-h-[4.5rem] items-center justify-center py-1">
+                  <StoreDetailLogo logo={store.logo} />
+                </div>
+              </DetailField>
+              <DetailField label="Descripción">
+                {store.description || 'Sin descripción'}
+              </DetailField>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <DetailField label="Política de envíos">
+                {store.shippingPolicy || 'No definida'}
+              </DetailField>
+              <DetailField label="Política de devoluciones">
+                {store.returnPolicy || 'No definida'}
+              </DetailField>
+            </div>
+          )}
         </section>
 
       </div>
@@ -268,7 +351,7 @@ function StoreDetailsDrawer({
       >
         <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-[#0d1938]">
           <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-            Details
+            Panel de detalles
           </h2>
           <div className="flex items-center gap-2">
             <Button
@@ -330,28 +413,28 @@ function SortHeader({
   const active = activeKey === sortKey;
   return (
     <th
-      className={`px-5 py-3 ${align === 'right' ? 'text-right' : 'text-left'}`}
+      className={`px-4 py-3.5 ${align === 'right' ? 'text-right' : 'text-left'}`}
     >
       <div
-        className={`inline-flex items-center gap-1 ${align === 'right' ? 'flex-row-reverse' : ''}`}
+        className={`inline-flex items-center gap-2 ${align === 'right' ? 'flex-row-reverse' : ''}`}
       >
-        <span>{label}</span>
-        <span className="inline-flex shrink-0 flex-col gap-0">
+        <span className="leading-tight">{label}</span>
+        <span className="inline-flex shrink-0 items-center gap-px">
           <button
             type="button"
-            className={`rounded-md p-0.5 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'asc' ? 'text-[var(--color-forest)] dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}`}
+            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'asc' ? 'text-[var(--color-forest)] dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}`}
             aria-label={`Ordenar ${label} ascendente`}
             onClick={() => onSort(sortKey, 'asc')}
           >
-            <FiChevronUp className="h-3.5 w-3.5" aria-hidden />
+            <FiChevronUp className="h-3 w-3" aria-hidden />
           </button>
           <button
             type="button"
-            className={`-mt-1 rounded-md p-0.5 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'desc' ? 'text-[var(--color-forest)] dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}`}
+            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'desc' ? 'text-[var(--color-forest)] dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}`}
             aria-label={`Ordenar ${label} descendente`}
             onClick={() => onSort(sortKey, 'desc')}
           >
-            <FiChevronDown className="h-3.5 w-3.5" aria-hidden />
+            <FiChevronDown className="h-3 w-3" aria-hidden />
           </button>
         </span>
       </div>
@@ -367,13 +450,31 @@ export function AdminStoresPage() {
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<(typeof PAGE_SIZE_OPTIONS)[number]>(
-    PAGE_SIZE_OPTIONS[0],
-  );
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [viewStoreId, setViewStoreId] = useState<string | null>(null);
   const [storeToDelete, setStoreToDelete] = useState<AdminStoreRow | null>(null);
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const storeDetailQuery = useAdminStoreDetailQuery(viewStoreId);
+  const tableHeaderScrollRef = useRef<HTMLDivElement>(null);
+  const tableBodyScrollRef = useRef<HTMLDivElement>(null);
+
+  const onTableHeaderScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      const left = e.currentTarget.scrollLeft;
+      const body = tableBodyScrollRef.current;
+      if (body && body.scrollLeft !== left) body.scrollLeft = left;
+    },
+    [],
+  );
+
+  const onTableBodyScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      const left = e.currentTarget.scrollLeft;
+      const header = tableHeaderScrollRef.current;
+      if (header && header.scrollLeft !== left) header.scrollLeft = left;
+    },
+    [],
+  );
 
   const stores = Array.isArray(data) ? data : [];
 
@@ -419,7 +520,8 @@ export function AdminStoresPage() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <h2 className="shrink-0 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+      <h2 className="flex shrink-0 items-center gap-2.5 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+        <FiShoppingBag className="h-7 w-7 shrink-0 text-zinc-900 dark:text-zinc-50" aria-hidden />
         Tiendas
       </h2>
 
@@ -438,13 +540,23 @@ export function AdminStoresPage() {
                 aria-hidden
               />
               <input
-                type="search"
+                type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar por tienda, slug, correo, teléfono o vendedor…"
-                className="box-border h-11 w-full rounded-md border border-zinc-200 bg-white py-0 pl-10 pr-4 text-sm leading-normal text-zinc-900 shadow-sm ring-zinc-200 placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:outline-none focus:ring-2 focus:ring-[var(--color-forest)]/25 dark:border-night-700 dark:bg-night-950 dark:text-zinc-50 dark:ring-night-800"
+                className={`box-border h-11 w-full rounded-md border border-zinc-200 bg-white py-0 pl-10 text-sm leading-normal text-zinc-900 shadow-sm ring-zinc-200 placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:outline-none focus:ring-2 focus:ring-[var(--color-forest)]/25 dark:border-night-700 dark:bg-night-950 dark:text-zinc-50 dark:ring-night-800 ${search ? 'pr-11' : 'pr-4'}`}
                 aria-label="Buscar tiendas"
               />
+              {search ? (
+                <button
+                  type="button"
+                  onClick={() => setSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-slate-500 transition-colors hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
+                  aria-label="Limpiar búsqueda"
+                >
+                  <FiX className="h-3.5 w-3.5" aria-hidden />
+                </button>
+              ) : null}
             </div>
             <Button
               type="button"
@@ -457,190 +569,196 @@ export function AdminStoresPage() {
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-slate-200/90 bg-[#f4f7fc]/92 shadow-[0_8px_32px_rgb(15_23_42/0.07)] backdrop-blur-xl dark:border-sky-500/25 dark:bg-[#0a1228]/92 dark:shadow-[0_24px_56px_-16px_rgb(0_0_0/0.55),inset_0_1px_0_0_rgb(56_189_248/0.11)] dark:backdrop-blur-xl">
-            <div className="min-h-0 flex-1 overflow-auto">
-              <table className="w-full min-w-[900px] text-left text-sm">
-                <thead className="sticky top-0 z-10 border-b border-slate-200/80 bg-slate-100/92 backdrop-blur-md dark:border-sky-500/20 dark:bg-[#0f1a38]/95 dark:backdrop-blur-md">
-                  <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                    <SortHeader
-                      label="Tienda"
-                      sortKey="name"
-                      activeKey={sortKey}
-                      dir={sortDir}
-                      onSort={handleSort}
-                    />
-                    <SortHeader
-                      label="Vendedor"
-                      sortKey="vendor"
-                      activeKey={sortKey}
-                      dir={sortDir}
-                      onSort={handleSort}
-                    />
-                    <SortHeader
-                      label="Correo tienda"
-                      sortKey="contactEmail"
-                      activeKey={sortKey}
-                      dir={sortDir}
-                      onSort={handleSort}
-                    />
-                    <SortHeader
-                      label="Teléfono"
-                      sortKey="contactPhone"
-                      activeKey={sortKey}
-                      dir={sortDir}
-                      onSort={handleSort}
-                    />
-                    <SortHeader
-                      label="Estado"
-                      sortKey="status"
-                      activeKey={sortKey}
-                      dir={sortDir}
-                      onSort={handleSort}
-                    />
-                    <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                      Comisión
-                    </th>
-                    <th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                      Acción
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pageRows.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={7}
-                        className="px-5 py-12 text-center text-sm text-slate-500 dark:text-slate-400"
-                      >
-                        {stores.length === 0
-                          ? 'No hay tiendas registradas.'
-                          : 'Ninguna tienda coincide con la búsqueda.'}
-                      </td>
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              <div
+                ref={tableHeaderScrollRef}
+                onScroll={onTableHeaderScroll}
+                className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-sky-500/20"
+              >
+                <table className="table-fixed w-full min-w-[900px] border-collapse text-left text-sm">
+                  <AdminStoresTableColgroup />
+                  <thead className="bg-slate-100/92 backdrop-blur-md dark:bg-[#0f1a38]/95 dark:backdrop-blur-md">
+                    <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+                      <SortHeader
+                        label="Tienda"
+                        sortKey="name"
+                        activeKey={sortKey}
+                        dir={sortDir}
+                        onSort={handleSort}
+                      />
+                      <SortHeader
+                        label="Vendedor"
+                        sortKey="vendor"
+                        activeKey={sortKey}
+                        dir={sortDir}
+                        onSort={handleSort}
+                      />
+                      <SortHeader
+                        label="Correo tienda"
+                        sortKey="contactEmail"
+                        activeKey={sortKey}
+                        dir={sortDir}
+                        onSort={handleSort}
+                      />
+                      <SortHeader
+                        label="Teléfono"
+                        sortKey="contactPhone"
+                        activeKey={sortKey}
+                        dir={sortDir}
+                        onSort={handleSort}
+                      />
+                      <SortHeader
+                        label="Estado"
+                        sortKey="status"
+                        activeKey={sortKey}
+                        dir={sortDir}
+                        onSort={handleSort}
+                      />
+                      <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+                        Comisión
+                      </th>
+                      <th className="px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+                        Acción
+                      </th>
                     </tr>
-                  ) : (
-                    pageRows.map((s) => (
-                      <tr
-                        key={s.id}
-                        className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
-                      >
-                        <td className="px-5 py-3 align-top">
-                          <p className="font-medium text-slate-900 dark:text-slate-100">
-                            {s.name}
-                          </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-500">
-                            {s.slug}
-                          </p>
-                        </td>
-                        <td className="px-5 py-3 align-top text-slate-700 dark:text-slate-300">
-                          {s.user ? (
-                            <>
-                              <p>
-                                {s.user.firstName} {s.user.lastName}
-                              </p>
-                              <p className="text-xs text-slate-500 dark:text-slate-500">
-                                {s.user.email}
-                              </p>
-                            </>
-                          ) : (
-                            '—'
-                          )}
-                        </td>
-                        <td className="max-w-[200px] truncate px-5 py-3 align-top text-slate-700 dark:text-slate-300">
-                          {s.contactEmail ?? '—'}
-                        </td>
-                        <td className="px-5 py-3 align-top text-slate-700 dark:text-slate-300">
-                          {s.contactPhone ?? '—'}
-                        </td>
-                        <td className="px-5 py-3 align-top">
-                          <span className="text-xs">
-                            {s.isApproved ? (
-                              <span className="text-[var(--color-forest)] dark:text-sky-400">
-                                Aprobada
-                              </span>
-                            ) : (
-                              <span className="text-amber-600 dark:text-amber-400">
-                                Pendiente / rechazada
-                              </span>
-                            )}
-                            {s.isActive ? null : (
-                              <span className="ml-2 text-red-600 dark:text-red-400">
-                                (inactiva)
-                              </span>
-                            )}
-                          </span>
-                        </td>
-                        <td className="px-5 py-3 align-top text-slate-700 tabular-nums dark:text-slate-300">
-                          {numOrZero(s.commission)}%
-                        </td>
-                        <td className="px-5 py-3 align-top text-right">
-                          <div className="flex flex-wrap items-center justify-end gap-1">
-                            <Button
-                              type="button"
-                              variant="icon"
-                              className="!text-[#2563eb] hover:bg-blue-500/10 dark:!text-sky-400 dark:hover:bg-sky-500/15"
-                              aria-label={`Ver detalle de ${s.name}`}
-                              onClick={() => {
-                                setMode('view');
-                                setViewStoreId(s.id);
-                              }}
-                            >
-                              <FiEye className="h-4 w-4" aria-hidden />
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="icon"
-                              className="!text-[#1d4ed8] hover:bg-blue-500/10 dark:!text-sky-300 dark:hover:bg-sky-500/15"
-                              aria-label={`Editar ${s.name}`}
-                              onClick={() => {
-                                setMode('edit');
-                                setViewStoreId(s.id);
-                              }}
-                            >
-                              <FiEdit2 className="h-4 w-4" aria-hidden />
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="icon"
-                              className="!text-red-600 hover:bg-red-500/10 dark:!text-red-400 dark:hover:bg-red-950/35"
-                              disabled={deleteStore.isPending}
-                              aria-label={`Eliminar ${s.name}`}
-                              onClick={() => setStoreToDelete(s)}
-                            >
-                              <FiTrash2 className="h-4 w-4" aria-hidden />
-                            </Button>
-                          </div>
+                  </thead>
+                </table>
+              </div>
+              <div
+                ref={tableBodyScrollRef}
+                onScroll={onTableBodyScroll}
+                className="market-scroll min-h-0 flex-1 overflow-y-auto overflow-x-auto"
+              >
+                <table className="table-fixed w-full min-w-[900px] border-collapse text-left text-sm">
+                  <AdminStoresTableColgroup />
+                  <tbody>
+                    {pageRows.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={7}
+                          className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400"
+                        >
+                          {stores.length === 0
+                            ? 'No hay tiendas registradas.'
+                            : 'Ninguna tienda coincide con la búsqueda.'}
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      pageRows.map((s) => (
+                        <tr
+                          key={s.id}
+                          className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
+                        >
+                          <td className="px-4 py-2 align-middle">
+                            <p className="font-medium leading-tight text-slate-900 dark:text-slate-100">
+                              {s.name}
+                            </p>
+                            <p className="mt-0.5 text-xs leading-tight text-slate-500 dark:text-slate-500">
+                              {s.slug}
+                            </p>
+                          </td>
+                          <td className="px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
+                            {s.user ? (
+                              <>
+                                <p className="leading-tight">
+                                  {s.user.firstName} {s.user.lastName}
+                                </p>
+                                <p className="mt-0.5 text-xs leading-tight text-slate-500 dark:text-slate-500">
+                                  {s.user.email}
+                                </p>
+                              </>
+                            ) : (
+                              '—'
+                            )}
+                          </td>
+                          <td className="min-w-0 truncate px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
+                            {s.contactEmail ?? '—'}
+                          </td>
+                          <td className="px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
+                            {s.contactPhone ?? '—'}
+                          </td>
+                          <td className="px-4 py-2 align-middle">
+                            <span className="text-xs leading-tight">
+                              {s.isApproved ? (
+                                <span className="text-[var(--color-forest)] dark:text-sky-400">
+                                  Aprobada
+                                </span>
+                              ) : (
+                                <span className="text-amber-600 dark:text-amber-400">
+                                  Pendiente / rechazada
+                                </span>
+                              )}
+                              {s.isActive ? null : (
+                                <span className="ml-2 text-red-600 dark:text-red-400">
+                                  (inactiva)
+                                </span>
+                              )}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2 align-middle text-slate-700 tabular-nums dark:text-slate-300">
+                            {numOrZero(s.commission)}%
+                          </td>
+                          <td className="px-4 py-2 align-middle text-center">
+                            <div className="flex flex-nowrap items-center justify-center gap-1.5">
+                              <Button
+                                type="button"
+                                variant="icon"
+                                className="!text-[#2563eb] hover:bg-blue-500/10 dark:!text-sky-400 dark:hover:bg-sky-500/15"
+                                aria-label={`Ver detalle de ${s.name}`}
+                                onClick={() => {
+                                  setMode('view');
+                                  setViewStoreId(s.id);
+                                }}
+                              >
+                                <FiEye className="h-4 w-4" aria-hidden />
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="icon"
+                                className="!text-[#1d4ed8] hover:bg-blue-500/10 dark:!text-sky-300 dark:hover:bg-sky-500/15"
+                                aria-label={`Editar ${s.name}`}
+                                onClick={() => {
+                                  setMode('edit');
+                                  setViewStoreId(s.id);
+                                }}
+                              >
+                                <FiEdit2 className="h-4 w-4" aria-hidden />
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="icon"
+                                className="!text-red-600 hover:bg-red-500/10 dark:!text-red-400 dark:hover:bg-red-950/35"
+                                disabled={deleteStore.isPending}
+                                aria-label={`Eliminar ${s.name}`}
+                                onClick={() => setStoreToDelete(s)}
+                              >
+                                <FiTrash2 className="h-4 w-4" aria-hidden />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
-            <div className="flex shrink-0 flex-col gap-3 border-t border-slate-200/80 bg-slate-50/75 px-4 py-3 backdrop-blur-sm dark:border-sky-500/18 dark:bg-[#0c1630]/88 dark:backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                {filteredSorted.length === 0
-                  ? '0 tiendas'
-                  : `${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, filteredSorted.length)} de ${filteredSorted.length}`}
-              </p>
-              <div className="flex flex-wrap items-center gap-3">
-                <label className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <span>Por página</span>
-                  <select
-                    value={pageSize}
-                    onChange={(e) =>
-                      setPageSize(
-                        Number(e.target.value) as (typeof PAGE_SIZE_OPTIONS)[number],
-                      )
-                    }
-                    className="rounded-md border border-slate-200 bg-white px-2 py-1 text-sm text-slate-900 dark:border-sky-500/25 dark:bg-[#0f1a32] dark:text-slate-100"
-                  >
-                    {PAGE_SIZE_OPTIONS.map((n) => (
-                      <option key={n} value={n}>
-                        {n}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+            <div className="flex shrink-0 flex-col items-center gap-3 border-t border-slate-200/80 bg-slate-50/75 px-4 py-3 backdrop-blur-sm dark:border-sky-500/18 dark:bg-[#0c1630]/88 dark:backdrop-blur-sm">
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                  {filteredSorted.length === 0
+                    ? '0 tiendas'
+                    : `${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, filteredSorted.length)} de ${filteredSorted.length}`}
+                </p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Página{' '}
+                  <span className="font-semibold tabular-nums text-slate-700 dark:text-slate-200">
+                    {page}
+                  </span>{' '}
+                  de{' '}
+                  <span className="tabular-nums">{totalPages}</span>
+                </p>
                 <div className="flex items-center gap-1">
                   <Button
                     type="button"
@@ -652,9 +770,6 @@ export function AdminStoresPage() {
                   >
                     <FiChevronLeft className="h-4 w-4" />
                   </Button>
-                  <span className="min-w-[4.5rem] text-center text-xs text-slate-600 dark:text-slate-400">
-                    {page} / {totalPages}
-                  </span>
                   <Button
                     type="button"
                     variant="outline"
@@ -666,6 +781,23 @@ export function AdminStoresPage() {
                     <FiChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
+                <label className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <span>Por página</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={999}
+                    value={pageSize}
+                    onChange={(e) => {
+                      const raw = Number(e.target.value);
+                      if (!Number.isFinite(raw)) return;
+                      const next = Math.min(999, Math.max(1, Math.trunc(raw)));
+                      setPageSize(next);
+                    }}
+                    className="page-size-input h-9 w-16 rounded-md border border-slate-300 bg-white px-2 text-center text-sm font-semibold text-slate-900 outline-none transition focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/25 dark:border-sky-500/30 dark:bg-[#0b1735] dark:text-slate-100 dark:focus:border-sky-400 dark:focus:ring-sky-500/25"
+                    aria-label="Cantidad de elementos por página"
+                  />
+                </label>
               </div>
             </div>
           </div>
@@ -741,7 +873,7 @@ export function AdminStoresPage() {
               <Button
                 type="button"
                 variant="ghost"
-                className="h-10 border border-zinc-300 bg-white px-4 text-sm text-zinc-800 hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700"
+                className="h-10 w-40 justify-center border border-zinc-300 bg-white px-4 text-sm text-zinc-800 hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700"
                 onClick={() => setStoreToDelete(null)}
                 disabled={deleteStore.isPending}
               >
@@ -750,7 +882,7 @@ export function AdminStoresPage() {
               <Button
                 type="button"
                 variant="primary"
-                className="h-10 border-0 bg-red-600 px-4 text-sm text-white hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
+                className="h-10 w-40 justify-center border-0 bg-rose-700/90 px-4 text-sm text-white hover:bg-rose-800 dark:bg-rose-700/90 dark:hover:bg-rose-800"
                 onClick={handleConfirmDelete}
                 disabled={deleteStore.isPending}
               >

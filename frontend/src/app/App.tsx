@@ -3,6 +3,7 @@ import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '../context/AuthProvider/AuthProvider';
 import { ThemeProvider } from '../context/ThemeProvider/ThemeProvider';
+import { useTheme } from '../hooks/useTheme';
 import { AuthLayout } from '../layouts/AuthLayout/AuthLayout';
 import { MainLayout } from '../layouts/MainLayout/MainLayout';
 import { AdminRoute } from '../components/AdminRoute/AdminRoute';
@@ -46,11 +47,23 @@ const queryClient = new QueryClient({
 });
 
 function AppToaster() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   return (
     <Toaster
-      position="top-center"
+      position="top-right"
       toastOptions={{
-        className: 'rounded-md text-sm dark:bg-night-800 dark:text-zinc-100',
+        className: 'rounded-md border text-sm',
+        style: {
+          background: isDark ? '#1f1f2e' : '#ffffff',
+          color: isDark ? '#f4f4f5' : '#18181b',
+          borderColor: isDark ? '#3f3f46' : '#e4e4e7',
+        },
+        iconTheme: {
+          primary: isDark ? '#60a5fa' : '#2563eb',
+          secondary: isDark ? '#0b1020' : '#ffffff',
+        },
         duration: 3200,
       }}
     />

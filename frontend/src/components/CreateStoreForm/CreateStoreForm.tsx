@@ -1,10 +1,12 @@
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { Button } from '../Button/Button';
 import { LogoUploadField } from '../LogoUploadField/LogoUploadField';
 import { getErrorMessage } from '../../helpers/mapApiError';
+import { useAuth } from '../../hooks/useAuth';
 import { useCreateStoreMutation } from '../../hooks/useStoreMutations';
+import { uploadFile } from '../../requests/fileRequests';
 import type { CreateStorePayload } from '../../requests/storeRequests';
 
 const fieldClass =
@@ -16,8 +18,7 @@ const labelClass = 'text-xs font-medium text-zinc-600 dark:text-zinc-300';
 
 const STEPS = [
   { title: 'Identidad y presentación' },
-  { title: 'Contacto público' },
-  { title: 'Políticas' },
+  { title: 'Contacto y políticas' },
 ] as const;
 
 function isValidEmail(value: string): boolean {
@@ -31,7 +32,13 @@ export type CreateStoreFormProps = {
   onCancel?: () => void;
 };
 
+type CreateStoreFormErrors = {
+  name?: string;
+  contactEmail?: string;
+};
+
 export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
+  const { token } = useAuth();
   const createMut = useCreateStoreMutation();
 
   const [step, setStep] = useState(0);
@@ -42,7 +49,9 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
   const [returnPolicy, setReturnPolicy] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactPhone, setContactPhone] = useState('');
+  const [selectedLogoFile, setSelectedLogoFile] = useState<File | null>(null);
   const [logoUploading, setLogoUploading] = useState(false);
+  const [errors, setErrors] = useState<CreateStoreFormErrors>({});
 
   const lastIndex = STEPS.length - 1;
 
@@ -55,24 +64,29 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
     setReturnPolicy('');
     setContactEmail('');
     setContactPhone('');
+    setSelectedLogoFile(null);
     setLogoUploading(false);
+    setErrors({});
   };
 
   const validateStep = (index: number): boolean => {
     if (index === 0) {
+      const nextErrors: CreateStoreFormErrors = {};
       if (!name.trim()) {
-        toast.error('El nombre es obligatorio');
-        return false;
+        nextErrors.name = 'El nombre es obligatorio.';
       }
-      return true;
+      setErrors((prev) => ({ ...prev, ...nextErrors }));
+      return Object.keys(nextErrors).length === 0;
     }
+
     if (index === 1) {
+      const nextErrors: CreateStoreFormErrors = {};
       const emailTrim = contactEmail.trim();
       if (emailTrim && !isValidEmail(emailTrim)) {
-        toast.error('Introduce un correo válido');
-        return false;
+        nextErrors.contactEmail = 'Introduce un correo válido.';
       }
-      return true;
+      setErrors((prev) => ({ ...prev, ...nextErrors }));
+      return Object.keys(nextErrors).length === 0;
     }
     return true;
   };
@@ -84,8 +98,7 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
 
   const goBack = () => setStep((s) => Math.max(0, s - 1));
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
+  const handleCreateStore = async () => {
     if (logoUploading) {
       toast.error('Espera a que termine la subida del logo');
       return;
@@ -100,16 +113,30 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
     }
     const n = name.trim();
     const emailTrim = contactEmail.trim();
-    if (emailTrim && !isValidEmail(emailTrim)) {
-      toast.error('Introduce un correo válido');
-      setStep(1);
-      return;
+
+    let logoUrl = logo.trim();
+    if (selectedLogoFile) {
+      if (!token) {
+        toast.error('Inicia sesión para subir archivos');
+        return;
+      }
+      setLogoUploading(true);
+      try {
+        const uploadRes = await uploadFile(token, selectedLogoFile, 'stores');
+        logoUrl = uploadRes.url;
+        setLogo(uploadRes.url);
+      } catch (err) {
+        toast.error(getErrorMessage(err));
+        return;
+      } finally {
+        setLogoUploading(false);
+      }
     }
 
     const body: CreateStorePayload = { name: n };
     const d = description.trim();
     if (d) body.description = d;
-    const l = logo.trim();
+    const l = logoUrl;
     if (l) body.logo = l;
     const sp = shippingPolicy.trim();
     if (sp) body.shippingPolicy = sp;
@@ -133,7 +160,7 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={(e) => e.preventDefault()}
       className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
     >
       <div className="market-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-4">
@@ -165,13 +192,20 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
                 </label>
                 <input
                   id="create-store-name"
-                  required
                   autoComplete="organization"
                   placeholder="Ej. Mi tienda online"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className={fieldClass}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setErrors((prev) => ({ ...prev, name: undefined }));
+                  }}
+                  className={`${fieldClass} ${errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400/20' : ''}`}
                 />
+                {errors.name ? (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                    {errors.name}
+                  </p>
+                ) : null}
               </div>
               <div>
                 <label htmlFor="create-store-description" className={labelClass}>
@@ -190,6 +224,9 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
                 value={logo}
                 onChange={setLogo}
                 disabled={createMut.isPending}
+                uploadOnSelect={false}
+                onFileChange={setSelectedLogoFile}
+                selectedFile={selectedLogoFile}
                 onUploadingChange={setLogoUploading}
               />
             </>
@@ -207,9 +244,17 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
                   autoComplete="email"
                   placeholder="tienda@ejemplo.com"
                   value={contactEmail}
-                  onChange={(e) => setContactEmail(e.target.value)}
-                  className={fieldClass}
+                  onChange={(e) => {
+                    setContactEmail(e.target.value);
+                    setErrors((prev) => ({ ...prev, contactEmail: undefined }));
+                  }}
+                  className={`${fieldClass} ${errors.contactEmail ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400/20' : ''}`}
                 />
+                {errors.contactEmail ? (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                    {errors.contactEmail}
+                  </p>
+                ) : null}
               </div>
               <div>
                 <label htmlFor="create-store-phone" className={labelClass}>
@@ -225,11 +270,6 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
                   className={fieldClass}
                 />
               </div>
-            </>
-          ) : null}
-
-          {step === 2 ? (
-            <>
               <div>
                 <label htmlFor="create-store-shipping" className={labelClass}>
                   Política de envíos
@@ -305,9 +345,10 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
             </Button>
           ) : (
             <Button
-              type="submit"
+              type="button"
               variant="primary"
               disabled={disabledNav}
+              onClick={() => void handleCreateStore()}
               className="h-11 min-h-11 min-w-0 flex-1 justify-center border-0 px-3 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e] sm:min-w-[11rem]"
             >
               {createMut.isPending ? 'Creando…' : 'Crear tienda'}

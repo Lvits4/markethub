@@ -6,7 +6,6 @@ export enum ProductSortBy {
   PRICE_ASC = 'price_asc',
   PRICE_DESC = 'price_desc',
   NEWEST = 'newest',
-  RATING = 'rating',
   BEST_SELLING = 'best_selling',
 }
 
@@ -37,12 +36,6 @@ export class FilterProductDto extends PaginationDto {
   @IsNumber()
   @Min(0)
   maxPrice?: number;
-
-  @ApiPropertyOptional({ description: 'Valoración mínima (1-5)' })
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  minRating?: number;
 
   @ApiPropertyOptional({ enum: ProductSortBy })
   @IsOptional()

@@ -17,8 +17,6 @@ export type Product = {
   price: string | number;
   stock: number;
   isActive: boolean;
-  averageRating: string | number;
-  totalReviews: number;
   storeId: string;
   categoryId: string | null;
   store?: StoreSummary;
@@ -30,7 +28,6 @@ export type ProductSortBy =
   | 'price_asc'
   | 'price_desc'
   | 'newest'
-  | 'rating'
   | 'best_selling';
 
 export type ProductFilters = {
@@ -41,7 +38,6 @@ export type ProductFilters = {
   storeId?: string;
   minPrice?: number;
   maxPrice?: number;
-  minRating?: number;
   sortBy?: ProductSortBy;
 };
 

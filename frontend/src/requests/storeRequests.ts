@@ -12,7 +12,9 @@ export type CreateStorePayload = {
   contactPhone?: string;
 };
 
-export type UpdateStorePayload = Partial<CreateStorePayload>;
+export type UpdateStorePayload = Partial<CreateStorePayload> & {
+  logo?: string | null;
+};
 
 export async function fetchPublicStores(): Promise<Store[]> {
   return fetchDefault<Store[]>(apiPaths.stores);
