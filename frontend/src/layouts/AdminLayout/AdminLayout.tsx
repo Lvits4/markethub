@@ -17,6 +17,7 @@ import {
   FiTag,
   FiUsers,
 } from 'react-icons/fi';
+import { AdminAccountSettingsDrawer } from '../../components/AdminAccountSettingsDrawer/AdminAccountSettingsDrawer';
 import { Button } from '../../components/Button/Button';
 import { SellerCreateStoreModalProvider } from '../../context/SellerCreateStoreModalProvider/SellerCreateStoreModalProvider';
 import { useTheme } from '../../hooks/useTheme';
@@ -101,6 +102,7 @@ export function AdminLayout() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
+  const [accountSettingsOpen, setAccountSettingsOpen] = useState(false);
   const { data: rejectedStores } = useRejectedStoresQuery();
   const pendingCount = rejectedStores?.length ?? 0;
 
@@ -283,12 +285,25 @@ export function AdminLayout() {
                   </button>
                 )}
               </div>
-              <SidebarNavItem
-                to={routePaths.settings}
-                icon={FiSettings}
-                label="Ajustes cuenta"
-                collapsed={collapsed}
-              />
+              <button
+                type="button"
+                title={collapsed ? 'Ajustes cuenta' : undefined}
+                onClick={() => setAccountSettingsOpen(true)}
+                className={[
+                  'admin-nav-link relative w-full text-left',
+                  accountSettingsOpen ? 'admin-nav-link--active' : '',
+                  collapsed ? 'justify-center px-2' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+              >
+                <span className="relative inline-flex shrink-0">
+                  <FiSettings className="h-[18px] w-[18px]" aria-hidden />
+                </span>
+                {!collapsed ? (
+                  <span className="min-w-0 flex-1 truncate">Ajustes cuenta</span>
+                ) : null}
+              </button>
             </div>
           </div>
         </nav>
@@ -331,6 +346,14 @@ export function AdminLayout() {
         </main>
       </div>
     </div>
+    <AdminAccountSettingsDrawer
+      open={accountSettingsOpen}
+      onClose={() => setAccountSettingsOpen(false)}
+      onLogoutSuccess={() => {
+        setAccountSettingsOpen(false);
+        navigate(routePaths.login, { replace: true });
+      }}
+    />
     </SellerCreateStoreModalProvider>
   );
 }
