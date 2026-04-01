@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, EntityManager, In, Repository } from 'typeorm';
 import { Store } from './entities/store.entity';
 import { CreateStoreDto, UpdateStoreDto } from './dto';
 import { User } from '../users/entities/user.entity';
@@ -199,6 +199,39 @@ export class StoresService {
     return this.storesRepository.save(store);
   }
 
+  /**
+   * Elimina una tienda y datos ligados (productos, pedidos de esa tienda, etc.)
+   * dentro de un EntityManager existente (p. ej. transacción de borrado de usuario).
+   */
+  async removeStoreInTransaction(em: EntityManager, storeId: string): Promise<void> {
+    const products = await em.find(Product, {
+      where: { storeId },
+      select: ['id'],
+    });
+    const productIds = products.map((p) => p.id);
+
+    if (productIds.length > 0) {
+      await em.delete(CartItem, { productId: In(productIds) });
+      await em.delete(Favorite, { productId: In(productIds) });
+      await em.delete(ProductImage, { productId: In(productIds) });
+      await em.delete(Product, { storeId });
+    }
+
+    const orders = await em.find(Order, {
+      where: { storeId },
+      select: ['id'],
+    });
+    const orderIds = orders.map((o) => o.id);
+
+    if (orderIds.length > 0) {
+      await em.delete(Payment, { orderId: In(orderIds) });
+      await em.delete(OrderItem, { orderId: In(orderIds) });
+    }
+    await em.delete(Order, { storeId });
+
+    await em.delete(Store, { id: storeId });
+  }
+
   async remove(id: string, user: User): Promise<void> {
     const store = await this.findById(id);
     if (store.userId !== user.id && user.role !== Role.ADMIN) {
@@ -206,32 +239,7 @@ export class StoresService {
     }
 
     await this.dataSource.transaction(async (em) => {
-      const products = await em.find(Product, {
-        where: { storeId: id },
-        select: ['id'],
-      });
-      const productIds = products.map((p) => p.id);
-
-      if (productIds.length > 0) {
-        await em.delete(CartItem, { productId: In(productIds) });
-        await em.delete(Favorite, { productId: In(productIds) });
-        await em.delete(ProductImage, { productId: In(productIds) });
-        await em.delete(Product, { storeId: id });
-      }
-
-      const orders = await em.find(Order, {
-        where: { storeId: id },
-        select: ['id'],
-      });
-      const orderIds = orders.map((o) => o.id);
-
-      if (orderIds.length > 0) {
-        await em.delete(Payment, { orderId: In(orderIds) });
-        await em.delete(OrderItem, { orderId: In(orderIds) });
-      }
-      await em.delete(Order, { storeId: id });
-
-      await em.delete(Store, { id });
+      await this.removeStoreInTransaction(em, id);
     });
   }
 

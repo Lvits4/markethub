@@ -71,7 +71,11 @@ export class ProductsController {
   @Roles(Role.SELLER, Role.ADMIN)
   @ApiBearerAuth('access-token')
   @Delete(':id')
-  @ApiOperation({ summary: 'Desactivar producto' })
+  @ApiOperation({
+    summary: 'Eliminar producto',
+    description:
+      'Borrado definitivo en base de datos. No aplica si el producto figura en pedidos.',
+  })
   remove(
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: User,

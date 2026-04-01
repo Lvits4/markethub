@@ -62,7 +62,7 @@ export class CategoriesController {
   @Roles(Role.ADMIN)
   @ApiBearerAuth('access-token')
   @Delete(':id')
-  @ApiOperation({ summary: 'Desactivar categoría (Admin)' })
+  @ApiOperation({ summary: 'Eliminar categoría (Admin)' })
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.categoriesService.remove(id);
   }

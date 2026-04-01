@@ -4,6 +4,7 @@ declare module 'react-icons/fi' {
   export const FiArrowLeft: I;
   export const FiBarChart2: I;
   export const FiBell: I;
+  export const FiCheck: I;
   export const FiChevronDown: I;
   export const FiChevronLeft: I;
   export const FiChevronRight: I;
@@ -21,6 +22,7 @@ declare module 'react-icons/fi' {
   export const FiMenu: I;
   export const FiMessageCircle: I;
   export const FiMinus: I;
+  export const FiMinusCircle: I;
   export const FiMoon: I;
   export const FiPercent: I;
   export const FiPhone: I;
@@ -38,6 +40,9 @@ declare module 'react-icons/fi' {
   export const FiShoppingCart: I;
   export const FiUpload: I;
   export const FiUser: I;
+  export const FiUserCheck: I;
   export const FiUsers: I;
+  export const FiUserX: I;
   export const FiX: I;
+  export const FiXCircle: I;
 }

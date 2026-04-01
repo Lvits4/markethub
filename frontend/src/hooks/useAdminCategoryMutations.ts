@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '../helpers/queryKeys';
 import {
   createCategory,
-  deactivateCategory,
+  deleteCategory,
   type CreateCategoryPayload,
   type UpdateCategoryPayload,
   updateCategory,
@@ -41,14 +41,14 @@ export function useUpdateCategoryMutation() {
   });
 }
 
-export function useDeactivateCategoryMutation() {
+export function useDeleteCategoryMutation() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => {
       if (!token) throw new Error('No autenticado');
-      return deactivateCategory(token, id);
+      return deleteCategory(token, id);
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.categories });

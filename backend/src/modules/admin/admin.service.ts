@@ -1,12 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+import { DataSource, In, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { Store } from '../stores/entities/store.entity';
 import { Product } from '../products/entities/product.entity';
 import { Order } from '../orders/entities/order.entity';
+import { OrderItem } from '../orders/entities/order-item.entity';
 import { Payment } from '../payments/entities/payment.entity';
+import { Cart } from '../cart/entities/cart.entity';
+import { CartItem } from '../cart/entities/cart-item.entity';
+import { Favorite } from '../favorites/entities/favorite.entity';
 import { StoresService } from '../stores/stores.service';
+import { AdminCreateUserDto, AdminUpdateUserDto } from './dto';
 import { OrderStatus, PaymentStatus, Role } from '../../common/enums';
 
 @Injectable()
@@ -22,6 +33,7 @@ export class AdminService {
     private readonly ordersRepository: Repository<Order>,
     @InjectRepository(Payment)
     private readonly paymentsRepository: Repository<Payment>,
+    private readonly dataSource: DataSource,
     private readonly storesService: StoresService,
   ) {}
 
@@ -83,13 +95,189 @@ export class AdminService {
     });
   }
 
+  private sanitizeUserForAdminList(user: User) {
+    return {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+    };
+  }
+
+  async createUser(dto: AdminCreateUserDto) {
+    const existing = await this.usersRepository.findOne({
+      where: { email: dto.email },
+    });
+    if (existing) {
+      throw new ConflictException('El email ya está registrado');
+    }
+    const hashed = await bcrypt.hash(dto.password, 10);
+    const user = this.usersRepository.create({
+      email: dto.email,
+      password: hashed,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      role: dto.role,
+      isActive: dto.isActive ?? true,
+    });
+    const saved = await this.usersRepository.save(user);
+    return this.sanitizeUserForAdminList(saved);
+  }
+
+  async updateUser(userId: string, dto: AdminUpdateUserDto, actor: User) {
+    const fields: (keyof AdminUpdateUserDto)[] = [
+      'email',
+      'password',
+      'firstName',
+      'lastName',
+      'role',
+      'isActive',
+    ];
+    const anySet = fields.some((k) => dto[k] !== undefined);
+    if (!anySet) {
+      throw new BadRequestException('Envía al menos un campo para actualizar');
+    }
+
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    if (dto.email !== undefined && dto.email !== user.email) {
+      const taken = await this.usersRepository.findOne({
+        where: { email: dto.email },
+      });
+      if (taken) {
+        throw new ConflictException('El email ya está registrado');
+      }
+      user.email = dto.email;
+    }
+
+    if (dto.firstName !== undefined) {
+      user.firstName = dto.firstName;
+    }
+    if (dto.lastName !== undefined) {
+      user.lastName = dto.lastName;
+    }
+
+    if (dto.role !== undefined && dto.role !== user.role) {
+      if (actor.id === userId && dto.role !== Role.ADMIN) {
+        throw new BadRequestException(
+          'No puedes cambiar tu propio rol de administrador',
+        );
+      }
+      if (user.role === Role.ADMIN && dto.role !== Role.ADMIN) {
+        const adminCount = await this.usersRepository.count({
+          where: { role: Role.ADMIN },
+        });
+        if (adminCount <= 1) {
+          throw new BadRequestException('Debe existir al menos un administrador');
+        }
+      }
+      user.role = dto.role;
+    }
+
+    if (dto.isActive !== undefined && dto.isActive !== user.isActive) {
+      if (actor.id === userId && dto.isActive === false) {
+        throw new BadRequestException(
+          'No puedes desactivar tu propia cuenta desde aquí',
+        );
+      }
+      if (!dto.isActive && user.role === Role.ADMIN && user.isActive) {
+        const activeAdmins = await this.usersRepository.count({
+          where: { role: Role.ADMIN, isActive: true },
+        });
+        if (activeAdmins <= 1) {
+          throw new BadRequestException(
+            'No se puede desactivar el único administrador activo',
+          );
+        }
+      }
+      user.isActive = dto.isActive;
+    }
+
+    if (dto.password != null && dto.password.length > 0) {
+      user.password = await bcrypt.hash(dto.password, 10);
+    }
+
+    const saved = await this.usersRepository.save(user);
+    return this.sanitizeUserForAdminList(saved);
+  }
+
   async toggleUserActive(userId: string) {
     const user = await this.usersRepository.findOne({ where: { id: userId } });
-    if (user) {
-      user.isActive = !user.isActive;
-      return this.usersRepository.save(user);
+    if (!user) {
+      return null;
     }
-    return null;
+    if (user.isActive && user.role === Role.ADMIN) {
+      const activeAdmins = await this.usersRepository.count({
+        where: { role: Role.ADMIN, isActive: true },
+      });
+      if (activeAdmins <= 1) {
+        throw new BadRequestException(
+          'No se puede desactivar el único administrador activo',
+        );
+      }
+    }
+    user.isActive = !user.isActive;
+    const saved = await this.usersRepository.save(user);
+    return this.sanitizeUserForAdminList(saved);
+  }
+
+  /**
+   * Borrado definitivo: pedidos del usuario como cliente, favoritos, carrito,
+   * cada tienda del usuario (con productos y pedidos de tienda) y el registro User.
+   */
+  async deleteUser(userId: string, actor: User): Promise<void> {
+    if (actor.id === userId) {
+      throw new BadRequestException('No puedes eliminar tu propio usuario');
+    }
+    const target = await this.usersRepository.findOne({ where: { id: userId } });
+    if (!target) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    if (target.role === Role.ADMIN) {
+      const adminCount = await this.usersRepository.count({
+        where: { role: Role.ADMIN },
+      });
+      if (adminCount <= 1) {
+        throw new BadRequestException('No se puede eliminar el único administrador');
+      }
+    }
+
+    await this.dataSource.transaction(async (em) => {
+      const ordersAsCustomer = await em.find(Order, {
+        where: { userId },
+        select: ['id'],
+      });
+      const customerOrderIds = ordersAsCustomer.map((o) => o.id);
+      if (customerOrderIds.length > 0) {
+        await em.delete(Payment, { orderId: In(customerOrderIds) });
+        await em.delete(OrderItem, { orderId: In(customerOrderIds) });
+      }
+      await em.delete(Order, { userId });
+
+      await em.delete(Favorite, { userId });
+
+      const cart = await em.findOne(Cart, { where: { userId } });
+      if (cart) {
+        await em.delete(CartItem, { cartId: cart.id });
+        await em.delete(Cart, { id: cart.id });
+      }
+
+      const stores = await em.find(Store, {
+        where: { userId },
+        select: ['id'],
+      });
+      for (const s of stores) {
+        await this.storesService.removeStoreInTransaction(em, s.id);
+      }
+
+      await em.delete(User, { id: userId });
+    });
   }
 
   async getAllStores() {

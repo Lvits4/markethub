@@ -26,6 +26,51 @@ export function toggleAdminUserActive(token: string, userId: string) {
   });
 }
 
+export function deleteAdminUser(token: string, userId: string) {
+  return fetchDefault<{ message: string }>(apiPaths.adminUser(userId), {
+    token,
+    method: 'DELETE',
+  });
+}
+
+export type AdminCreateUserPayload = {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  isActive?: boolean;
+};
+
+export type AdminUpdateUserPayload = {
+  email?: string;
+  password?: string;
+  firstName?: string;
+  lastName?: string;
+  role?: string;
+  isActive?: boolean;
+};
+
+export function createAdminUser(token: string, body: AdminCreateUserPayload) {
+  return fetchDefault<AdminUserRow>(apiPaths.adminUsers, {
+    token,
+    method: 'POST',
+    body,
+  });
+}
+
+export function updateAdminUser(
+  token: string,
+  userId: string,
+  body: AdminUpdateUserPayload,
+) {
+  return fetchDefault<AdminUserRow>(apiPaths.adminUser(userId), {
+    token,
+    method: 'PATCH',
+    body,
+  });
+}
+
 export function fetchAdminStores(token: string) {
   return fetchDefault<AdminStoreRow[]>(apiPaths.adminStores, { token });
 }

@@ -108,6 +108,8 @@ export type AdminOrderRow = {
   user?: AdminStoreOwner;
   store?: { id: string; name: string };
   items?: AdminOrderItemRow[];
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type AdminMonthlySaleRow = {

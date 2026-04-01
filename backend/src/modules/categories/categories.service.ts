@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Product } from '../products/entities/product.entity';
 import { Category } from './entities/category.entity';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
 
@@ -13,6 +14,8 @@ export class CategoriesService {
   constructor(
     @InjectRepository(Category)
     private readonly categoriesRepository: Repository<Category>,
+    @InjectRepository(Product)
+    private readonly productsRepository: Repository<Product>,
   ) {}
 
   async create(dto: CreateCategoryDto): Promise<Category> {
@@ -77,9 +80,18 @@ export class CategoriesService {
   }
 
   async remove(id: string): Promise<void> {
-    const category = await this.findById(id);
-    category.isActive = false;
-    await this.categoriesRepository.save(category);
+    const category = await this.categoriesRepository.findOne({ where: { id } });
+    if (!category) {
+      throw new NotFoundException('Categoría no encontrada');
+    }
+    await this.categoriesRepository.update({ parentId: id }, { parentId: null });
+    await this.productsRepository
+      .createQueryBuilder()
+      .update(Product)
+      .set({ categoryId: null })
+      .where('category_id = :id', { id })
+      .execute();
+    await this.categoriesRepository.remove(category);
   }
 
   private generateSlug(name: string): string {

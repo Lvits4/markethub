@@ -39,7 +39,7 @@ export function updateCategory(
   });
 }
 
-export function deactivateCategory(token: string, id: string) {
+export function deleteCategory(token: string, id: string) {
   return fetchDefault<void>(apiPaths.category(id), {
     token,
     method: 'DELETE',

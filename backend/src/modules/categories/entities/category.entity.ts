@@ -30,11 +30,11 @@ export class Category {
   isActive: boolean;
 
   @Column({ name: 'parent_id', type: 'uuid', nullable: true })
-  parentId: string;
+  parentId: string | null;
 
   @ManyToOne(() => Category, (cat) => cat.children, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'parent_id' })
-  parent: Category;
+  parent: Category | null;
 
   @OneToMany(() => Category, (cat) => cat.parent)
   children: Category[];

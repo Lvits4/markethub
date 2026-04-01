@@ -1,5 +1,51 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { FiImage, FiUpload, FiX } from 'react-icons/fi';
+import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc';
+
+const DEFAULT_HINT =
+  'PNG, JPG, WebP… Se subirán al crear el producto.';
+
+function RemoteImageThumb({
+  url,
+  token,
+  disabled,
+  onRemove,
+}: {
+  url: string;
+  token: string | null | undefined;
+  disabled: boolean;
+  onRemove: () => void;
+}) {
+  const { src, loading, error } = useProtectedImageSrc(url, token);
+  const short =
+    url.length > 28 ? `${url.slice(0, 14)}…${url.slice(-10)}` : url;
+
+  return (
+    <li className="relative aspect-square overflow-hidden rounded-md border border-zinc-200 bg-zinc-100 dark:border-night-600 dark:bg-night-800">
+      {loading ? (
+        <div className="h-full w-full animate-pulse bg-zinc-200 dark:bg-night-700" />
+      ) : error || !src ? (
+        <div className="flex h-full w-full items-center justify-center bg-zinc-200 px-1 text-center text-[10px] leading-tight text-zinc-500 dark:bg-night-700 dark:text-zinc-400">
+          Sin vista previa
+        </div>
+      ) : (
+        <img src={src} alt="" className="h-full w-full object-cover" />
+      )}
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={onRemove}
+        className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-md bg-black/55 text-white backdrop-blur-sm transition hover:bg-black/70 disabled:pointer-events-none disabled:opacity-50"
+        aria-label="Quitar imagen guardada"
+      >
+        <FiX className="h-4 w-4" strokeWidth={2.5} />
+      </button>
+      <p className="absolute bottom-0 left-0 right-0 truncate bg-black/45 px-1.5 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
+        {short}
+      </p>
+    </li>
+  );
+}
 
 export type ProductImagesFieldProps = {
   /** Mismo `id` que `htmlFor` del `<label>` del formulario. */
@@ -7,6 +53,14 @@ export type ProductImagesFieldProps = {
   files: File[];
   onChange: (files: File[]) => void;
   disabled?: boolean;
+  /** URLs ya persistidas (formulario de edición). */
+  remoteUrls?: string[];
+  onRemoveRemote?: (url: string) => void;
+  protectedImageToken?: string | null;
+  /** Texto bajo la zona de soltar archivos. */
+  hintText?: string;
+  /** Si es false, solo se admite una imagen local (sustituye la anterior). */
+  multiple?: boolean;
 };
 
 function filterImageFiles(list: FileList | File[]): File[] {
@@ -18,6 +72,11 @@ export function ProductImagesField({
   files,
   onChange,
   disabled = false,
+  remoteUrls,
+  onRemoveRemote,
+  protectedImageToken,
+  hintText,
+  multiple = true,
 }: ProductImagesFieldProps) {
   const previewUrls = useMemo(
     () => files.map((f) => URL.createObjectURL(f)),
@@ -35,6 +94,10 @@ export function ProductImagesField({
     if (disabled) return;
     const incoming = filterImageFiles(list);
     if (incoming.length === 0) return;
+    if (!multiple) {
+      onChange([incoming[0]]);
+      return;
+    }
     onChange([...files, ...incoming]);
   };
 
@@ -67,7 +130,7 @@ export function ProductImagesField({
         </span>
       </span>
       <span className="max-w-xs text-xs text-zinc-500 dark:text-zinc-500">
-        PNG, JPG, WebP… Se subirán al crear el producto.
+        {hintText ?? DEFAULT_HINT}
       </span>
     </>
   );
@@ -78,7 +141,7 @@ export function ProductImagesField({
         id={id}
         type="file"
         accept="image/*"
-        multiple
+        multiple={multiple}
         disabled={disabled}
         className="sr-only"
         onChange={(e) => {
@@ -119,8 +182,17 @@ export function ProductImagesField({
         </label>
       )}
 
-      {files.length > 0 ? (
+      {(remoteUrls?.length ?? 0) > 0 || files.length > 0 ? (
         <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {(remoteUrls ?? []).map((u) => (
+            <RemoteImageThumb
+              key={u}
+              url={u}
+              token={protectedImageToken}
+              disabled={disabled}
+              onRemove={() => onRemoveRemote?.(u)}
+            />
+          ))}
           {files.map((file, i) => (
             <li
               key={`${file.name}-${file.lastModified}-${i}`}

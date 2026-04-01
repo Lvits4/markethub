@@ -6,13 +6,18 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
+  Post,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { CurrentUser, Roles } from '../../common/decorators';
 import { Role } from '../../common/enums';
 import { User } from '../users/entities/user.entity';
-import { UpdateCommissionDto } from './dto';
+import {
+  AdminCreateUserDto,
+  AdminUpdateUserDto,
+  UpdateCommissionDto,
+} from './dto';
 
 @ApiTags('Admin')
 @ApiBearerAuth('access-token')
@@ -33,10 +38,38 @@ export class AdminController {
     return this.adminService.getAllUsers();
   }
 
+  @Post('users')
+  @ApiOperation({ summary: 'Crear usuario (admin)' })
+  createUser(@Body() dto: AdminCreateUserDto) {
+    return this.adminService.createUser(dto);
+  }
+
   @Patch('users/:id/toggle-active')
   @ApiOperation({ summary: 'Activar/desactivar usuario' })
   toggleUserActive(@Param('id', ParseUUIDPipe) id: string) {
     return this.adminService.toggleUserActive(id);
+  }
+
+  @Patch('users/:id')
+  @ApiOperation({ summary: 'Actualizar usuario (admin)' })
+  updateUser(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: AdminUpdateUserDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.adminService.updateUser(id, dto, user);
+  }
+
+  @Delete('users/:id')
+  @ApiOperation({
+    summary: 'Eliminar usuario de forma permanente (admin)',
+  })
+  async deleteUser(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: User,
+  ) {
+    await this.adminService.deleteUser(id, user);
+    return { message: 'Usuario eliminado correctamente' };
   }
 
   @Get('stores')

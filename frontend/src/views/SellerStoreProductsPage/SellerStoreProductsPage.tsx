@@ -96,14 +96,19 @@ export function SellerStoreProductsPage() {
                         className="text-xs text-red-600"
                         disabled={deleteMut.isPending}
                         onClick={() => {
-                          if (!window.confirm('¿Desactivar este producto?')) return;
+                          if (
+                            !window.confirm(
+                              '¿Eliminar este producto de forma permanente? No podrás deshacerlo. Si tiene pedidos asociados, no se eliminará.',
+                            )
+                          )
+                            return;
                           deleteMut.mutate(p.id, {
-                            onSuccess: () => toast.success('Producto desactivado'),
+                            onSuccess: () => toast.success('Producto eliminado'),
                             onError: (e) => toast.error(getErrorMessage(e)),
                           });
                         }}
                       >
-                        Desactivar
+                        Eliminar
                       </Button>
                     </div>
                   </td>

@@ -219,10 +219,30 @@ function ProductDetailsPanel({ product }: { product: Product }) {
   );
 }
 
+function adminProductRowFromDetail(p: Product): AdminProductRow {
+  return {
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    price: p.price,
+    stock: p.stock,
+    isActive: p.isActive,
+    storeId: p.storeId,
+    store: p.store
+      ? { id: p.store.id, name: p.store.name, slug: p.store.slug }
+      : undefined,
+    category: p.category
+      ? { id: p.category.id, name: p.category.name }
+      : null,
+  };
+}
+
 function ProductDetailsDrawer({
   open,
   onClose,
   onEdit,
+  onRequestDelete,
+  deleteDisabled,
   isLoading,
   isError,
   product,
@@ -230,6 +250,8 @@ function ProductDetailsDrawer({
   open: boolean;
   onClose: () => void;
   onEdit: () => void;
+  onRequestDelete?: () => void;
+  deleteDisabled?: boolean;
   isLoading: boolean;
   isError: boolean;
   product?: Product;
@@ -283,6 +305,17 @@ function ProductDetailsDrawer({
             >
               Editar
             </Button>
+            {onRequestDelete ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="h-8 border-rose-200 px-3 text-xs text-rose-700 hover:bg-rose-50 dark:border-rose-500/40 dark:text-rose-300 dark:hover:bg-rose-950/40"
+                onClick={onRequestDelete}
+                disabled={!product || deleteDisabled}
+              >
+                Eliminar
+              </Button>
+            ) : null}
             <Button
               type="button"
               variant="icon"
@@ -372,15 +405,16 @@ export function AdminProductsPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [viewProductId, setViewProductId] = useState<string | null>(null);
-  const [productToDeactivate, setProductToDeactivate] =
-    useState<AdminProductRow | null>(null);
+  const [productToDelete, setProductToDelete] = useState<AdminProductRow | null>(
+    null,
+  );
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [createProductOpen, setCreateProductOpen] = useState(false);
 
   const productDetailQuery = useAdminProductDetailQuery(viewProductId);
 
-  const deactivateStoreId = productToDeactivate?.storeId;
-  const deleteMut = useDeleteProductMutation(deactivateStoreId);
+  const deleteStoreId = productToDelete?.storeId;
+  const deleteMut = useDeleteProductMutation(deleteStoreId);
 
   const tableHeaderScrollRef = useRef<HTMLDivElement>(null);
   const tableBodyScrollRef = useRef<HTMLDivElement>(null);
@@ -434,16 +468,32 @@ export function AdminProductsPage() {
     setSortDir(direction);
   }, []);
 
-  const handleConfirmDeactivate = () => {
-    if (!productToDeactivate) return;
-    deleteMut.mutate(productToDeactivate.id, {
+  const handleConfirmDelete = () => {
+    if (!productToDelete) return;
+    const deletedId = productToDelete.id;
+    deleteMut.mutate(deletedId, {
       onSuccess: () => {
-        toast.success('Producto desactivado');
-        setProductToDeactivate(null);
+        toast.success('Producto eliminado');
+        setProductToDelete(null);
+        if (viewProductId === deletedId) {
+          setViewProductId(null);
+          setMode('view');
+        }
       },
       onError: (e) => toast.error(getErrorMessage(e)),
     });
   };
+
+  const openDeleteForViewedProduct = useCallback(() => {
+    if (!viewProductId) return;
+    const row = products.find((x) => x.id === viewProductId);
+    if (row) {
+      setProductToDelete(row);
+      return;
+    }
+    const d = productDetailQuery.data;
+    if (d) setProductToDelete(adminProductRowFromDetail(d));
+  }, [viewProductId, products, productDetailQuery.data]);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
@@ -647,8 +697,8 @@ export function AdminProductsPage() {
                                 variant="icon"
                                 className="!text-red-600 hover:bg-red-500/10 dark:!text-red-400 dark:hover:bg-red-950/35"
                                 disabled={deleteMut.isPending}
-                                aria-label={`Desactivar ${p.name}`}
-                                onClick={() => setProductToDeactivate(p)}
+                                aria-label={`Eliminar ${p.name}`}
+                                onClick={() => setProductToDelete(p)}
                               >
                                 <FiTrash2 className="h-4 w-4" aria-hidden />
                               </Button>
@@ -737,7 +787,7 @@ export function AdminProductsPage() {
                 : 'Editar producto'
             }
           >
-            <div className="min-h-0 flex-1 overflow-hidden">
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
               {productDetailQuery.isLoading ? (
                 <p className="px-5 py-4 text-sm text-zinc-500">
                   Cargando detalle…
@@ -748,6 +798,7 @@ export function AdminProductsPage() {
                 </p>
               ) : productDetailQuery.data ? (
                 <AdminEditProductForm
+                  key={productDetailQuery.data.id}
                   product={productDetailQuery.data}
                   onSuccess={() => {
                     setViewProductId(null);
@@ -768,27 +819,29 @@ export function AdminProductsPage() {
               setMode('view');
             }}
             onEdit={() => setMode('edit')}
+            onRequestDelete={openDeleteForViewedProduct}
+            deleteDisabled={deleteMut.isPending}
             isLoading={productDetailQuery.isLoading}
             isError={productDetailQuery.isError}
             product={productDetailQuery.data}
           />
 
           <Modal
-            open={productToDeactivate != null}
-            onClose={() => setProductToDeactivate(null)}
-            title="Confirmar desactivación"
+            open={productToDelete != null}
+            onClose={() => setProductToDelete(null)}
+            title="Confirmar eliminación"
           >
             <div className="space-y-4 px-5 py-4">
               <p className="text-sm text-zinc-700 dark:text-zinc-200">
-                ¿Seguro que quieres desactivar el producto{' '}
+                ¿Seguro que quieres eliminar el producto{' '}
                 <span className="font-semibold">
-                  «{productToDeactivate?.name}»
+                  «{productToDelete?.name}»
                 </span>
                 ?
               </p>
               <p className="text-xs text-red-600 dark:text-red-400">
-                El producto dejará de estar visible para los compradores. Puedes
-                reactivarlo después desde la edición.
+                Se borrará de forma permanente. Si el producto consta en algún
+                pedido, el sistema no permitirá eliminarlo.
               </p>
             </div>
             <div className="flex justify-end gap-2 border-t border-zinc-100 bg-zinc-50/90 px-5 py-4 dark:border-night-800 dark:bg-night-950/90">
@@ -796,7 +849,7 @@ export function AdminProductsPage() {
                 type="button"
                 variant="ghost"
                 className="h-10 w-40 justify-center border border-zinc-300 bg-white px-4 text-sm text-zinc-800 hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700"
-                onClick={() => setProductToDeactivate(null)}
+                onClick={() => setProductToDelete(null)}
                 disabled={deleteMut.isPending}
               >
                 Cancelar
@@ -805,10 +858,10 @@ export function AdminProductsPage() {
                 type="button"
                 variant="primary"
                 className="h-10 w-40 justify-center border-0 bg-rose-700/90 px-4 text-sm text-white hover:bg-rose-800 dark:bg-rose-700/90 dark:hover:bg-rose-800"
-                onClick={handleConfirmDeactivate}
+                onClick={handleConfirmDelete}
                 disabled={deleteMut.isPending}
               >
-                {deleteMut.isPending ? 'Desactivando…' : 'Desactivar'}
+                {deleteMut.isPending ? 'Eliminando…' : 'Eliminar'}
               </Button>
             </div>
           </Modal>

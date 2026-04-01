@@ -23,6 +23,7 @@ export const apiPaths = {
   store: (id: string) => `/stores/${id}`,
   adminDashboard: '/admin/dashboard',
   adminUsers: '/admin/users',
+  adminUser: (id: string) => `/admin/users/${id}`,
   adminUserToggleActive: (id: string) => `/admin/users/${id}/toggle-active`,
   adminStores: '/admin/stores',
   adminStore: (id: string) => `/admin/stores/${id}`,

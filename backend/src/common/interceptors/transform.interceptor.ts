@@ -90,10 +90,16 @@ export class TransformInterceptor<T>
         if (isStreamableFileBody(data)) {
           return data as unknown as ApiResponse<T>;
         }
+        // void / sin retorno → undefined; JSON.stringify omite claves undefined y el
+        // cliente espera siempre `{ data }` (p. ej. DELETE que resuelve sin cuerpo útil).
+        const payload =
+          data === undefined
+            ? null
+            : stripAuditTimestamps(data, new WeakMap());
         return {
           statusCode,
           message: 'Success',
-          data: stripAuditTimestamps(data, new WeakMap()) as T,
+          data: payload as T,
         };
       }),
     );

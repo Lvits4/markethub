@@ -43,11 +43,11 @@ export class Product {
   store: Store;
 
   @Column({ name: 'category_id', type: 'uuid', nullable: true })
-  categoryId: string;
+  categoryId: string | null;
 
-  @ManyToOne(() => Category)
+  @ManyToOne(() => Category, { nullable: true })
   @JoinColumn({ name: 'category_id' })
-  category: Category;
+  category: Category | null;
 
   @OneToMany(() => ProductImage, (img) => img.product, { cascade: true })
   images: ProductImage[];

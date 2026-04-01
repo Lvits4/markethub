@@ -1,12 +1,16 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { ProductImage } from './entities/product-image.entity';
+import { CartItem } from '../cart/entities/cart-item.entity';
+import { Favorite } from '../favorites/entities/favorite.entity';
+import { OrderItem } from '../orders/entities/order-item.entity';
 import { CreateProductDto, FilterProductDto, ProductSortBy, UpdateProductDto } from './dto';
 import { User } from '../users/entities/user.entity';
 import { StoresService } from '../stores/stores.service';
@@ -16,6 +20,8 @@ import { PaginatedResponseDto } from '../../common/dto';
 @Injectable()
 export class ProductsService {
   constructor(
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
     @InjectRepository(Product)
     private readonly productsRepository: Repository<Product>,
     @InjectRepository(ProductImage)
@@ -113,10 +119,17 @@ export class ProductsService {
         this.productImagesRepository.create({ ...img, productId: id }),
       );
       await this.productImagesRepository.save(images);
+      // findById cargó `images` en memoria; ya se borraron/recrearon en BD. Si
+      // guardamos el product con cascade, TypeORM intenta sincronizar filas
+      // huérfanas y puede fallar con 500.
+      delete (product as { images?: ProductImage[] }).images;
     }
 
     const { images, ...updateData } = dto;
     Object.assign(product, updateData);
+    if (Object.prototype.hasOwnProperty.call(updateData, 'categoryId')) {
+      delete (product as { category?: unknown }).category;
+    }
     await this.productsRepository.save(product);
 
     return this.findById(id);
@@ -130,8 +143,19 @@ export class ProductsService {
       throw new ForbiddenException('No tienes permiso para eliminar este producto');
     }
 
-    product.isActive = false;
-    await this.productsRepository.save(product);
+    await this.dataSource.transaction(async (manager) => {
+      const inOrders = await manager.count(OrderItem, { where: { productId: id } });
+      if (inOrders > 0) {
+        throw new ConflictException(
+          'No se puede eliminar el producto porque consta en uno o más pedidos.',
+        );
+      }
+
+      await manager.delete(CartItem, { productId: id });
+      await manager.delete(Favorite, { productId: id });
+      await manager.delete(ProductImage, { productId: id });
+      await manager.delete(Product, { id });
+    });
   }
 
   private applyFilters(qb: SelectQueryBuilder<Product>, filters: FilterProductDto): void {

@@ -2,12 +2,14 @@ import { useEffect, useId, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Button } from '../Button/Button';
+import { ProductImagesField } from '../CreateProductForm/ProductImagesField';
 import { routePaths } from '../../config/routes';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
 import { useUpdateProfileMutation } from '../../hooks/useUpdateProfileMutation';
 import { useUserProfileQuery } from '../../queries/useUserProfileQuery';
+import { uploadFile } from '../../requests/fileRequests';
 
 type AccountSettingsBodyProps = {
   className?: string;
@@ -25,13 +27,15 @@ export function AccountSettingsBody({
   const avatarFieldId = `${ids}-avatar`;
 
   const { theme, toggleTheme } = useTheme();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, token } = useAuth();
   const { data: profile, isLoading: profileLoading } = useUserProfileQuery();
   const updateProfile = useUpdateProfileMutation();
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [avatar, setAvatar] = useState('');
+  const [avatarFiles, setAvatarFiles] = useState<File[]>([]);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -54,17 +58,44 @@ export function AccountSettingsBody({
       toast.error('Nombre y apellidos: mínimo 2 caracteres cada uno');
       return;
     }
-    updateProfile.mutate(
-      {
-        firstName: fn,
-        lastName: ln,
-        avatar: avatar.trim() || undefined,
-      },
-      {
-        onSuccess: () => toast.success('Perfil actualizado'),
-        onError: (e) => toast.error(getErrorMessage(e)),
-      },
-    );
+
+    const run = async () => {
+      let avatarUrl: string | undefined = avatar.trim() || undefined;
+      if (avatarFiles.length > 0) {
+        if (!token) {
+          toast.error('No hay sesión para subir la imagen.');
+          return;
+        }
+        setUploadingAvatar(true);
+        try {
+          const res = await uploadFile(token, avatarFiles[0], 'general');
+          avatarUrl = res.url;
+        } catch (e) {
+          toast.error(getErrorMessage(e));
+          return;
+        } finally {
+          setUploadingAvatar(false);
+        }
+      }
+
+      updateProfile.mutate(
+        {
+          firstName: fn,
+          lastName: ln,
+          avatar: avatarUrl,
+        },
+        {
+          onSuccess: (profile) => {
+            toast.success('Perfil actualizado');
+            setAvatarFiles([]);
+            setAvatar(profile.avatar ?? '');
+          },
+          onError: (e) => toast.error(getErrorMessage(e)),
+        },
+      );
+    };
+
+    void run();
   };
 
   return (
@@ -135,38 +166,57 @@ export function AccountSettingsBody({
                       htmlFor={avatarFieldId}
                       className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
                     >
-                      URL del avatar (opcional)
+                      Avatar (opcional)
                     </label>
-                    <input
-                      id={avatarFieldId}
-                      type="url"
-                      value={avatar}
-                      onChange={(e) => setAvatar(e.target.value)}
-                      className="mt-1 w-full rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100"
-                      placeholder="https://…"
-                    />
+                    <div className="mt-1">
+                      <ProductImagesField
+                        id={avatarFieldId}
+                        files={avatarFiles}
+                        onChange={setAvatarFiles}
+                        disabled={updateProfile.isPending || uploadingAvatar}
+                        multiple={false}
+                        protectedImageToken={token}
+                        remoteUrls={
+                          avatarFiles.length === 0 && avatar.trim()
+                            ? [avatar.trim()]
+                            : []
+                        }
+                        onRemoveRemote={() => setAvatar('')}
+                        hintText="PNG, JPG, WebP… Se aplicará al guardar el perfil."
+                      />
+                    </div>
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="mt-2 w-full justify-center sm:w-auto"
-                    disabled={updateProfile.isPending}
-                    onClick={handleSaveProfile}
-                  >
-                    {updateProfile.isPending ? 'Guardando…' : 'Guardar perfil'}
-                  </Button>
                 </div>
               )}
             </div>
 
-            <Button
-              type="button"
-              variant="primary"
-              className="mt-6 w-full justify-center"
-              onClick={handleLogout}
-            >
-              Cerrar sesión
-            </Button>
+            <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3">
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-11 min-h-11 w-full justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:min-w-0 sm:flex-1"
+                disabled={
+                  profileLoading ||
+                  updateProfile.isPending ||
+                  uploadingAvatar
+                }
+                onClick={handleSaveProfile}
+              >
+                {uploadingAvatar
+                  ? 'Subiendo imagen…'
+                  : updateProfile.isPending
+                    ? 'Guardando…'
+                    : 'Guardar perfil'}
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                className="h-11 min-h-11 w-full justify-center border-0 px-3 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e] sm:min-w-0 sm:flex-1"
+                onClick={handleLogout}
+              >
+                Cerrar sesión
+              </Button>
+            </div>
           </>
         ) : (
           <>
@@ -176,7 +226,7 @@ export function AccountSettingsBody({
             <Button
               type="button"
               variant="primary"
-              className="mt-4 w-full justify-center"
+              className="mt-4 h-11 w-full justify-center border-0 px-3 text-sm !bg-[#102251] !text-[#458bde] shadow-sm hover:!bg-[#152a5e] focus-visible:!ring-2 focus-visible:!ring-[#458bde]/35 dark:!bg-[#102251] dark:!text-[#458bde] dark:hover:!bg-[#152a5e]"
               onClick={() => navigate(routePaths.login)}
             >
               Iniciar sesión
