@@ -13,8 +13,11 @@ import { FiPlus } from 'react-icons/fi';
 import { FormSelect } from '../../components/CreateProductForm/FormSelect';
 import { routePaths } from '../../config/routes';
 import { formatPrice } from '../../helpers/formatPrice';
+import { useAuth } from '../../hooks/useAuth';
 import { useAdminDashboardQuery } from '../../queries/useAdminDashboardQuery';
 import { useAdminSalesReportQuery } from '../../queries/useAdminSalesReportQuery';
+import { useSellerDashboardQuery } from '../../queries/useSellerDashboardQuery';
+import { useSellerSalesReportQuery } from '../../queries/useSellerSalesReportQuery';
 
 const CHART_PERIOD_FORM_OPTIONS = [
   { value: '3', label: '3 meses' },
@@ -118,8 +121,19 @@ function truncateLabel(name: string, max = 14) {
 }
 
 export function AdminDashboardPage() {
-  const { data, isLoading, isError } = useAdminDashboardQuery();
-  const sales = useAdminSalesReportQuery();
+  const { user } = useAuth();
+  const isSeller = user?.role === 'SELLER';
+  const adminDashboard = useAdminDashboardQuery();
+  const sellerDashboard = useSellerDashboardQuery();
+  const data = isSeller ? sellerDashboard.data : adminDashboard.data;
+  const isLoading = isSeller
+    ? sellerDashboard.isLoading
+    : adminDashboard.isLoading;
+  const isError = isSeller ? sellerDashboard.isError : adminDashboard.isError;
+
+  const adminSales = useAdminSalesReportQuery();
+  const sellerSales = useSellerSalesReportQuery();
+  const sales = isSeller ? sellerSales : adminSales;
   const [periodMonths, setPeriodMonths] = useState<3 | 6 | 12>(6);
 
   const monthlyChrono = useMemo(() => {
@@ -172,38 +186,83 @@ export function AdminDashboardPage() {
             Panel
           </h1>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 sm:text-sm">
-            Resumen de MarketHub
+            {isSeller ? 'Resumen de tus tiendas' : 'Resumen de MarketHub'}
           </p>
         </div>
       </header>
 
       <div className="flex min-w-0 flex-nowrap items-stretch gap-2 overflow-x-auto pb-0.5 md:gap-2.5">
-        <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
-          <KpiCard variant={0} label="Vendedores" value={data.users.sellers} />
-        </div>
-        <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
-          <KpiCard variant={1} label="Clientes" value={data.users.customers} />
-        </div>
-        <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
-          <KpiCard
-            variant={2}
-            label="Tiendas aprobadas"
-            value={data.stores.approved}
-          />
-        </div>
-        <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
-          <KpiCard
-            variant={3}
-            label="Tiendas rechazadas"
-            value={data.stores.rejected}
-          />
-        </div>
-        <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
-          <KpiCard variant={4} label="Órdenes" value={data.orders.total} />
-        </div>
-        <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
-          <KpiCard variant={5} label="Productos" value={data.products.total} />
-        </div>
+        {isSeller ? (
+          <>
+            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+              <KpiCard
+                variant={0}
+                label="Ingresos"
+                value={formatPrice(data.revenue.totalSales)}
+              />
+            </div>
+            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+              <KpiCard
+                variant={1}
+                label="Productos activos"
+                value={data.products.active}
+              />
+            </div>
+            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+              <KpiCard
+                variant={2}
+                label="Mis tiendas"
+                value={data.stores.total}
+              />
+            </div>
+            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+              <KpiCard
+                variant={3}
+                label="Aprobadas"
+                value={data.stores.approved}
+              />
+            </div>
+            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+              <KpiCard variant={4} label="Órdenes" value={data.orders.total} />
+            </div>
+            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+              <KpiCard
+                variant={5}
+                label="Completadas"
+                value={data.orders.completed}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+              <KpiCard variant={0} label="Vendedores" value={data.users.sellers} />
+            </div>
+            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+              <KpiCard variant={1} label="Clientes" value={data.users.customers} />
+            </div>
+            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+              <KpiCard
+                variant={2}
+                label="Tiendas aprobadas"
+                value={data.stores.approved}
+              />
+            </div>
+            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+              <KpiCard
+                variant={3}
+                label="Tiendas rechazadas"
+                value={data.stores.rejected}
+              />
+            </div>
+            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+              <KpiCard variant={4} label="Órdenes" value={data.orders.total} />
+            </div>
+            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+              <KpiCard variant={5} label="Productos" value={data.products.total} />
+            </div>
+          </>
+        )}
         <NavLink
           to={routePaths.adminSales}
           className="flex min-h-[76px] min-w-[4.25rem] shrink-0 grow basis-0 flex-col items-center justify-center gap-0.5 rounded-md border-2 border-dashed border-blue-300/80 bg-blue-50/30 px-1 py-1.5 text-center backdrop-blur-md transition-colors hover:border-[var(--admin-primary)] hover:bg-[var(--admin-primary-soft)] md:min-w-0 md:shrink dark:border-blue-500/35 dark:bg-blue-950/25 dark:hover:bg-blue-950/40"
