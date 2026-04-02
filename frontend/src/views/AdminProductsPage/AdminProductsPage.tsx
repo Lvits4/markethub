@@ -37,12 +37,17 @@ import {
 } from '../../components/AdminDetailPanel/AdminDetailPanel';
 import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
+import { TableEmptyCell } from '../../components/TableEmptyCell/TableEmptyCell';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminEditProductForm } from '../../components/AdminEditProductForm/AdminEditProductForm';
 import { CreateProductForm } from '../../components/CreateProductForm/CreateProductForm';
 import { useAuth } from '../../hooks/useAuth';
 import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc';
 import { formatPrice } from '../../helpers/formatPrice';
+import {
+  galleryProductImages,
+  primaryProductImageUrl,
+} from '../../helpers/productPrimaryImage';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useDeleteProductMutation } from '../../hooks/useProductSellerMutations';
 import { useAdminProductDetailQuery } from '../../queries/useAdminProductDetailQuery';
@@ -139,6 +144,7 @@ function ProductDetailImage({ url }: { url: string }) {
   }
   return (
     <img
+      key={url}
       src={src}
       alt=""
       className="h-auto max-h-full w-auto max-w-full rounded object-contain"
@@ -149,8 +155,9 @@ function ProductDetailImage({ url }: { url: string }) {
 function ProductDetailsPanel({ product }: { product: Product }) {
   const [detailTab, setDetailTab] = useState<'datos' | 'galeria'>('datos');
   const images = product.images ?? [];
-  const firstImageUrl = images[0]?.url;
   const imgCount = images.length;
+  const heroImageUrl = primaryProductImageUrl(product);
+  const galleryImages = galleryProductImages(product);
 
   return (
     <AdminDetailPanelRoot>
@@ -195,8 +202,8 @@ function ProductDetailsPanel({ product }: { product: Product }) {
         <AdminDetailHeroSplit
           image={
             <AdminDetailImageFrame ariaLabel="Imagen principal del producto">
-              {firstImageUrl ? (
-                <ProductDetailImage url={firstImageUrl} />
+              {heroImageUrl ? (
+                <ProductDetailImage url={heroImageUrl} />
               ) : (
                 <FiPackage
                   className="h-12 w-12 text-slate-400 dark:text-slate-500"
@@ -233,9 +240,9 @@ function ProductDetailsPanel({ product }: { product: Product }) {
               {product.description?.trim() || 'Sin descripción'}
             </AdminDetailTextCard>
           </div>
-        ) : imgCount > 0 ? (
+        ) : galleryImages.length > 0 ? (
           <div className="grid grid-cols-2 gap-2 pb-1">
-            {images.map((img) => (
+            {galleryImages.map((img) => (
               <div
                 key={img.id}
                 className="flex min-h-[5rem] items-center justify-center rounded-lg border border-slate-200/80 bg-white p-2 dark:border-sky-500/20 dark:bg-[#0f1a38]"
@@ -366,7 +373,7 @@ function SortHeader({
         className={`inline-flex items-center gap-2 ${align === 'right' ? 'flex-row-reverse' : ''}`}
       >
         <span className="leading-tight">{label}</span>
-        <span className="inline-flex shrink-0 items-center gap-px">
+        <span className="inline-flex shrink-0 flex-col items-center gap-0 leading-none">
           <button
             type="button"
             className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'asc' ? 'text-[var(--color-forest)] dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}`}
@@ -535,7 +542,7 @@ export function AdminProductsPage() {
             </Button>
           </div>
 
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-slate-200/90 bg-[#f4f7fc]/92 shadow-[0_8px_32px_rgb(15_23_42/0.07)] backdrop-blur-xl dark:border-sky-500/25 dark:bg-[#0a1228]/92 dark:shadow-[0_24px_56px_-16px_rgb(0_0_0/0.55),inset_0_1px_0_0_rgb(56_189_248/0.11)] dark:backdrop-blur-xl">
+          <div className="admin-table-panel">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <div
                 ref={tableHeaderScrollRef}
@@ -629,10 +636,10 @@ export function AdminProductsPage() {
                             </p>
                           </td>
                           <td className="px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
-                            {p.store?.name ?? '—'}
+                            {p.store?.name ?? <TableEmptyCell />}
                           </td>
                           <td className="px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
-                            {p.category?.name ?? '—'}
+                            {p.category?.name ?? <TableEmptyCell />}
                           </td>
                           <td className="px-4 py-2 align-middle tabular-nums text-slate-700 dark:text-slate-300">
                             {formatPrice(numOrZero(p.price))}

@@ -89,6 +89,9 @@ export class ProductsService {
     const product = await this.productsRepository.findOne({
       where: { id },
       relations: ['images', 'store', 'category'],
+      order: {
+        images: { sortOrder: 'ASC' },
+      },
     });
     if (!product) {
       throw new NotFoundException('Producto no encontrado');

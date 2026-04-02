@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   Bar,
@@ -9,95 +9,18 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { FiChevronDown, FiPlus } from 'react-icons/fi';
+import { FiPlus } from 'react-icons/fi';
+import { FormSelect } from '../../components/CreateProductForm/FormSelect';
 import { routePaths } from '../../config/routes';
 import { formatPrice } from '../../helpers/formatPrice';
 import { useAdminDashboardQuery } from '../../queries/useAdminDashboardQuery';
 import { useAdminSalesReportQuery } from '../../queries/useAdminSalesReportQuery';
 
-const PERIOD_OPTIONS: { value: 3 | 6 | 12; label: string }[] = [
-  { value: 3, label: '3 meses' },
-  { value: 6, label: '6 meses' },
-  { value: 12, label: '12 meses' },
-];
-
-function ChartPeriodSelect({
-  value,
-  onChange,
-  labelledBy,
-}: {
-  value: 3 | 6 | 12;
-  onChange: (v: 3 | 6 | 12) => void;
-  labelledBy: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const wrapRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDocMouseDown = (e: MouseEvent) => {
-      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    document.addEventListener('mousedown', onDocMouseDown);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDocMouseDown);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
-
-  const selected =
-    PERIOD_OPTIONS.find((o) => o.value === value) ?? PERIOD_OPTIONS[2];
-
-  return (
-    <div className="relative shrink-0" ref={wrapRef}>
-      <button
-        type="button"
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-labelledby={labelledBy}
-        onClick={() => setOpen((o) => !o)}
-        className="flex min-w-[7.5rem] items-center justify-between gap-2 rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] px-2.5 py-1.5 text-left text-xs font-medium text-zinc-800 shadow-sm outline-none ring-[var(--admin-primary)]/0 transition hover:border-zinc-300 focus-visible:ring-2 dark:text-zinc-100 dark:hover:border-night-600"
-      >
-        <span className="truncate">{selected.label}</span>
-        <FiChevronDown
-          className={`h-3.5 w-3.5 shrink-0 text-zinc-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-          aria-hidden
-        />
-      </button>
-      {open ? (
-        <ul
-          role="listbox"
-          className="absolute right-0 top-[calc(100%+4px)] z-50 min-w-full overflow-hidden rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] py-0.5 shadow-lg ring-1 ring-black/5 dark:ring-white/10"
-        >
-          {PERIOD_OPTIONS.map((opt) => (
-            <li key={opt.value} role="presentation">
-              <button
-                type="button"
-                role="option"
-                aria-selected={opt.value === value}
-                onClick={() => {
-                  onChange(opt.value);
-                  setOpen(false);
-                }}
-                className={
-                  opt.value === value
-                    ? 'w-full px-3 py-1.5 text-left text-xs font-semibold text-[var(--admin-primary)] bg-[var(--admin-primary-soft)] dark:text-blue-400'
-                    : 'w-full px-3 py-1.5 text-left text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800/80'
-                }
-              >
-                {opt.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </div>
-  );
-}
+const CHART_PERIOD_FORM_OPTIONS = [
+  { value: '3', label: '3 meses' },
+  { value: '6', label: '6 meses' },
+  { value: '12', label: '12 meses' },
+] as const;
 
 const KPI_VARIANTS = [
   {
@@ -308,10 +231,18 @@ export function AdminDashboardPage() {
                 Barras: importe · línea: pedidos
               </p>
             </div>
-            <ChartPeriodSelect
-              labelledBy="chart-monthly-title"
-              value={periodMonths}
-              onChange={setPeriodMonths}
+            <FormSelect
+              id="admin-chart-period"
+              variant="compact"
+              aria-labelledby="chart-monthly-title"
+              value={String(periodMonths)}
+              onChange={(v) => {
+                const n = Number(v);
+                if (n === 3 || n === 6 || n === 12) {
+                  setPeriodMonths(n);
+                }
+              }}
+              options={[...CHART_PERIOD_FORM_OPTIONS]}
             />
           </div>
           <div

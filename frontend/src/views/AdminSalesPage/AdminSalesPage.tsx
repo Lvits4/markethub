@@ -105,7 +105,7 @@ export function AdminSalesPage() {
                 />
               </div>
               {platform.data.productSales.length > 0 ? (
-                <div className="mt-6 overflow-x-auto rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">
+                <div className="mt-6 market-table-wrap">
                   <table className="w-full min-w-[480px] text-left text-sm">
                     <thead>
                       <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-night-800">
@@ -144,7 +144,7 @@ export function AdminSalesPage() {
                   : 'Histórico mensual y top tiendas'}
               </h3>
               <div className="mt-4 grid gap-8 lg:grid-cols-2">
-                <div className="overflow-x-auto rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">
+                <div className="market-table-wrap">
                   <table className="w-full min-w-[280px] text-left text-sm">
                     <thead>
                       <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-night-800">
@@ -173,7 +173,7 @@ export function AdminSalesPage() {
                     </tbody>
                   </table>
                 </div>
-                <div className="overflow-x-auto rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">
+                <div className="market-table-wrap">
                   <table className="w-full min-w-[280px] text-left text-sm">
                     <thead>
                       <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-night-800">

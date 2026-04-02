@@ -57,7 +57,7 @@ export function SellerStoreProductsPage() {
           No hay productos en esta tienda.
         </p>
       ) : (
-        <div className="mt-8 overflow-x-auto rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
+        <div className="mt-8 market-table-wrap">
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead>
               <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-night-800">

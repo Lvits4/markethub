@@ -46,7 +46,7 @@ function SidebarNavItem({
 }: NavItemProps) {
   const collapsedBadge =
     collapsed && collapsedBadgeCount != null && collapsedBadgeCount > 0 ? (
-      <span className="absolute right-0 top-0 flex h-4 min-w-4 translate-x-0.5 -translate-y-0.5 items-center justify-center rounded-md bg-red-500 px-0.5 text-[9px] font-bold leading-none text-white">
+      <span className="absolute right-0 top-0 inline-flex h-4 min-w-4 translate-x-0.5 -translate-y-0.5 items-center justify-center rounded-full bg-[var(--admin-primary)] px-0.5 text-[9px] font-bold leading-none tabular-nums text-white">
         {collapsedBadgeCount > 9 ? '9+' : collapsedBadgeCount}
       </span>
     ) : null;
@@ -110,7 +110,7 @@ export function AdminLayout() {
 
   const moderationBadge =
     pendingCount > 0 ? (
-      <span className="rounded-md bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+      <span className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[var(--admin-primary)] px-1 text-[10px] font-bold leading-none tabular-nums text-white">
         {pendingCount > 99 ? '99+' : pendingCount}
       </span>
     ) : null;

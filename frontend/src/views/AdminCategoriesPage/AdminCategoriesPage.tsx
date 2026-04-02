@@ -20,6 +20,10 @@ import {
   FiX,
 } from 'react-icons/fi';
 import { Button } from '../../components/Button/Button';
+import {
+  renderTableCellString,
+  TableEmptyCell,
+} from '../../components/TableEmptyCell/TableEmptyCell';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminCreateCategoryForm } from '../../components/AdminCreateCategoryForm/AdminCreateCategoryForm';
 import { AdminEditCategoryForm } from '../../components/AdminEditCategoryForm/AdminEditCategoryForm';
@@ -166,7 +170,7 @@ function SortHeader({
         className={`inline-flex items-center gap-2 ${align === 'right' ? 'flex-row-reverse' : ''}`}
       >
         <span className="leading-tight">{label}</span>
-        <span className="inline-flex shrink-0 items-center gap-px">
+        <span className="inline-flex shrink-0 flex-col items-center gap-0 leading-none">
           <button
             type="button"
             className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'asc' ? 'text-[var(--color-forest)] dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}`}
@@ -334,7 +338,7 @@ export function AdminCategoriesPage() {
             </Button>
           </div>
 
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-slate-200/90 bg-[#f4f7fc]/92 shadow-[0_8px_32px_rgb(15_23_42/0.07)] backdrop-blur-xl dark:border-sky-500/25 dark:bg-[#0a1228]/92 dark:shadow-[0_24px_56px_-16px_rgb(0_0_0/0.55),inset_0_1px_0_0_rgb(56_189_248/0.11)] dark:backdrop-blur-xl">
+          <div className="admin-table-panel">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <div
                 ref={tableHeaderScrollRef}
@@ -414,10 +418,14 @@ export function AdminCategoriesPage() {
                             {c.slug}
                           </td>
                           <td className="min-w-0 truncate px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
-                            {parentLabel(list, c.parentId)}
+                            {renderTableCellString(parentLabel(list, c.parentId))}
                           </td>
                           <td className="min-w-0 truncate px-4 py-2 align-middle text-slate-600 dark:text-slate-400">
-                            {c.description?.trim() ? c.description : '—'}
+                            {c.description?.trim() ? (
+                              c.description
+                            ) : (
+                              <TableEmptyCell />
+                            )}
                           </td>
                           <td className="px-4 py-2 align-middle text-center">
                             <div className="flex flex-nowrap items-center justify-center gap-1.5">

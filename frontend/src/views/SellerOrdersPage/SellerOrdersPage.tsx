@@ -5,6 +5,7 @@ import {
   orderStatusLabel,
   ORDER_STATUS_VALUES,
 } from '../../helpers/orderStatus';
+import { FormSelect } from '../../components/CreateProductForm/FormSelect';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAdminOrderStatus } from '../../hooks/useAdminOrderStatus';
 import { useStoreOrdersSellerQuery } from '../../queries/useStoreOrdersSellerQuery';
@@ -13,6 +14,11 @@ function numAmount(v: string | number) {
   const n = typeof v === 'string' ? Number.parseFloat(v) : v;
   return Number.isFinite(n) ? n : 0;
 }
+
+const ORDER_STATUS_OPTIONS = ORDER_STATUS_VALUES.map((st) => ({
+  value: st,
+  label: orderStatusLabel[st],
+}));
 
 export function SellerOrdersPage() {
   const { data, isLoading, isError } = useStoreOrdersSellerQuery();
@@ -83,22 +89,24 @@ export function SellerOrdersPage() {
                     {formatPrice(numAmount(o.totalAmount))}
                   </p>
                 </div>
-                <div className="flex flex-col gap-2 sm:items-end">
-                  <label className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+                <div className="flex w-full min-w-0 flex-col gap-2 sm:w-auto sm:items-end">
+                  <label
+                    htmlFor={`seller-order-status-${o.id}`}
+                    className="text-xs font-medium uppercase tracking-wide text-zinc-400"
+                  >
                     Estado
                   </label>
-                  <select
-                    className="rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
-                    value={isOrderStatusValue(o.status) ? o.status : 'PENDING'}
-                    disabled={updateStatus.isPending}
-                    onChange={(e) => onStatusChange(o.id, e.target.value)}
-                  >
-                    {ORDER_STATUS_VALUES.map((st) => (
-                      <option key={st} value={st}>
-                        {orderStatusLabel[st]}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="w-full min-w-[10rem] sm:w-auto sm:min-w-[12rem]">
+                    <FormSelect
+                      id={`seller-order-status-${o.id}`}
+                      value={
+                        isOrderStatusValue(o.status) ? o.status : 'PENDING'
+                      }
+                      disabled={updateStatus.isPending}
+                      onChange={(v) => onStatusChange(o.id, v)}
+                      options={ORDER_STATUS_OPTIONS}
+                    />
+                  </div>
                 </div>
               </div>
               {o.shippingAddress ? (

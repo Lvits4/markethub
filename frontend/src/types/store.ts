@@ -2,6 +2,8 @@ export type StoreSummary = {
   id: string;
   name: string;
   slug: string;
+  /** Presente cuando el backend devuelve la tienda completa anidada en producto, etc. */
+  logo?: string | null;
 };
 
 /** Tienda pública o propia (vendedor) alineada al backend */

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { FormSelect } from '../CreateProductForm/FormSelect';
 import { Button } from '../Button/Button';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import {
@@ -12,10 +13,12 @@ import { useAdminOrderStatus } from '../../hooks/useAdminOrderStatus';
 import { formatPrice } from '../../helpers/formatPrice';
 import type { Order } from '../../types/order';
 
-const fieldClass =
-  'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';
-
 const labelClass = 'text-xs font-medium text-zinc-600 dark:text-zinc-300';
+
+const ORDER_STATUS_OPTIONS = ORDER_STATUS_VALUES.map((st) => ({
+  value: st,
+  label: orderStatusLabel[st],
+}));
 
 function numAmount(v: string | number) {
   const n = typeof v === 'string' ? Number.parseFloat(v) : v;
@@ -95,22 +98,15 @@ export function AdminEditOrderForm({
               Estado del pedido{' '}
               <span className="text-red-600 dark:text-red-400">*</span>
             </label>
-            <select
+            <FormSelect
               id="edit-order-status"
               value={status}
-              onChange={(e) => {
-                const v = e.target.value;
+              onChange={(v) => {
                 if (isOrderStatusValue(v)) setStatus(v);
               }}
-              className={fieldClass}
+              options={ORDER_STATUS_OPTIONS}
               disabled={busy}
-            >
-              {ORDER_STATUS_VALUES.map((st) => (
-                <option key={st} value={st}>
-                  {orderStatusLabel[st]}
-                </option>
-              ))}
-            </select>
+            />
             <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
               Selecciona el nuevo estado para este pedido.
             </p>

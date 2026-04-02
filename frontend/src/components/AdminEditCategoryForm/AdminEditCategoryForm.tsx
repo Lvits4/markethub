@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
+import { FormSelect } from '../CreateProductForm/FormSelect';
 import { Button } from '../Button/Button';
 import { excludedParentIdsForEdit } from '../../helpers/categoryParentSelect';
 import { getErrorMessage } from '../../helpers/mapApiError';
@@ -37,6 +38,14 @@ export function AdminEditCategoryForm({
   const parentOptions = useMemo(
     () => categories.filter((c) => !excluded.has(c.id)),
     [categories, excluded],
+  );
+
+  const parentFormOptions = useMemo(
+    () => [
+      { value: '', label: '— Ninguna —' },
+      ...parentOptions.map((c) => ({ value: c.id, label: c.name })),
+    ],
+    [parentOptions],
   );
 
   useEffect(() => {
@@ -113,46 +122,39 @@ export function AdminEditCategoryForm({
             <label htmlFor="edit-cat-parent" className={labelClass}>
               Categoría padre (opcional)
             </label>
-            <select
+            <FormSelect
               id="edit-cat-parent"
               value={parentId}
-              onChange={(e) => setParentId(e.target.value)}
-              className={fieldClass}
+              onChange={setParentId}
+              options={parentFormOptions}
               disabled={busy}
-            >
-              <option value="">— Ninguna —</option>
-              {parentOptions.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+            />
           </div>
         </div>
       </div>
-      <div className="flex w-full shrink-0 flex-col gap-2 border-t border-zinc-100 bg-zinc-50/90 px-5 py-4 dark:border-night-800 dark:bg-night-950/90 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
-        <div className="flex w-full gap-2 sm:w-auto">
-          {onCancel ? (
-            <Button
-              type="button"
-              variant="ghost"
-              disabled={busy}
-              onClick={onCancel}
-              className="h-11 min-h-11 min-w-0 flex-1 basis-0 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:min-w-[7.5rem]"
-            >
-              Cancelar
-            </Button>
-          ) : null}
+      <div
+        className={`flex w-full shrink-0 flex-col gap-2 border-t border-zinc-100 bg-zinc-50/90 px-5 py-4 dark:border-night-800 dark:bg-night-950/90 sm:flex-row sm:flex-wrap sm:items-center ${onCancel ? 'sm:justify-between' : 'sm:justify-end'}`}
+      >
+        {onCancel ? (
           <Button
             type="button"
-            variant="cta"
+            variant="ghost"
             disabled={busy}
-            onClick={handleSubmit}
-            className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:min-w-[11rem]"
+            onClick={onCancel}
+            className="h-11 min-h-11 w-full justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:w-auto sm:min-w-[7.5rem]"
           >
-            {busy ? 'Guardando…' : 'Guardar cambios'}
+            Cancelar
           </Button>
-        </div>
+        ) : null}
+        <Button
+          type="button"
+          variant="cta"
+          disabled={busy}
+          onClick={handleSubmit}
+          className="h-11 min-h-11 w-full justify-center px-3 sm:min-w-[11rem] sm:w-auto"
+        >
+          {busy ? 'Guardando…' : 'Guardar cambios'}
+        </Button>
       </div>
     </form>
   );

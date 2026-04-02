@@ -39,6 +39,10 @@ import {
   orderStatusTone,
 } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
+import {
+  renderTableCellString,
+  TableEmptyCell,
+} from '../../components/TableEmptyCell/TableEmptyCell';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminEditOrderForm } from '../../components/AdminEditOrderForm/AdminEditOrderForm';
 import { formatOrderStatus } from '../../helpers/orderStatus';
@@ -60,7 +64,15 @@ type SortDir = 'asc' | 'desc';
 
 const DEFAULT_PAGE_SIZE = 10;
 const NUM_COLS = 6;
-const COL_WIDTH = `${100 / NUM_COLS}%`;
+/** Anchos: Total queda en el hueco entre Tienda y Estado, con contenido centrado. */
+const ORDER_TABLE_COL_WIDTHS = [
+  '11%',
+  '21%',
+  '26%',
+  '14%',
+  '18%',
+  '10%',
+] as const;
 
 function orderToAdminRow(
   o: Order & { createdAt?: string; updatedAt?: string },
@@ -91,8 +103,8 @@ function orderToAdminRow(
 function OrdersTableColgroup() {
   return (
     <colgroup>
-      {Array.from({ length: NUM_COLS }, (__, i) => (
-        <col key={i} style={{ width: COL_WIDTH }} />
+      {ORDER_TABLE_COL_WIDTHS.map((width, i) => (
+        <col key={i} style={{ width }} />
       ))}
     </colgroup>
   );
@@ -273,7 +285,7 @@ function OrderDetailsPanel({ order }: { order: Order }) {
             </div>
           </div>
         ) : lineCount > 0 ? (
-          <div className="overflow-hidden rounded-lg border border-slate-200/80 dark:border-sky-500/20">
+          <div className="market-table-wrap market-table-wrap--clip rounded-lg">
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:bg-[#0f1a38] dark:text-slate-400">
                 <tr>
@@ -410,24 +422,30 @@ function SortHeader({
   dir,
   onSort,
   align = 'left',
+  thClassName = '',
 }: {
   label: string;
   sortKey: SortKey;
   activeKey: SortKey;
   dir: SortDir;
   onSort: (key: SortKey, direction: SortDir) => void;
-  align?: 'left' | 'right';
+  align?: 'left' | 'right' | 'center';
+  thClassName?: string;
 }) {
   const active = activeKey === sortKey;
+  const alignClass =
+    align === 'right'
+      ? 'text-right'
+      : align === 'center'
+        ? 'text-center'
+        : 'text-left';
   return (
     <th
-      className={`px-4 py-3.5 ${align === 'right' ? 'text-right' : 'text-left'}`}
+      className={`px-4 py-3.5 ${alignClass} ${thClassName}`.trim()}
     >
-      <div
-        className={`inline-flex items-center gap-2 ${align === 'right' ? 'flex-row-reverse' : ''}`}
-      >
+      <div className="inline-flex items-center gap-2">
         <span className="leading-tight">{label}</span>
-        <span className="inline-flex shrink-0 items-center gap-px">
+        <span className="inline-flex shrink-0 flex-col items-center gap-0 leading-none">
           <button
             type="button"
             className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'asc' ? 'text-[var(--color-forest)] dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}`}
@@ -573,7 +591,7 @@ export function AdminOrdersPage() {
             </div>
           </div>
 
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-slate-200/90 bg-[#f4f7fc]/92 shadow-[0_8px_32px_rgb(15_23_42/0.07)] backdrop-blur-xl dark:border-sky-500/25 dark:bg-[#0a1228]/92 dark:shadow-[0_24px_56px_-16px_rgb(0_0_0/0.55),inset_0_1px_0_0_rgb(56_189_248/0.11)] dark:backdrop-blur-xl">
+          <div className="admin-table-panel">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <div
                 ref={tableHeaderScrollRef}
@@ -611,7 +629,7 @@ export function AdminOrdersPage() {
                         activeKey={sortKey}
                         dir={sortDir}
                         onSort={handleSort}
-                        align="right"
+                        align="center"
                       />
                       <SortHeader
                         label="Estado"
@@ -654,7 +672,7 @@ export function AdminOrdersPage() {
                         >
                           <td className="px-4 py-2 align-middle">
                             <p className="leading-tight text-slate-700 dark:text-slate-300">
-                              {formatDate(o.createdAt)}
+                              {renderTableCellString(formatDate(o.createdAt))}
                             </p>
                             <p className="mt-0.5 font-mono text-[11px] leading-tight text-slate-400 dark:text-slate-500">
                               {o.id.slice(0, 8)}…
@@ -672,13 +690,13 @@ export function AdminOrdersPage() {
                                 </p>
                               </>
                             ) : (
-                              <span className="text-slate-400">—</span>
+                              <TableEmptyCell className="text-slate-400 dark:text-slate-500" />
                             )}
                           </td>
                           <td className="px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
-                            {o.store?.name ?? '—'}
+                            {o.store?.name ?? <TableEmptyCell />}
                           </td>
-                          <td className="px-4 py-2 align-middle text-right tabular-nums font-medium text-slate-900 dark:text-slate-100">
+                          <td className="px-4 py-2 align-middle text-center tabular-nums font-medium text-slate-900 dark:text-slate-100">
                             {formatPrice(numAmount(o.totalAmount))}
                           </td>
                           <td className="px-4 py-2 align-middle">

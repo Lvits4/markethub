@@ -1,7 +1,8 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
+import { FormSelect } from '../../components/CreateProductForm/FormSelect';
 import { ProductImagesField } from '../../components/CreateProductForm/ProductImagesField';
 import { routePaths } from '../../config/routes';
 import { getErrorMessage } from '../../helpers/mapApiError';
@@ -43,6 +44,14 @@ export function SellerProductFormPage() {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const productImagesFieldId = useId();
+
+  const categoryOptions = useMemo(
+    () => [
+      { value: '', label: '—' },
+      ...(categories ?? []).map((c) => ({ value: c.id, label: c.name })),
+    ],
+    [categories],
+  );
 
   useEffect(() => {
     if (!existing) return;
@@ -241,19 +250,20 @@ export function SellerProductFormPage() {
           </div>
         </div>
         <div>
-          <label className="text-xs text-zinc-500">Categoría</label>
-          <select
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            className="mt-1 w-full rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
+          <label
+            htmlFor="seller-product-category"
+            className="text-xs text-zinc-500"
           >
-            <option value="">—</option>
-            {(categories ?? []).map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+            Categoría
+          </label>
+          <FormSelect
+            id="seller-product-category"
+            value={categoryId}
+            onChange={setCategoryId}
+            options={categoryOptions}
+            placeholder="—"
+            triggerClassName="!mt-1"
+          />
         </div>
         <div>
           <label

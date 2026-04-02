@@ -23,6 +23,8 @@ export type ProductImagesFieldProps = {
   hintText?: string;
   /** Si es false, solo se admite una imagen local (sustituye la anterior). */
   multiple?: boolean;
+  /** Zona de soltar más baja (p. ej. panel lateral de ajustes). */
+  compact?: boolean;
   /**
    * Si se define, cada selección o drop invoca esto y **no** actualiza `files` vía `onChange`.
    * Útil para subida inmediata (p. ej. formulario vendedor).
@@ -44,6 +46,7 @@ export function ProductImagesField({
   hintText,
   multiple = true,
   onPickFiles,
+  compact = false,
 }: ProductImagesFieldProps) {
   const [dragOver, setDragOver] = useState(false);
   const dragDepth = useRef(0);
@@ -68,7 +71,9 @@ export function ProductImagesField({
     onChange(files.filter((_, i) => i !== index));
   };
 
-  const zoneClass = `flex w-full flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed px-4 py-8 text-center transition-colors ${
+  const zoneClass = `flex w-full flex-col items-center justify-center rounded-md border-2 border-dashed text-center transition-colors ${
+    compact ? 'gap-1 px-3 py-3' : 'gap-2 px-4 py-8'
+  } ${
     disabled
       ? 'cursor-not-allowed border-zinc-200 bg-zinc-50/40 opacity-50 dark:border-night-700 dark:bg-night-950/30'
       : dragOver
@@ -78,20 +83,38 @@ export function ProductImagesField({
 
   const body = (
     <>
-      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-200/90 text-zinc-600 transition-colors group-hover:bg-zinc-300/90 dark:bg-night-700 dark:text-sky-300/90 dark:group-hover:bg-night-600">
+      <span
+        className={`flex items-center justify-center rounded-full bg-zinc-200/90 text-zinc-600 transition-colors group-hover:bg-zinc-300/90 dark:bg-night-700 dark:text-sky-300/90 dark:group-hover:bg-night-600 ${
+          compact ? 'h-9 w-9' : 'h-12 w-12'
+        }`}
+      >
         {dragOver ? (
-          <FiUpload className="h-6 w-6" aria-hidden />
+          <FiUpload
+            className={compact ? 'h-5 w-5' : 'h-6 w-6'}
+            aria-hidden
+          />
         ) : (
-          <FiImage className="h-6 w-6" aria-hidden />
+          <FiImage
+            className={compact ? 'h-5 w-5' : 'h-6 w-6'}
+            aria-hidden
+          />
         )}
       </span>
-      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+      <span
+        className={`font-medium text-zinc-700 dark:text-zinc-200 ${
+          compact ? 'text-xs' : 'text-sm'
+        }`}
+      >
         Arrastra imágenes aquí o{' '}
         <span className="text-[var(--color-forest)] underline decoration-transparent underline-offset-2 transition-colors group-hover:decoration-current dark:text-sky-400">
           elige archivos
         </span>
       </span>
-      <span className="max-w-xs text-xs text-zinc-500 dark:text-zinc-500">
+      <span
+        className={`max-w-xs text-zinc-500 dark:text-zinc-500 ${
+          compact ? 'text-[11px] leading-snug' : 'text-xs'
+        }`}
+      >
         {hintText ?? DEFAULT_HINT}
       </span>
     </>
@@ -101,7 +124,7 @@ export function ProductImagesField({
     'flex items-center justify-between gap-2 rounded-md border border-zinc-200 bg-zinc-50/80 px-3 py-2 dark:border-night-600 dark:bg-night-900/60';
 
   return (
-    <div className="space-y-3">
+    <div className={compact ? 'space-y-2' : 'space-y-3'}>
       <input
         id={id}
         type="file"
