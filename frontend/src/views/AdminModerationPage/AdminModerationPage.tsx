@@ -4,7 +4,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
@@ -23,11 +22,26 @@ import {
   FiX,
   FiXCircle,
 } from 'react-icons/fi';
+import {
+  AdminDetailCompactField,
+  AdminDetailFieldsGrid,
+  AdminDetailHeroSplit,
+  AdminDetailImageFrame,
+  AdminDetailPanelRoot,
+  AdminDetailPanelTop,
+  AdminDetailScrollSection,
+  AdminDetailStatTile,
+  AdminDetailStatsGrid,
+  AdminDetailTextCard,
+  AdminDetailTitleRow,
+  getAdminStorePanelStats,
+} from '../../components/AdminDetailPanel/AdminDetailPanel';
 import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
+import { formatPrice } from '../../helpers/formatPrice';
+import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAuth } from '../../hooks/useAuth';
 import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc';
-import { getErrorMessage } from '../../helpers/mapApiError';
 import { useStoreApprove, useStoreReject } from '../../hooks/useStoreModeration';
 import { useAdminStoreDetailQuery } from '../../queries/useAdminStoreDetailQuery';
 import { useRejectedStoresQuery } from '../../queries/useRejectedStoresQuery';
@@ -113,25 +127,6 @@ function formatDate(iso?: string) {
   });
 }
 
-function DetailField({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="space-y-1">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-        {label}
-      </p>
-      <div className="rounded-md border border-slate-200/80 bg-white px-2.5 py-1.5 text-xs text-slate-700 dark:border-sky-500/20 dark:bg-[#0f1a38] dark:text-slate-200">
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function StoreDetailLogo({ logo }: { logo: string | null }) {
   const { token } = useAuth();
   const { src, loading, error } = useProtectedImageSrc(logo, token);
@@ -154,7 +149,7 @@ function StoreDetailLogo({ logo }: { logo: string | null }) {
     <img
       src={src}
       alt=""
-      className="mx-auto max-h-28 w-auto max-w-full object-contain"
+      className="max-h-full max-w-full object-contain rounded-md shadow-sm ring-1 ring-black/5 dark:ring-white/10"
     />
   );
 }
@@ -164,136 +159,117 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
   const ownerName = store.user
     ? `${store.user.firstName} ${store.user.lastName}`.trim()
     : '';
+  const st = getAdminStorePanelStats(store);
+  const createdLabel = store.createdAt
+    ? new Date(store.createdAt).toLocaleDateString('es', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      })
+    : '—';
+  const descText = store.description?.trim() || 'Sin descripción';
+  const shipText = store.shippingPolicy?.trim() || 'No definida';
+  const retText = store.returnPolicy?.trim() || 'No definida';
 
   return (
-    <div className="market-scroll min-h-0 flex-1 overflow-y-auto px-4 py-3">
-      <div className="space-y-4">
-        <section className="space-y-3">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-              {store.name}
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              /{store.slug}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            <span className="rounded border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
-              Comisión {numOrZero(store.commission)}%
-            </span>
-            <AdminStatusBadge tone="warning">
-              Pendiente de aprobación
-            </AdminStatusBadge>
-          </div>
-        </section>
+    <AdminDetailPanelRoot>
+      <AdminDetailPanelTop>
+        <AdminDetailTitleRow
+          title={store.name}
+          subtitle={`/${store.slug}`}
+          badges={
+            <>
+              <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
+                {numOrZero(store.commission)}% comisión
+              </span>
+              <AdminStatusBadge tone="warning">
+                Pendiente de aprobación
+              </AdminStatusBadge>
+            </>
+          }
+        />
 
-        <section className="space-y-2 border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            Contacto
-          </h4>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <DetailField label="Vendedor">
-              <span className="inline-flex items-center gap-1.5">
-                <FiUser className="h-3.5 w-3.5 text-slate-400" aria-hidden />
+        <AdminDetailStatsGrid>
+          <AdminDetailStatTile
+            label="Productos"
+            value={st.productsTotal}
+            hint={`${st.productsActive} activos`}
+          />
+          <AdminDetailStatTile
+            label="Pedidos"
+            value={st.ordersTotal}
+            hint={`${st.ordersDelivered} entregados`}
+          />
+          <AdminDetailStatTile
+            label="Ventas (bruto)"
+            value={formatPrice(st.revenue)}
+            hint="excl. cancelados"
+          />
+          <AdminDetailStatTile label="Alta" value={createdLabel} hint="registro" />
+        </AdminDetailStatsGrid>
+
+        <AdminDetailHeroSplit
+          image={
+            <AdminDetailImageFrame ariaLabel="Logo de la tienda">
+              <StoreDetailLogo logo={store.logo} />
+            </AdminDetailImageFrame>
+          }
+          fields={
+            <AdminDetailFieldsGrid>
+              <AdminDetailCompactField label="Vendedor" icon={FiUser}>
                 {ownerName || '—'}
-              </span>
-            </DetailField>
-            <DetailField label="Correo vendedor">
-              <span className="inline-flex items-center gap-1.5">
-                <FiMail className="h-3.5 w-3.5 text-slate-400" aria-hidden />
+              </AdminDetailCompactField>
+              <AdminDetailCompactField label="Correo vendedor" icon={FiMail}>
                 {store.user?.email ?? '—'}
-              </span>
-            </DetailField>
-            <DetailField label="Correo tienda">
-              <span className="inline-flex items-center gap-1.5">
-                <FiMail className="h-3.5 w-3.5 text-slate-400" aria-hidden />
+              </AdminDetailCompactField>
+              <AdminDetailCompactField label="Correo tienda" icon={FiMail}>
                 {store.contactEmail ?? '—'}
-              </span>
-            </DetailField>
-            <DetailField label="Teléfono">
-              <span className="inline-flex items-center gap-1.5">
-                <FiPhone className="h-3.5 w-3.5 text-slate-400" aria-hidden />
+              </AdminDetailCompactField>
+              <AdminDetailCompactField label="Teléfono" icon={FiPhone}>
                 {store.contactPhone ?? '—'}
-              </span>
-            </DetailField>
-          </div>
-        </section>
+              </AdminDetailCompactField>
+            </AdminDetailFieldsGrid>
+          }
+        />
+      </AdminDetailPanelTop>
 
-        <section className="space-y-2 border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
-          <div
-            className="inline-flex rounded-md bg-slate-100 p-0.5 dark:bg-[#0f1a38]"
-            role="tablist"
-            aria-label="Datos y políticas"
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={detailTab === 'datos'}
-              onClick={() => setDetailTab('datos')}
-              className={`cursor-pointer rounded px-2.5 py-1 text-xs font-semibold transition-colors ${
-                detailTab === 'datos'
-                  ? 'bg-white text-slate-700 shadow-sm dark:bg-[#162647] dark:text-slate-100'
-                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
-            >
-              Datos
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={detailTab === 'politicas'}
-              onClick={() => setDetailTab('politicas')}
-              className={`cursor-pointer rounded px-2.5 py-1 text-xs font-semibold transition-colors ${
-                detailTab === 'politicas'
-                  ? 'bg-white text-slate-700 shadow-sm dark:bg-[#162647] dark:text-slate-100'
-                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
-            >
-              Políticas
-            </button>
+      <AdminDetailScrollSection
+        tablistLabel="Datos y políticas"
+        tabs={[
+          { id: 'datos', label: 'Datos' },
+          { id: 'politicas', label: 'Políticas' },
+        ]}
+        activeTab={detailTab}
+        onTabChange={(id) => setDetailTab(id as 'datos' | 'politicas')}
+      >
+        {detailTab === 'datos' ? (
+          <div className="space-y-3 pb-1">
+            <AdminDetailTextCard title="Descripción">{descText}</AdminDetailTextCard>
           </div>
-          {detailTab === 'datos' ? (
-            <div className="space-y-2">
-              <DetailField label="Logo">
-                <div className="flex min-h-[4.5rem] items-center justify-center py-1">
-                  <StoreDetailLogo logo={store.logo} />
-                </div>
-              </DetailField>
-              <DetailField label="Descripción">
-                {store.description || 'Sin descripción'}
-              </DetailField>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <DetailField label="Política de envíos">
-                {store.shippingPolicy || 'No definida'}
-              </DetailField>
-              <DetailField label="Política de devoluciones">
-                {store.returnPolicy || 'No definida'}
-              </DetailField>
-            </div>
-          )}
-        </section>
-      </div>
-    </div>
+        ) : (
+          <div className="space-y-3 pb-1">
+            <AdminDetailTextCard title="Política de envíos">
+              {shipText}
+            </AdminDetailTextCard>
+            <AdminDetailTextCard title="Política de devoluciones">
+              {retText}
+            </AdminDetailTextCard>
+          </div>
+        )}
+      </AdminDetailScrollSection>
+    </AdminDetailPanelRoot>
   );
 }
 
 function ModerationDrawer({
   open,
   onClose,
-  onApprove,
-  onReject,
-  busy,
   isLoading,
   isError,
   store,
 }: {
   open: boolean;
   onClose: () => void;
-  onApprove: () => void;
-  onReject: () => void;
-  busy: boolean;
   isLoading: boolean;
   isError: boolean;
   store?: AdminStoreDetail;
@@ -338,24 +314,6 @@ function ModerationDrawer({
             Panel de detalles
           </h2>
           <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="primary"
-              className="h-8 border-0 px-3 text-xs !bg-emerald-600 !text-white hover:!bg-emerald-700 dark:!bg-emerald-600 dark:!text-white dark:hover:!bg-emerald-700"
-              onClick={onApprove}
-              disabled={!store || busy}
-            >
-              Aprobar
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="h-8 border-rose-200 px-3 text-xs text-rose-700 hover:bg-rose-50 dark:border-rose-500/40 dark:text-rose-300 dark:hover:bg-rose-950/40"
-              onClick={onReject}
-              disabled={!store || busy}
-            >
-              Rechazar
-            </Button>
             <Button
               type="button"
               variant="icon"
@@ -782,13 +740,6 @@ export function AdminModerationPage() {
           <ModerationDrawer
             open={viewStoreId != null}
             onClose={() => setViewStoreId(null)}
-            onApprove={() => {
-              if (viewStoreId) onApprove(viewStoreId);
-            }}
-            onReject={() => {
-              if (viewStoreId) onReject(viewStoreId);
-            }}
-            busy={busy}
             isLoading={storeDetailQuery.isLoading}
             isError={storeDetailQuery.isError}
             store={storeDetailQuery.data}

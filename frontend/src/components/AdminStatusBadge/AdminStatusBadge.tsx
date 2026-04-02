@@ -34,7 +34,7 @@ export function AdminStatusBadge({
 }: AdminStatusBadgeProps) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold leading-none ring-1 ring-inset ${TONE_CLASSES[tone]} ${className}`}
+      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold leading-tight ring-1 ring-inset ${TONE_CLASSES[tone]} ${className}`}
     >
       {children}
     </span>

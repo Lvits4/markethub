@@ -4,7 +4,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
@@ -15,11 +14,27 @@ import {
   FiChevronUp,
   FiEdit2,
   FiEye,
+  FiImage,
   FiPackage,
   FiSearch,
+  FiShoppingBag,
+  FiTag,
   FiTrash2,
   FiX,
 } from 'react-icons/fi';
+import {
+  AdminDetailCompactField,
+  AdminDetailFieldsGrid,
+  AdminDetailHeroSplit,
+  AdminDetailImageFrame,
+  AdminDetailPanelRoot,
+  AdminDetailPanelTop,
+  AdminDetailScrollSection,
+  AdminDetailStatTile,
+  AdminDetailStatsGrid,
+  AdminDetailTextCard,
+  AdminDetailTitleRow,
+} from '../../components/AdminDetailPanel/AdminDetailPanel';
 import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
 import { Modal } from '../../components/Modal/Modal';
@@ -107,25 +122,6 @@ function matchesSearch(p: AdminProductRow, q: string): boolean {
   return chunks.some((c) => (c ?? '').toLowerCase().includes(n));
 }
 
-function DetailField({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="space-y-1">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-        {label}
-      </p>
-      <div className="rounded-md border border-slate-200/80 bg-white px-2.5 py-1.5 text-xs text-slate-700 dark:border-sky-500/20 dark:bg-[#0f1a38] dark:text-slate-200">
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function ProductDetailImage({ url }: { url: string }) {
   const { token } = useAuth();
   const { src, loading, error } = useProtectedImageSrc(url, token);
@@ -145,73 +141,117 @@ function ProductDetailImage({ url }: { url: string }) {
     <img
       src={src}
       alt=""
-      className="max-h-28 w-auto max-w-full rounded object-contain"
+      className="h-auto max-h-full w-auto max-w-full rounded object-contain"
     />
   );
 }
 
 function ProductDetailsPanel({ product }: { product: Product }) {
+  const [detailTab, setDetailTab] = useState<'datos' | 'galeria'>('datos');
+  const images = product.images ?? [];
+  const firstImageUrl = images[0]?.url;
+  const imgCount = images.length;
+
   return (
-    <div className="market-scroll min-h-0 flex-1 overflow-y-auto px-4 py-3">
-      <div className="space-y-4">
-        <section className="space-y-3">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-              {product.name}
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              /{product.slug}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            <span className="rounded border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
-              {formatPrice(numOrZero(product.price))}
-            </span>
-            <span className="rounded border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
-              Stock: {product.stock}
-            </span>
-            <AdminStatusBadge tone={product.isActive ? 'success' : 'danger'}>
-              {product.isActive ? 'Activo' : 'Inactivo'}
-            </AdminStatusBadge>
-          </div>
-        </section>
+    <AdminDetailPanelRoot>
+      <AdminDetailPanelTop>
+        <AdminDetailTitleRow
+          title={product.name}
+          subtitle={`/${product.slug}`}
+          badges={
+            <>
+              <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
+                {formatPrice(numOrZero(product.price))}
+              </span>
+              <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
+                Stock: {product.stock}
+              </span>
+              <AdminStatusBadge tone={product.isActive ? 'success' : 'danger'}>
+                {product.isActive ? 'Activo' : 'Inactivo'}
+              </AdminStatusBadge>
+            </>
+          }
+        />
 
-        <section className="space-y-2 border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            Información
-          </h4>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <DetailField label="Tienda">
-              {product.store?.name ?? '—'}
-            </DetailField>
-            <DetailField label="Categoría">
-              {product.category?.name ?? '—'}
-            </DetailField>
-          </div>
-          <DetailField label="Descripción">
-            {product.description || 'Sin descripción'}
-          </DetailField>
-        </section>
+        <AdminDetailStatsGrid>
+          <AdminDetailStatTile
+            label="Precio"
+            value={formatPrice(numOrZero(product.price))}
+            hint="venta"
+          />
+          <AdminDetailStatTile label="Stock" value={product.stock} hint="unidades" />
+          <AdminDetailStatTile
+            label="Imágenes"
+            value={imgCount}
+            hint={imgCount === 1 ? '1 archivo' : `${imgCount} archivos`}
+          />
+          <AdminDetailStatTile
+            label="Tienda"
+            value={product.store?.name ?? '—'}
+            hint={product.store?.slug ? `/${product.store.slug}` : 'catálogo'}
+          />
+        </AdminDetailStatsGrid>
 
-        {product.images && product.images.length > 0 ? (
-          <section className="space-y-2 border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-              Imágenes
-            </h4>
-            <div className="grid grid-cols-2 gap-2">
-              {product.images.map((img) => (
-                <div
-                  key={img.id}
-                  className="flex min-h-[5rem] items-center justify-center rounded-md border border-slate-200/80 bg-white p-2 dark:border-sky-500/20 dark:bg-[#0f1a38]"
-                >
-                  <ProductDetailImage url={img.url} />
-                </div>
-              ))}
-            </div>
-          </section>
-        ) : null}
-      </div>
-    </div>
+        <AdminDetailHeroSplit
+          image={
+            <AdminDetailImageFrame ariaLabel="Imagen principal del producto">
+              {firstImageUrl ? (
+                <ProductDetailImage url={firstImageUrl} />
+              ) : (
+                <FiPackage
+                  className="h-12 w-12 text-slate-400 dark:text-slate-500"
+                  aria-hidden
+                />
+              )}
+            </AdminDetailImageFrame>
+          }
+          fields={
+            <AdminDetailFieldsGrid>
+              <AdminDetailCompactField label="Tienda" icon={FiShoppingBag}>
+                {product.store?.name ?? '—'}
+              </AdminDetailCompactField>
+              <AdminDetailCompactField label="Categoría" icon={FiTag}>
+                {product.category?.name ?? '—'}
+              </AdminDetailCompactField>
+            </AdminDetailFieldsGrid>
+          }
+        />
+      </AdminDetailPanelTop>
+
+      <AdminDetailScrollSection
+        tablistLabel="Datos y galería"
+        tabs={[
+          { id: 'datos', label: 'Datos' },
+          { id: 'galeria', label: 'Galería' },
+        ]}
+        activeTab={detailTab}
+        onTabChange={(id) => setDetailTab(id as 'datos' | 'galeria')}
+      >
+        {detailTab === 'datos' ? (
+          <div className="space-y-3 pb-1">
+            <AdminDetailTextCard title="Descripción">
+              {product.description?.trim() || 'Sin descripción'}
+            </AdminDetailTextCard>
+          </div>
+        ) : imgCount > 0 ? (
+          <div className="grid grid-cols-2 gap-2 pb-1">
+            {images.map((img) => (
+              <div
+                key={img.id}
+                className="flex min-h-[5rem] items-center justify-center rounded-lg border border-slate-200/80 bg-white p-2 dark:border-sky-500/20 dark:bg-[#0f1a38]"
+              >
+                <ProductDetailImage url={img.url} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2 pb-6 pt-4 text-center text-sm text-slate-500 dark:text-slate-400">
+            <FiImage className="h-8 w-8 opacity-60" aria-hidden />
+            <p>No hay imágenes en este producto.</p>
+          </div>
+        )}
+      </AdminDetailScrollSection>
+    </AdminDetailPanelRoot>
   );
 }
 

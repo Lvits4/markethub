@@ -23,6 +23,20 @@ import {
   FiUser,
   FiX,
 } from 'react-icons/fi';
+import {
+  AdminDetailCompactField,
+  AdminDetailFieldsGrid,
+  AdminDetailHeroSplit,
+  AdminDetailImageFrame,
+  AdminDetailPanelRoot,
+  AdminDetailPanelTop,
+  AdminDetailScrollSection,
+  AdminDetailStatTile,
+  AdminDetailStatsGrid,
+  AdminDetailTextCard,
+  AdminDetailTitleRow,
+  getAdminStorePanelStats,
+} from '../../components/AdminDetailPanel/AdminDetailPanel';
 import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
 import { Modal } from '../../components/Modal/Modal';
@@ -39,11 +53,7 @@ import { useAdminStoreDetailQuery } from '../../queries/useAdminStoreDetailQuery
 import { useAdminStoresQuery } from '../../queries/useAdminStoresQuery';
 import { useMyStoresQuery } from '../../queries/useMyStoresQuery';
 import { useSellerStoreDetailQuery } from '../../queries/useSellerStoreDetailQuery';
-import type {
-  AdminStoreDetail,
-  AdminStoreDetailStats,
-  AdminStoreRow,
-} from '../../types/admin';
+import type { AdminStoreDetail, AdminStoreRow } from '../../types/admin';
 import type { Store } from '../../types/store';
 
 function mapMyStoreToAdminRow(s: Store): AdminStoreRow {
@@ -78,13 +88,27 @@ type SortDir = 'asc' | 'desc';
 
 const DEFAULT_PAGE_SIZE = 10;
 
-function AdminStoresTableColgroup({ count }: { count: number }) {
-  const w = `${100 / count}%`;
+function AdminStoresTableColgroup({ isSeller }: { isSeller: boolean }) {
+  if (isSeller) {
+    return (
+      <colgroup>
+        <col style={{ width: '20%' }} />
+        <col style={{ width: '22%' }} />
+        <col style={{ width: '14%' }} />
+        <col style={{ width: '24%' }} />
+        <col style={{ width: '20%' }} />
+      </colgroup>
+    );
+  }
   return (
     <colgroup>
-      {Array.from({ length: count }, (__, i) => (
-        <col key={i} style={{ width: w }} />
-      ))}
+      <col style={{ width: '14%' }} />
+      <col style={{ width: '16%' }} />
+      <col style={{ width: '17%' }} />
+      <col style={{ width: '11%' }} />
+      <col style={{ width: '20%' }} />
+      <col style={{ width: '7%' }} />
+      <col style={{ width: '15%' }} />
     </colgroup>
   );
 }
@@ -175,44 +199,6 @@ function StoreDetailLogo({
   );
 }
 
-function storeDetailStats(store: AdminStoreDetail): AdminStoreDetailStats {
-  return (
-    store.stats ?? {
-      productsTotal: 0,
-      productsActive: 0,
-      ordersTotal: 0,
-      ordersDelivered: 0,
-      revenue: 0,
-    }
-  );
-}
-
-function StatTile({
-  label,
-  value,
-  hint,
-}: {
-  label: string;
-  value: string | number;
-  hint?: string;
-}) {
-  return (
-    <div className="rounded-md border border-slate-200/80 bg-white px-2 py-1.5 shadow-sm dark:border-sky-500/20 dark:bg-[#0f1a38]">
-      <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-        {label}
-      </p>
-      <p className="truncate text-sm font-bold tabular-nums text-slate-900 dark:text-slate-100">
-        {value}
-      </p>
-      {hint ? (
-        <p className="truncate text-[9px] leading-tight text-slate-500 dark:text-slate-500">
-          {hint}
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
 function StoreDetailsPanel({
   store,
   variant = 'admin',
@@ -224,7 +210,7 @@ function StoreDetailsPanel({
   const ownerName = store.user
     ? `${store.user.firstName} ${store.user.lastName}`.trim()
     : '';
-  const st = storeDetailStats(store);
+  const st = getAdminStorePanelStats(store);
   const createdLabel = store.createdAt
     ? new Date(store.createdAt).toLocaleDateString('es', {
         day: 'numeric',
@@ -237,172 +223,108 @@ function StoreDetailsPanel({
   const retText = store.returnPolicy?.trim() || 'No definida';
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden px-4 py-3">
-      <div className="shrink-0 space-y-3">
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
-              {store.name}
-            </h3>
-            <p className="truncate text-[11px] text-slate-500 dark:text-slate-400">
-              /{store.slug}
-            </p>
-          </div>
-          <div className="flex flex-wrap justify-end gap-1">
-            {variant === 'admin' ? (
-              <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
-                {numOrZero(store.commission)}% comisión
-              </span>
-            ) : null}
-            {store.isRejected ? (
-              <AdminStatusBadge tone="danger">Rechazada</AdminStatusBadge>
-            ) : store.isApproved ? (
-              <AdminStatusBadge tone="success">Aprobada</AdminStatusBadge>
-            ) : (
-              <AdminStatusBadge tone="warning">Pendiente</AdminStatusBadge>
-            )}
-            <AdminStatusBadge tone={store.isActive ? 'success' : 'danger'}>
-              {store.isActive ? 'Activa' : 'Inactiva'}
-            </AdminStatusBadge>
-          </div>
-        </div>
+    <AdminDetailPanelRoot>
+      <AdminDetailPanelTop>
+        <AdminDetailTitleRow
+          title={store.name}
+          subtitle={`/${store.slug}`}
+          badges={
+            <>
+              {variant === 'admin' ? (
+                <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
+                  {numOrZero(store.commission)}% comisión
+                </span>
+              ) : null}
+              {store.isRejected ? (
+                <AdminStatusBadge tone="danger">Rechazada</AdminStatusBadge>
+              ) : store.isApproved ? (
+                <AdminStatusBadge tone="success">Aprobada</AdminStatusBadge>
+              ) : (
+                <AdminStatusBadge tone="warning">Pendiente</AdminStatusBadge>
+              )}
+              <AdminStatusBadge tone={store.isActive ? 'success' : 'danger'}>
+                {store.isActive ? 'Activa' : 'Inactiva'}
+              </AdminStatusBadge>
+            </>
+          }
+        />
 
-        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-          <StatTile label="Productos" value={st.productsTotal} hint={`${st.productsActive} activos`} />
-          <StatTile label="Pedidos" value={st.ordersTotal} hint={`${st.ordersDelivered} entregados`} />
-          <StatTile
+        <AdminDetailStatsGrid>
+          <AdminDetailStatTile
+            label="Productos"
+            value={st.productsTotal}
+            hint={`${st.productsActive} activos`}
+          />
+          <AdminDetailStatTile
+            label="Pedidos"
+            value={st.ordersTotal}
+            hint={`${st.ordersDelivered} entregados`}
+          />
+          <AdminDetailStatTile
             label="Ventas (bruto)"
             value={formatPrice(st.revenue)}
             hint="excl. cancelados"
           />
-          <StatTile label="Alta" value={createdLabel} hint="registro" />
-        </div>
+          <AdminDetailStatTile label="Alta" value={createdLabel} hint="registro" />
+        </AdminDetailStatsGrid>
 
-        <div className="grid grid-cols-2 gap-1.5 border-t border-slate-200/80 pt-2 dark:border-sky-500/20">
-          {variant === 'admin' ? (
-            <>
-              <div className="min-w-0">
-                <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                  Vendedor
-                </p>
-                <p className="flex items-center gap-1 truncate text-[11px] text-slate-800 dark:text-slate-200">
-                  <FiUser className="h-3 w-3 shrink-0 text-slate-400" aria-hidden />
-                  <span className="truncate">{ownerName || '—'}</span>
-                </p>
-              </div>
-              <div className="min-w-0">
-                <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                  Correo vendedor
-                </p>
-                <p className="flex items-center gap-1 truncate text-[11px] text-slate-800 dark:text-slate-200">
-                  <FiMail className="h-3 w-3 shrink-0 text-slate-400" aria-hidden />
-                  <span className="truncate">{store.user?.email ?? '—'}</span>
-                </p>
-              </div>
-            </>
-          ) : null}
-          <div className="min-w-0">
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Correo tienda
-            </p>
-            <p className="flex items-center gap-1 truncate text-[11px] text-slate-800 dark:text-slate-200">
-              <FiMail className="h-3 w-3 shrink-0 text-slate-400" aria-hidden />
-              <span className="truncate">{store.contactEmail ?? '—'}</span>
-            </p>
-          </div>
-          <div className="min-w-0">
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              Teléfono
-            </p>
-            <p className="flex items-center gap-1 truncate text-[11px] text-slate-800 dark:text-slate-200">
-              <FiPhone className="h-3 w-3 shrink-0 text-slate-400" aria-hidden />
-              <span className="truncate">{store.contactPhone ?? '—'}</span>
-            </p>
-          </div>
-        </div>
-      </div>
+        <AdminDetailHeroSplit
+          image={
+            <AdminDetailImageFrame ariaLabel="Logo de la tienda">
+              <StoreDetailLogo
+                logo={store.logo}
+                imageClassName="max-h-full max-w-full object-contain rounded-md shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+              />
+            </AdminDetailImageFrame>
+          }
+          fields={
+            <AdminDetailFieldsGrid>
+              {variant === 'admin' ? (
+                <>
+                  <AdminDetailCompactField label="Vendedor" icon={FiUser}>
+                    {ownerName || '—'}
+                  </AdminDetailCompactField>
+                  <AdminDetailCompactField label="Correo vendedor" icon={FiMail}>
+                    {store.user?.email ?? '—'}
+                  </AdminDetailCompactField>
+                </>
+              ) : null}
+              <AdminDetailCompactField label="Correo tienda" icon={FiMail}>
+                {store.contactEmail ?? '—'}
+              </AdminDetailCompactField>
+              <AdminDetailCompactField label="Teléfono" icon={FiPhone}>
+                {store.contactPhone ?? '—'}
+              </AdminDetailCompactField>
+            </AdminDetailFieldsGrid>
+          }
+        />
+      </AdminDetailPanelTop>
 
-      <section className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
-        <div
-          className="inline-flex shrink-0 rounded-lg bg-slate-100 p-0.5 dark:bg-[#0f1a38]"
-          role="tablist"
-          aria-label="Datos y políticas"
-        >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={detailTab === 'datos'}
-            onClick={() => setDetailTab('datos')}
-            className={`cursor-pointer rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
-              detailTab === 'datos'
-                ? 'bg-white text-slate-800 shadow-sm dark:bg-[#162647] dark:text-slate-100'
-                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-            }`}
-          >
-            Datos
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={detailTab === 'politicas'}
-            onClick={() => setDetailTab('politicas')}
-            className={`cursor-pointer rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
-              detailTab === 'politicas'
-                ? 'bg-white text-slate-800 shadow-sm dark:bg-[#162647] dark:text-slate-100'
-                : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-            }`}
-          >
-            Políticas
-          </button>
-        </div>
-        <div className="market-scroll mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain pr-0.5">
-          {detailTab === 'datos' ? (
-            <div className="space-y-3 pb-1">
-              <div className="overflow-hidden rounded-lg border border-slate-200/80 bg-white dark:border-sky-500/20 dark:bg-[#0f1a38]">
-                <p className="border-b border-slate-100 px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:border-sky-500/15 dark:text-slate-400">
-                  Logo de la tienda
-                </p>
-                <div className="flex justify-center px-3 py-4">
-                  <div className="inline-flex max-w-full items-center justify-center rounded-lg bg-slate-50/90 px-3 py-3 ring-1 ring-slate-200/60 dark:bg-[#0a1228] dark:ring-sky-500/20">
-                    <StoreDetailLogo
-                      logo={store.logo}
-                      imageClassName="max-h-48 w-auto max-w-[min(100%,20rem)] rounded-md shadow-sm ring-1 ring-black/5 dark:ring-white/10"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="rounded-lg border border-slate-200/80 bg-white p-3 dark:border-sky-500/20 dark:bg-[#0f1a38]">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                  Descripción
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
-                  {descText}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3 pb-1">
-              <div className="rounded-lg border border-slate-200/80 bg-white p-3 dark:border-sky-500/20 dark:bg-[#0f1a38]">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                  Política de envíos
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
-                  {shipText}
-                </p>
-              </div>
-              <div className="rounded-lg border border-slate-200/80 bg-white p-3 dark:border-sky-500/20 dark:bg-[#0f1a38]">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                  Política de devoluciones
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
-                  {retText}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
-    </div>
+      <AdminDetailScrollSection
+        tablistLabel="Datos y políticas"
+        tabs={[
+          { id: 'datos', label: 'Datos' },
+          { id: 'politicas', label: 'Políticas' },
+        ]}
+        activeTab={detailTab}
+        onTabChange={(id) => setDetailTab(id as 'datos' | 'politicas')}
+      >
+        {detailTab === 'datos' ? (
+          <div className="space-y-3 pb-1">
+            <AdminDetailTextCard title="Descripción">{descText}</AdminDetailTextCard>
+          </div>
+        ) : (
+          <div className="space-y-3 pb-1">
+            <AdminDetailTextCard title="Política de envíos">
+              {shipText}
+            </AdminDetailTextCard>
+            <AdminDetailTextCard title="Política de devoluciones">
+              {retText}
+            </AdminDetailTextCard>
+          </div>
+        )}
+      </AdminDetailScrollSection>
+    </AdminDetailPanelRoot>
   );
 }
 
@@ -714,7 +636,7 @@ export function AdminStoresPage() {
                 className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-sky-500/20"
               >
                 <table className="table-fixed w-full min-w-[900px] border-collapse text-left text-sm">
-                  <AdminStoresTableColgroup count={colCount} />
+                  <AdminStoresTableColgroup isSeller={isSeller} />
                   <thead className="bg-slate-100/92 backdrop-blur-md dark:bg-[#0f1a38]/95 dark:backdrop-blur-md">
                     <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
                       <SortHeader
@@ -755,7 +677,7 @@ export function AdminStoresPage() {
                         onSort={handleSort}
                       />
                       {!isSeller ? (
-                        <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+                        <th className="px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
                           Comisión
                         </th>
                       ) : null}
@@ -772,7 +694,7 @@ export function AdminStoresPage() {
                 className="market-scroll min-h-0 flex-1 overflow-y-auto overflow-x-auto"
               >
                 <table className="table-fixed w-full min-w-[900px] border-collapse text-left text-sm">
-                  <AdminStoresTableColgroup count={colCount} />
+                  <AdminStoresTableColgroup isSeller={isSeller} />
                   <tbody>
                     {pageRows.length === 0 ? (
                       <tr>
@@ -822,7 +744,7 @@ export function AdminStoresPage() {
                             {s.contactPhone ?? '—'}
                           </td>
                           <td className="px-4 py-2 align-middle">
-                            <div className="flex flex-wrap gap-1.5">
+                            <div className="flex flex-wrap gap-2">
                               {s.isRejected ? (
                                 <AdminStatusBadge tone="danger">
                                   Rechazada
@@ -844,7 +766,7 @@ export function AdminStoresPage() {
                             </div>
                           </td>
                           {!isSeller ? (
-                            <td className="px-4 py-2 align-middle text-slate-700 tabular-nums dark:text-slate-300">
+                            <td className="whitespace-nowrap px-4 py-2 text-center align-middle text-slate-700 tabular-nums dark:text-slate-300">
                               {numOrZero(s.commission)}%
                             </td>
                           ) : null}

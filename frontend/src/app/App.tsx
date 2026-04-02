@@ -11,7 +11,6 @@ import { AdminRoute } from '../components/AdminRoute/AdminRoute';
 import { ProtectedRoute } from '../components/ProtectedRoute/ProtectedRoute';
 import { SellerRoute } from '../components/SellerRoute/SellerRoute';
 import { AdminLayout } from '../layouts/AdminLayout/AdminLayout';
-import { routePaths } from '../config/routes';
 import { AdminCategoriesPage } from '../views/AdminCategoriesPage/AdminCategoriesPage';
 import { AdminDashboardPage } from '../views/AdminDashboardPage/AdminDashboardPage';
 import { AdminModerationPage } from '../views/AdminModerationPage/AdminModerationPage';
@@ -20,6 +19,12 @@ import { AdminProductsPage } from '../views/AdminProductsPage/AdminProductsPage'
 import { AdminSalesPage } from '../views/AdminSalesPage/AdminSalesPage';
 import { AdminStoresPage } from '../views/AdminStoresPage/AdminStoresPage';
 import { AdminUsersPage } from '../views/AdminUsersPage/AdminUsersPage';
+import { SellerLayout } from '../layouts/SellerLayout/SellerLayout';
+import { SellerDashboardPage } from '../views/SellerDashboardPage/SellerDashboardPage';
+import { SellerOrdersPage } from '../views/SellerOrdersPage/SellerOrdersPage';
+import { SellerProductFormPage } from '../views/SellerProductFormPage/SellerProductFormPage';
+import { SellerReportPage } from '../views/SellerReportPage/SellerReportPage';
+import { SellerStoreProductsPage } from '../views/SellerStoreProductsPage/SellerStoreProductsPage';
 import { CatalogPage } from '../views/CatalogPage/CatalogPage';
 import { CatalogEntry } from '../views/CatalogEntry/CatalogEntry';
 import { CartPage } from '../views/CartPage/CartPage';
@@ -114,15 +119,28 @@ export default function App() {
                 />
               </Route>
               <Route
-                path="/seller/*"
+                path="/seller"
                 element={
                   <ProtectedRoute>
                     <SellerRoute>
-                      <Navigate to={routePaths.admin} replace />
+                      <SellerLayout />
                     </SellerRoute>
                   </ProtectedRoute>
                 }
-              />
+              >
+                <Route index element={<SellerDashboardPage />} />
+                <Route path="orders" element={<SellerOrdersPage />} />
+                <Route path="report" element={<SellerReportPage />} />
+                <Route
+                  path="stores/:storeId/products"
+                  element={<SellerStoreProductsPage />}
+                />
+                <Route path="products/new" element={<SellerProductFormPage />} />
+                <Route
+                  path="products/:productId/edit"
+                  element={<SellerProductFormPage />}
+                />
+              </Route>
               <Route path="/auth" element={<AuthPage />}>
                 <Route index element={<Navigate to="login" replace />} />
                 <Route path="login" element={<LoginPage />} />

@@ -4,7 +4,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
@@ -13,13 +12,30 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiChevronUp,
+  FiCalendar,
   FiEdit2,
   FiEye,
+  FiMail,
   FiSearch,
+  FiShield,
   FiTrash2,
+  FiUser,
   FiUsers,
   FiX,
 } from 'react-icons/fi';
+import {
+  AdminDetailCompactField,
+  AdminDetailFieldsGrid,
+  AdminDetailHeroSplit,
+  AdminDetailImageFrame,
+  AdminDetailPanelRoot,
+  AdminDetailPanelTop,
+  AdminDetailScrollSection,
+  AdminDetailStatTile,
+  AdminDetailStatsGrid,
+  AdminDetailTextCard,
+  AdminDetailTitleRow,
+} from '../../components/AdminDetailPanel/AdminDetailPanel';
 import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
 import { Modal } from '../../components/Modal/Modal';
@@ -109,74 +125,99 @@ function formatDate(iso?: string) {
   });
 }
 
-function DetailField({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="space-y-1">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-        {label}
-      </p>
-      <div className="rounded-md border border-slate-200/80 bg-white px-2.5 py-1.5 text-xs text-slate-700 dark:border-sky-500/20 dark:bg-[#0f1a38] dark:text-slate-200">
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function UserDetailsPanel({ user }: { user: AdminUserRow }) {
+  const [detailTab, setDetailTab] = useState<'cuenta' | 'ayuda'>('cuenta');
+  const displayName = fullName(user) || user.email;
+  const idShort =
+    user.id.length > 10 ? `…${user.id.slice(-8)}` : user.id;
+
   return (
-    <div className="market-scroll min-h-0 flex-1 overflow-y-auto px-4 py-3">
-      <div className="space-y-4">
-        <section className="space-y-3">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-              {fullName(user) || user.email}
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {user.email}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            <span className="rounded border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
-              {user.role}
-            </span>
-            <AdminStatusBadge tone={user.isActive ? 'success' : 'danger'}>
-              {user.isActive ? 'Activo' : 'Inactivo'}
-            </AdminStatusBadge>
-          </div>
-        </section>
+    <AdminDetailPanelRoot>
+      <AdminDetailPanelTop>
+        <AdminDetailTitleRow
+          title={displayName}
+          subtitle={user.email}
+          badges={
+            <>
+              <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
+                {user.role}
+              </span>
+              <AdminStatusBadge tone={user.isActive ? 'success' : 'danger'}>
+                {user.isActive ? 'Activo' : 'Inactivo'}
+              </AdminStatusBadge>
+            </>
+          }
+        />
 
-        <section className="space-y-2 border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            Datos
-          </h4>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <DetailField label="Nombre">
-              {fullName(user) || '—'}
-            </DetailField>
-            <DetailField label="Correo">{user.email}</DetailField>
-            <DetailField label="Rol">{user.role}</DetailField>
-            <DetailField label="Alta">{formatDate(user.createdAt)}</DetailField>
-          </div>
-          <DetailField label="ID">
-            <span className="break-all font-mono text-[11px]">{user.id}</span>
-          </DetailField>
-        </section>
+        <AdminDetailStatsGrid>
+          <AdminDetailStatTile label="Rol" value={user.role} hint="permiso" />
+          <AdminDetailStatTile
+            label="Alta"
+            value={formatDate(user.createdAt)}
+            hint="registro"
+          />
+          <AdminDetailStatTile
+            label="Estado"
+            value={user.isActive ? 'Activo' : 'Inactivo'}
+            hint="cuenta"
+          />
+          <AdminDetailStatTile label="ID" value={idShort} hint="recorte" />
+        </AdminDetailStatsGrid>
 
-        <section className="space-y-2 border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Para cambiar el estado activo/inactivo, el rol o los datos de la
-            cuenta, o para eliminar de forma definitiva, usa las acciones de la
-            fila en la tabla.
-          </p>
-        </section>
-      </div>
-    </div>
+        <AdminDetailHeroSplit
+          image={
+            <AdminDetailImageFrame ariaLabel="Avatar del usuario">
+              <FiUser
+                className="h-12 w-12 text-slate-400 dark:text-slate-500"
+                aria-hidden
+              />
+            </AdminDetailImageFrame>
+          }
+          fields={
+            <AdminDetailFieldsGrid>
+              <AdminDetailCompactField label="Nombre" icon={FiUser}>
+                {fullName(user) || '—'}
+              </AdminDetailCompactField>
+              <AdminDetailCompactField label="Correo" icon={FiMail}>
+                {user.email}
+              </AdminDetailCompactField>
+              <AdminDetailCompactField label="Rol" icon={FiShield}>
+                {user.role}
+              </AdminDetailCompactField>
+              <AdminDetailCompactField label="Alta" icon={FiCalendar}>
+                {formatDate(user.createdAt)}
+              </AdminDetailCompactField>
+            </AdminDetailFieldsGrid>
+          }
+        />
+      </AdminDetailPanelTop>
+
+      <AdminDetailScrollSection
+        tablistLabel="Cuenta y ayuda"
+        tabs={[
+          { id: 'cuenta', label: 'Cuenta' },
+          { id: 'ayuda', label: 'Ayuda' },
+        ]}
+        activeTab={detailTab}
+        onTabChange={(id) => setDetailTab(id as 'cuenta' | 'ayuda')}
+      >
+        {detailTab === 'cuenta' ? (
+          <div className="space-y-3 pb-1">
+            <AdminDetailTextCard title="Identificador (UUID)">
+              <span className="break-all font-mono text-xs">{user.id}</span>
+            </AdminDetailTextCard>
+          </div>
+        ) : (
+          <div className="space-y-3 pb-1">
+            <AdminDetailTextCard title="Acciones en la tabla">
+              Para cambiar el estado activo o inactivo, el rol o los datos de la
+              cuenta, o para eliminar de forma definitiva un usuario, utiliza los
+              botones de la fila correspondiente en la tabla principal.
+            </AdminDetailTextCard>
+          </div>
+        )}
+      </AdminDetailScrollSection>
+    </AdminDetailPanelRoot>
   );
 }
 

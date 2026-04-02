@@ -4,7 +4,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
 import {
@@ -14,10 +13,27 @@ import {
   FiChevronUp,
   FiEdit2,
   FiEye,
+  FiMail,
+  FiMapPin,
   FiSearch,
+  FiShoppingBag,
   FiShoppingCart,
+  FiUser,
   FiX,
 } from 'react-icons/fi';
+import {
+  AdminDetailCompactField,
+  AdminDetailCompactFieldBlock,
+  AdminDetailFieldsGrid,
+  AdminDetailHeroSplit,
+  AdminDetailImageFrame,
+  AdminDetailPanelRoot,
+  AdminDetailPanelTop,
+  AdminDetailScrollSection,
+  AdminDetailStatTile,
+  AdminDetailStatsGrid,
+  AdminDetailTitleRow,
+} from '../../components/AdminDetailPanel/AdminDetailPanel';
 import {
   AdminStatusBadge,
   orderStatusTone,
@@ -154,115 +170,149 @@ function formatDate(iso?: string) {
   });
 }
 
-function DetailField({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="space-y-1">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-        {label}
-      </p>
-      <div className="rounded-md border border-slate-200/80 bg-white px-2.5 py-1.5 text-xs text-slate-700 dark:border-sky-500/20 dark:bg-[#0f1a38] dark:text-slate-200">
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function OrderDetailsPanel({ order }: { order: Order }) {
+  const [detailTab, setDetailTab] = useState<'envio' | 'lineas'>('envio');
+  const items = order.items ?? [];
+  const lineCount = items.length;
+  const clientLabel = order.user
+    ? `${order.user.firstName ?? ''} ${order.user.lastName ?? ''}`.trim() ||
+      order.user.email
+    : order.userId;
+  const createdAt = (order as { createdAt?: string }).createdAt;
+
   return (
-    <div className="market-scroll min-h-0 flex-1 overflow-y-auto px-4 py-3">
-      <div className="space-y-4">
-        <section className="space-y-3">
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-              Pedido
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {order.id}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            <span className="rounded border border-slate-200/80 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
-              {formatPrice(numAmount(order.totalAmount))}
-            </span>
-            <AdminStatusBadge tone={orderStatusTone(order.status)}>
-              {formatOrderStatus(order.status)}
-            </AdminStatusBadge>
-          </div>
-        </section>
+    <AdminDetailPanelRoot>
+      <AdminDetailPanelTop>
+        <AdminDetailTitleRow
+          title="Pedido"
+          subtitle={order.id}
+          badges={
+            <>
+              <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
+                {formatPrice(numAmount(order.totalAmount))}
+              </span>
+              <AdminStatusBadge tone={orderStatusTone(order.status)}>
+                {formatOrderStatus(order.status)}
+              </AdminStatusBadge>
+            </>
+          }
+        />
 
-        <section className="space-y-2 border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-            Información
-          </h4>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <DetailField label="Cliente">
-              {order.user
-                ? `${order.user.firstName ?? ''} ${order.user.lastName ?? ''}`.trim() ||
-                  order.user.email
-                : order.userId}
-            </DetailField>
-            <DetailField label="Correo">
-              {order.user?.email ?? '—'}
-            </DetailField>
-            <DetailField label="Tienda">
-              {order.store?.name ?? '—'}
-            </DetailField>
-            <DetailField label="Dirección de envío">
-              {order.shippingAddress || 'No especificada'}
-            </DetailField>
-          </div>
-        </section>
+        <AdminDetailStatsGrid>
+          <AdminDetailStatTile
+            label="Total"
+            value={formatPrice(numAmount(order.totalAmount))}
+            hint="pedido"
+          />
+          <AdminDetailStatTile
+            label="Líneas"
+            value={lineCount}
+            hint={lineCount === 1 ? '1 artículo' : `${lineCount} artículos`}
+          />
+          <AdminDetailStatTile
+            label="Cliente"
+            value={clientLabel.length > 18 ? `${clientLabel.slice(0, 16)}…` : clientLabel}
+            hint="comprador"
+          />
+          <AdminDetailStatTile
+            label="Fecha"
+            value={formatDate(createdAt)}
+            hint="alta"
+          />
+        </AdminDetailStatsGrid>
 
-        {order.items && order.items.length > 0 ? (
-          <section className="space-y-2 border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-              Líneas del pedido
-            </h4>
-            <div className="overflow-hidden rounded-md border border-slate-200/80 dark:border-sky-500/20">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:bg-[#0f1a38] dark:text-slate-400">
-                  <tr>
-                    <th className="px-2.5 py-2">Producto</th>
-                    <th className="px-2.5 py-2 text-right">Cant.</th>
-                    <th className="px-2.5 py-2 text-right">P. Unit.</th>
-                    <th className="px-2.5 py-2 text-right">Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {order.items.map((item) => (
-                    <tr
-                      key={item.id}
-                      className="border-t border-slate-100 dark:border-sky-500/10"
-                    >
-                      <td className="px-2.5 py-1.5 text-slate-700 dark:text-slate-200">
-                        {item.product?.name ?? 'Producto'}
-                      </td>
-                      <td className="px-2.5 py-1.5 text-right tabular-nums text-slate-700 dark:text-slate-200">
-                        {item.quantity}
-                      </td>
-                      <td className="px-2.5 py-1.5 text-right tabular-nums text-slate-700 dark:text-slate-200">
-                        {formatPrice(numAmount(item.unitPrice))}
-                      </td>
-                      <td className="px-2.5 py-1.5 text-right tabular-nums font-medium text-slate-900 dark:text-slate-100">
-                        {formatPrice(
-                          numAmount(item.unitPrice) * item.quantity,
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        <AdminDetailHeroSplit
+          image={
+            <AdminDetailImageFrame ariaLabel="Pedido">
+              <FiShoppingCart
+                className="h-12 w-12 text-slate-400 dark:text-slate-500"
+                aria-hidden
+              />
+            </AdminDetailImageFrame>
+          }
+          fields={
+            <AdminDetailFieldsGrid>
+              <AdminDetailCompactField label="Cliente" icon={FiUser}>
+                {clientLabel}
+              </AdminDetailCompactField>
+              <AdminDetailCompactField label="Correo" icon={FiMail}>
+                {order.user?.email ?? '—'}
+              </AdminDetailCompactField>
+              <AdminDetailCompactField label="Tienda" icon={FiShoppingBag}>
+                {order.store?.name ?? '—'}
+              </AdminDetailCompactField>
+              <AdminDetailCompactFieldBlock
+                label="Dirección de envío"
+                icon={FiMapPin}
+              >
+                {order.shippingAddress?.trim() || 'No especificada'}
+              </AdminDetailCompactFieldBlock>
+            </AdminDetailFieldsGrid>
+          }
+        />
+      </AdminDetailPanelTop>
+
+      <AdminDetailScrollSection
+        tablistLabel="Envío y líneas"
+        tabs={[
+          { id: 'envio', label: 'Envío' },
+          { id: 'lineas', label: 'Líneas' },
+        ]}
+        activeTab={detailTab}
+        onTabChange={(id) => setDetailTab(id as 'envio' | 'lineas')}
+      >
+        {detailTab === 'envio' ? (
+          <div className="space-y-3 pb-1">
+            <div className="rounded-lg border border-slate-200/80 bg-white p-3 dark:border-sky-500/20 dark:bg-[#0f1a38]">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                Dirección completa
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
+                {order.shippingAddress?.trim() || 'No especificada'}
+              </p>
             </div>
-          </section>
-        ) : null}
-      </div>
-    </div>
+          </div>
+        ) : lineCount > 0 ? (
+          <div className="overflow-hidden rounded-lg border border-slate-200/80 dark:border-sky-500/20">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:bg-[#0f1a38] dark:text-slate-400">
+                <tr>
+                  <th className="px-2.5 py-2">Producto</th>
+                  <th className="px-2.5 py-2 text-right">Cant.</th>
+                  <th className="px-2.5 py-2 text-right">P. unit.</th>
+                  <th className="px-2.5 py-2 text-right">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map((item) => (
+                  <tr
+                    key={item.id}
+                    className="border-t border-slate-100 dark:border-sky-500/10"
+                  >
+                    <td className="px-2.5 py-1.5 text-slate-700 dark:text-slate-200">
+                      {item.product?.name ?? 'Producto'}
+                    </td>
+                    <td className="px-2.5 py-1.5 text-right tabular-nums text-slate-700 dark:text-slate-200">
+                      {item.quantity}
+                    </td>
+                    <td className="px-2.5 py-1.5 text-right tabular-nums text-slate-700 dark:text-slate-200">
+                      {formatPrice(numAmount(item.unitPrice))}
+                    </td>
+                    <td className="px-2.5 py-1.5 text-right tabular-nums font-medium text-slate-900 dark:text-slate-100">
+                      {formatPrice(numAmount(item.unitPrice) * item.quantity)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="pb-4 text-sm text-slate-500 dark:text-slate-400">
+            Este pedido no tiene líneas registradas.
+          </p>
+        )}
+      </AdminDetailScrollSection>
+    </AdminDetailPanelRoot>
   );
 }
 
