@@ -27,6 +27,5 @@ export const routePaths = {
   adminModeration: '/admin/moderation',
   adminProducts: '/admin/products',
   adminOrders: '/admin/orders',
-  adminSales: '/admin/sales',
   adminCategories: '/admin/categories',
 } as const;

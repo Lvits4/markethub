@@ -1,4 +1,11 @@
-import { useDeferredValue, useEffect, useId, useMemo, useState } from 'react';
+import {
+  useDeferredValue,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { FiArrowLeft, FiMail, FiPhone } from 'react-icons/fi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
@@ -20,10 +27,29 @@ const SORT_OPTIONS: { value: ProductSortBy; label: string }[] = [
   { value: 'best_selling', label: 'Más vendidos' },
 ];
 
+const DEFAULT_SORT: ProductSortBy = 'newest';
+
+const filterFieldClass =
+  'page-size-input w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm text-zinc-900 outline-none transition-[border-color,box-shadow] placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/25 dark:border-night-600 dark:bg-night-800/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-[var(--color-market-dark-accent)] dark:focus:ring-[color:rgb(69_139_222/0.22)]';
+
+function storeInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    const a = parts[0]?.[0];
+    const b = parts[parts.length - 1]?.[0];
+    if (a && b) return `${a}${b}`.toUpperCase();
+  }
+  const compact = name.trim().replace(/\s+/g, '');
+  if (compact.length >= 2) return compact.slice(0, 2).toUpperCase();
+  if (compact.length === 1) return compact.toUpperCase();
+  return '?';
+}
+
 export function StorePublicPage() {
   const { storeId } = useParams<{ storeId: string }>();
   const navigate = useNavigate();
   const storeCategoryFieldId = useId();
+  const storeSortFieldId = useId();
   const {
     data: store,
     isLoading: storeLoading,
@@ -33,10 +59,16 @@ export function StorePublicPage() {
   const [categoryId, setCategoryId] = useState<string | undefined>();
   const [search, setSearch] = useState('');
   const deferredSearch = useDeferredValue(search);
-  const [sortBy, setSortBy] = useState<ProductSortBy>('newest');
+  const [sortBy, setSortBy] = useState<ProductSortBy>(DEFAULT_SORT);
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
+  const [draftSortBy, setDraftSortBy] = useState<ProductSortBy>(DEFAULT_SORT);
+  const [draftCategoryId, setDraftCategoryId] = useState('');
+  const [draftMinPrice, setDraftMinPrice] = useState('');
+  const [draftMaxPrice, setDraftMaxPrice] = useState('');
   const [page, setPage] = useState(1);
+  const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
+  const filterPopoverRef = useRef<HTMLDivElement>(null);
 
   const minNum = minPrice.trim() === '' ? undefined : Number.parseFloat(minPrice);
   const maxNum = maxPrice.trim() === '' ? undefined : Number.parseFloat(maxPrice);
@@ -57,6 +89,32 @@ export function StorePublicPage() {
   useEffect(() => {
     setPage(1);
   }, [filterKey]);
+
+  useEffect(() => {
+    if (!filterPopoverOpen) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const t = e.target;
+      if (
+        t instanceof Element &&
+        t.closest('[data-markethub-select-list]')
+      ) {
+        return;
+      }
+      const el = filterPopoverRef.current;
+      if (el && !el.contains(t as Node)) {
+        setFilterPopoverOpen(false);
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setFilterPopoverOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [filterPopoverOpen]);
 
   const productFilters = useMemo(
     () => ({
@@ -116,6 +174,27 @@ export function StorePublicPage() {
     }
   };
 
+  const handleClearFilters = () => {
+    setPage(1);
+    setCategoryId(undefined);
+    setSortBy(DEFAULT_SORT);
+    setMinPrice('');
+    setMaxPrice('');
+    setDraftCategoryId('');
+    setDraftSortBy(DEFAULT_SORT);
+    setDraftMinPrice('');
+    setDraftMaxPrice('');
+  };
+
+  const handleApplyFilters = () => {
+    setPage(1);
+    setCategoryId(draftCategoryId === '' ? undefined : draftCategoryId);
+    setSortBy(draftSortBy);
+    setMinPrice(draftMinPrice);
+    setMaxPrice(draftMaxPrice);
+    setFilterPopoverOpen(false);
+  };
+
   if (!storeId) {
     return (
       <div className="mx-auto max-w-6xl px-4 py-16 text-center">
@@ -161,68 +240,80 @@ export function StorePublicPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-8 pt-4 sm:pt-6">
-      <div className="mb-4">
+      <div className="mb-3">
         <button
           type="button"
           onClick={goBack}
-          className="inline-flex items-center gap-2 rounded-md px-2 py-2 text-sm font-medium text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-night-800"
+          className="group -mx-1 inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 text-sm font-normal text-zinc-600 transition-colors hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-forest)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-cream)] dark:text-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:ring-[color:rgb(69_139_222/0.4)] dark:focus-visible:ring-offset-[var(--color-night-base)]"
         >
-          <FiArrowLeft className="h-4 w-4" aria-hidden />
+          <FiArrowLeft
+            className="h-3.5 w-3.5 shrink-0 transition-transform group-hover:-translate-x-0.5"
+            aria-hidden
+          />
           Volver
         </button>
       </div>
 
       <section className="mb-8 overflow-hidden rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/60 dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">
-        <div className="relative h-40 bg-zinc-200 dark:bg-night-800 sm:h-48">
-          {store.banner ? (
-            <img
-              src={publicStorageImageSrc(store.banner)}
-              alt=""
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="h-full w-full bg-gradient-to-br from-[var(--color-forest)]/20 to-zinc-200 dark:from-sky-600/18 dark:to-night-800" />
-          )}
-          {store.logo ? (
-            <div className="absolute -bottom-10 left-4 sm:left-6">
-              <div className="h-20 w-20 overflow-hidden rounded-md border-4 border-white bg-white shadow-md dark:border-night-900 sm:h-24 sm:w-24">
-                <img
-                  src={publicStorageImageSrc(store.logo)}
-                  alt=""
-                  className="h-full w-full object-cover"
-                />
+        <div className="grid grid-cols-1 sm:grid-cols-[minmax(11rem,min(38vw,20rem))_1fr]">
+          <div className="relative aspect-[5/3] w-full min-h-[11rem] border-b border-zinc-200 bg-zinc-100 dark:border-night-700 dark:bg-night-800 sm:aspect-auto sm:min-h-0 sm:border-b-0 sm:border-r">
+            {store.logo ? (
+              <img
+                src={publicStorageImageSrc(store.logo)}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            ) : (
+              <div
+                className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[var(--color-forest)]/30 to-zinc-200 dark:from-sky-600/28 dark:to-night-800"
+                aria-hidden
+              >
+                <span className="text-4xl font-bold tracking-tight text-[var(--color-forest)] dark:text-[var(--color-market-dark-accent)] sm:text-5xl md:text-6xl">
+                  {storeInitials(store.name)}
+                </span>
               </div>
+            )}
+          </div>
+          <div className="min-w-0 px-4 py-5 sm:px-6 sm:py-6">
+            <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">
+              {store.name}
+            </h1>
+            {store.description ? (
+              <p className="mt-2 max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 sm:mt-3">
+                {store.description}
+              </p>
+            ) : null}
+            <div className="mt-5 border-t border-zinc-200 pt-5 dark:border-night-700 sm:mt-6">
+              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                Contacto
+              </h2>
+              {store.contactEmail || store.contactPhone ? (
+                <div className="mt-3 flex flex-wrap gap-3 text-sm">
+                  {store.contactEmail ? (
+                    <a
+                      href={`mailto:${store.contactEmail}`}
+                      className="inline-flex items-center gap-2 rounded-md bg-zinc-100 px-3 py-2 font-medium text-zinc-800 transition hover:bg-zinc-200 dark:bg-night-800 dark:text-zinc-200 dark:hover:bg-night-700"
+                    >
+                      <FiMail className="h-4 w-4 shrink-0" aria-hidden />
+                      {store.contactEmail}
+                    </a>
+                  ) : null}
+                  {store.contactPhone ? (
+                    <a
+                      href={`tel:${store.contactPhone.replace(/\s/g, '')}`}
+                      className="inline-flex items-center gap-2 rounded-md bg-zinc-100 px-3 py-2 font-medium text-zinc-800 transition hover:bg-zinc-200 dark:bg-night-800 dark:text-zinc-200 dark:hover:bg-night-700"
+                    >
+                      <FiPhone className="h-4 w-4 shrink-0" aria-hidden />
+                      {store.contactPhone}
+                    </a>
+                  ) : null}
+                </div>
+              ) : (
+                <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+                  Esta tienda no publicó correo ni teléfono de contacto.
+                </p>
+              )}
             </div>
-          ) : null}
-        </div>
-        <div className={`px-4 pb-6 pt-12 sm:px-6 ${store.logo ? 'sm:pt-14' : 'pt-6'}`}>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">
-            {store.name}
-          </h1>
-          {store.description ? (
-            <p className="mt-3 max-w-3xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-              {store.description}
-            </p>
-          ) : null}
-          <div className="mt-4 flex flex-wrap gap-3 text-sm">
-            {store.contactEmail ? (
-              <a
-                href={`mailto:${store.contactEmail}`}
-                className="inline-flex items-center gap-2 rounded-md bg-zinc-100 px-3 py-2 font-medium text-zinc-800 transition hover:bg-zinc-200 dark:bg-night-800 dark:text-zinc-200 dark:hover:bg-night-700"
-              >
-                <FiMail className="h-4 w-4 shrink-0" aria-hidden />
-                {store.contactEmail}
-              </a>
-            ) : null}
-            {store.contactPhone ? (
-              <a
-                href={`tel:${store.contactPhone.replace(/\s/g, '')}`}
-                className="inline-flex items-center gap-2 rounded-md bg-zinc-100 px-3 py-2 font-medium text-zinc-800 transition hover:bg-zinc-200 dark:bg-night-800 dark:text-zinc-200 dark:hover:bg-night-700"
-              >
-                <FiPhone className="h-4 w-4 shrink-0" aria-hidden />
-                {store.contactPhone}
-              </a>
-            ) : null}
           </div>
         </div>
       </section>
@@ -231,80 +322,136 @@ export function StorePublicPage() {
         Productos de la tienda
       </h2>
 
-      <SearchInput value={search} onChange={setSearch} className="mb-4" />
-
-      <details className="mb-5 rounded-md border border-zinc-200 bg-white/80 px-4 py-3 dark:border-night-700 dark:bg-night-900/50">
-        <summary className="cursor-pointer text-sm font-semibold text-zinc-800 dark:text-zinc-100">
-          Filtros y orden
-        </summary>
-        <div className="mt-4 flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label
-              className="text-xs font-medium text-zinc-600 dark:text-zinc-400"
-              htmlFor={storeCategoryFieldId}
+      <div className="relative mb-5 flex min-h-[52px] items-stretch gap-2">
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder="Buscar en esta tienda…"
+          className="min-h-[52px] min-w-0 flex-1"
+        />
+        <div
+          className="relative flex shrink-0 self-stretch"
+          ref={filterPopoverRef}
+        >
+          <Button
+            type="button"
+            variant="outline"
+            className="h-full min-h-[52px] min-w-[5.5rem] shrink-0 px-4 py-0"
+            aria-expanded={filterPopoverOpen}
+            aria-controls="store-public-filter-popover"
+            aria-haspopup="dialog"
+            onClick={() => {
+              setFilterPopoverOpen((open) => {
+                if (!open) {
+                  setDraftCategoryId(categoryId ?? '');
+                  setDraftSortBy(sortBy);
+                  setDraftMinPrice(minPrice);
+                  setDraftMaxPrice(maxPrice);
+                }
+                return !open;
+              });
+            }}
+          >
+            Filtrar
+          </Button>
+          {filterPopoverOpen ? (
+            <div
+              id="store-public-filter-popover"
+              role="dialog"
+              aria-label="Filtros y orden"
+              className="catalog-filter-popover absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[min(calc(100vw-2rem),20rem)] rounded-xl border border-zinc-200/90 bg-white p-4 shadow-[0_16px_48px_-12px_rgb(0_0_0/0.18)] ring-1 ring-zinc-200/70 dark:border-night-600 dark:bg-night-900 dark:shadow-[0_20px_56px_-12px_rgb(0_0_0/0.55)] dark:ring-night-700/80"
             >
-              Categoría
-            </label>
-            <FormSelect
-              id={storeCategoryFieldId}
-              value={categoryId ?? ''}
-              onChange={(v) => setCategoryId(v === '' ? undefined : v)}
-              options={categorySelectOptions}
-              placeholder="Todas las categorías"
-              variant="field"
-              searchable
-              searchPlaceholder="Buscar categoría…"
-              listMaxHeightPx={320}
-              triggerClassName="!mt-0 rounded-lg border-zinc-200 bg-zinc-50/80 py-2.5 dark:border-night-700 dark:bg-night-800/50"
-              listClassName="rounded-xl border-zinc-200/90 dark:border-sky-500/25"
-            />
-          </div>
-          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end">
-          <label className="flex min-w-[10rem] flex-col gap-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400">
-            Orden
-            <select
-              value={sortBy}
-              onChange={(e) =>
-                setSortBy(e.target.value as ProductSortBy)
-              }
-              className="rounded-md border border-zinc-200 bg-zinc-50/80 px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100 dark:focus:border-[var(--color-market-dark-accent)]"
-            >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="flex min-w-[6rem] flex-col gap-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400">
-            Precio mín.
-            <input
-              type="number"
-              inputMode="decimal"
-              min={0}
-              step="0.01"
-              value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
-              placeholder="0"
-              className="rounded-md border border-zinc-200 bg-zinc-50/80 px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100 dark:focus:border-[var(--color-market-dark-accent)]"
-            />
-          </label>
-          <label className="flex min-w-[6rem] flex-col gap-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400">
-            Precio máx.
-            <input
-              type="number"
-              inputMode="decimal"
-              min={0}
-              step="0.01"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
-              placeholder="∞"
-              className="rounded-md border border-zinc-200 bg-zinc-50/80 px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100 dark:focus:border-[var(--color-market-dark-accent)]"
-            />
-          </label>
-          </div>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
+                    htmlFor={storeCategoryFieldId}
+                  >
+                    Categoría
+                  </label>
+                  <FormSelect
+                    id={storeCategoryFieldId}
+                    value={draftCategoryId}
+                    onChange={setDraftCategoryId}
+                    options={categorySelectOptions}
+                    placeholder="Todas las categorías"
+                    variant="field"
+                    searchable
+                    searchPlaceholder="Buscar categoría…"
+                    listMaxHeightPx={320}
+                    triggerClassName="!mt-0 rounded-lg border-zinc-200 bg-zinc-50 py-2.5 dark:border-night-600 dark:bg-night-800/80"
+                    listClassName="rounded-xl border-zinc-200/90 dark:border-sky-500/25"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
+                    htmlFor={storeSortFieldId}
+                  >
+                    Orden
+                  </label>
+                  <FormSelect
+                    id={storeSortFieldId}
+                    value={draftSortBy}
+                    onChange={(v) => setDraftSortBy(v as ProductSortBy)}
+                    options={SORT_OPTIONS.map((o) => ({
+                      value: o.value,
+                      label: o.label,
+                    }))}
+                    variant="field"
+                    triggerClassName="!mt-0 rounded-lg border-zinc-200 bg-zinc-50 py-2.5 dark:border-night-600 dark:bg-night-800/80"
+                    listClassName="rounded-xl border-zinc-200/90 dark:border-sky-500/25"
+                  />
+                </div>
+                <label className="flex flex-col gap-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300">
+                  Precio mín.
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    step="0.01"
+                    value={draftMinPrice}
+                    onChange={(e) => setDraftMinPrice(e.target.value)}
+                    placeholder="0"
+                    className={filterFieldClass}
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300">
+                  Precio máx.
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    step="0.01"
+                    value={draftMaxPrice}
+                    onChange={(e) => setDraftMaxPrice(e.target.value)}
+                    placeholder="∞"
+                    className={filterFieldClass}
+                  />
+                </label>
+                <div className="mt-1 flex gap-2 border-t border-zinc-200/80 pt-4 dark:border-night-700">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="flex-1 justify-center py-2.5 text-sm"
+                    onClick={handleClearFilters}
+                  >
+                    Limpiar
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="primary"
+                    className="flex-1 justify-center py-2.5 text-sm"
+                    onClick={handleApplyFilters}
+                  >
+                    Aplicar
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
-      </details>
+      </div>
 
       <section
         className="relative min-h-[12rem]"

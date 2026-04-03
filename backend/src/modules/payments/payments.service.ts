@@ -41,4 +41,9 @@ export class PaymentsService {
     }
     return payment;
   }
+
+  /** Elimina el registro de pago ligado al pedido (p. ej. antes de borrar el pedido). */
+  async deleteByOrderId(orderId: string): Promise<void> {
+    await this.paymentsRepository.delete({ orderId });
+  }
 }

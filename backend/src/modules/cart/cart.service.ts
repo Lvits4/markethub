@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Cart } from './entities/cart.entity';
 import { CartItem } from './entities/cart-item.entity';
 import { AddToCartDto, UpdateCartItemDto } from './dto';
@@ -18,12 +18,18 @@ export class CartService {
     @InjectRepository(CartItem)
     private readonly cartItemRepository: Repository<CartItem>,
     private readonly productsService: ProductsService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async getOrCreateCart(userId: string): Promise<Cart> {
     let cart = await this.cartRepository.findOne({
       where: { user: { id: userId } },
-      relations: ['items', 'items.product', 'items.product.store'],
+      relations: [
+        'items',
+        'items.product',
+        'items.product.store',
+        'items.product.images',
+      ],
     });
 
     if (!cart) {
@@ -91,13 +97,28 @@ export class CartService {
       throw new NotFoundException('Item no encontrado en el carrito');
     }
 
-    await this.cartItemRepository.remove(item);
+    const result = await this.cartItemRepository.delete({
+      id: itemId,
+      cartId: cart.id,
+    });
+    if (!result.affected) {
+      throw new NotFoundException('Item no encontrado en el carrito');
+    }
     return this.getOrCreateCart(userId);
   }
 
+  /** Borrado definitivo: ítems y fila del carrito en BD (el siguiente uso crea carrito nuevo). */
   async clearCart(userId: string): Promise<void> {
-    const cart = await this.getOrCreateCart(userId);
-    await this.cartItemRepository.delete({ cartId: cart.id });
+    const cart = await this.cartRepository.findOne({
+      where: { user: { id: userId } },
+    });
+    if (!cart) {
+      return;
+    }
+    await this.dataSource.transaction(async (em) => {
+      await em.delete(CartItem, { cartId: cart.id });
+      await em.delete(Cart, { id: cart.id });
+    });
   }
 
   async getCartSummary(userId: string) {

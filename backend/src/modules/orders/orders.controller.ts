@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   NotFoundException,
   Param,
   ParseUUIDPipe,
@@ -35,6 +38,16 @@ export class OrdersController {
   @ApiOperation({ summary: 'Historial de pedidos del cliente' })
   getMyOrders(@CurrentUser() user: User) {
     return this.ordersService.findByUserId(user.id);
+  }
+
+  @Delete('my')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'Limpiar historial de pedidos del cliente (oculta en la cuenta; los registros siguen en tienda/admin)',
+  })
+  clearMyOrders(@CurrentUser() user: User) {
+    return this.ordersService.clearHistoryForUser(user.id);
   }
 
   @Roles(Role.SELLER, Role.ADMIN)
@@ -73,8 +86,11 @@ export class OrdersController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Obtener pedido por ID' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.ordersService.findById(id);
+  findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: User,
+  ) {
+    return this.ordersService.findById(id, user);
   }
 
   @Roles(Role.SELLER, Role.ADMIN)
@@ -86,5 +102,16 @@ export class OrdersController {
     @CurrentUser() user: User,
   ) {
     return this.ordersService.updateStatus(id, dto, user);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Eliminar pedido',
+    description:
+      'Borrado definitivo. Admin: cualquier pedido. Vendedor: pedidos de su tienda. Comprador: solo sus pedidos.',
+  })
+  remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: User) {
+    return this.ordersService.remove(id, user);
   }
 }

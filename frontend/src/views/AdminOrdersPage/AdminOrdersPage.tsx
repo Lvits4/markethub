@@ -6,6 +6,7 @@ import {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
+import toast from 'react-hot-toast';
 import {
   FiChevronDown,
   FiChevronLeft,
@@ -18,6 +19,7 @@ import {
   FiSearch,
   FiShoppingBag,
   FiShoppingCart,
+  FiTrash2,
   FiUser,
   FiX,
 } from 'react-icons/fi';
@@ -39,15 +41,14 @@ import {
   orderStatusTone,
 } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
-import {
-  renderTableCellString,
-  TableEmptyCell,
-} from '../../components/TableEmptyCell/TableEmptyCell';
+import { TableEmptyCell } from '../../components/TableEmptyCell/TableEmptyCell';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminEditOrderForm } from '../../components/AdminEditOrderForm/AdminEditOrderForm';
 import { formatOrderStatus } from '../../helpers/orderStatus';
 import { formatPrice } from '../../helpers/formatPrice';
+import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAuth } from '../../hooks/useAuth';
+import { useDeleteOrderMutation } from '../../hooks/useDeleteOrderMutation';
 import { useAdminOrdersQuery } from '../../queries/useAdminOrdersQuery';
 import { useOrderDetailQuery } from '../../queries/useOrderDetailQuery';
 import { useStoreOrdersSellerQuery } from '../../queries/useStoreOrdersSellerQuery';
@@ -59,20 +60,12 @@ function numAmount(v: string | number) {
   return Number.isFinite(n) ? n : 0;
 }
 
-type SortKey = 'date' | 'client' | 'store' | 'total' | 'status';
+type SortKey = 'client' | 'store' | 'total' | 'status';
 type SortDir = 'asc' | 'desc';
 
 const DEFAULT_PAGE_SIZE = 10;
-const NUM_COLS = 6;
-/** Anchos: Total queda en el hueco entre Tienda y Estado, con contenido centrado. */
-const ORDER_TABLE_COL_WIDTHS = [
-  '11%',
-  '21%',
-  '26%',
-  '14%',
-  '18%',
-  '10%',
-] as const;
+const NUM_COLS = 5;
+const ORDER_TABLE_COL_WIDTHS = ['20%', '20%', '20%', '20%', '20%'] as const;
 
 function orderToAdminRow(
   o: Order & { createdAt?: string; updatedAt?: string },
@@ -132,9 +125,6 @@ function compareOrders(
 ): number {
   let cmp = 0;
   switch (key) {
-    case 'date':
-      cmp = (a.createdAt ?? '').localeCompare(b.createdAt ?? '');
-      break;
     case 'client':
       cmp = clientSortValue(a).localeCompare(clientSortValue(b), 'es');
       break;
@@ -171,17 +161,6 @@ function matchesSearch(o: AdminOrderRow, q: string): boolean {
   return chunks.some((c) => (c ?? '').toLowerCase().includes(n));
 }
 
-function formatDate(iso?: string) {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '—';
-  return d.toLocaleDateString('es', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-}
-
 function OrderDetailsPanel({ order }: { order: Order }) {
   const [detailTab, setDetailTab] = useState<'envio' | 'lineas'>('envio');
   const items = order.items ?? [];
@@ -190,14 +169,12 @@ function OrderDetailsPanel({ order }: { order: Order }) {
     ? `${order.user.firstName ?? ''} ${order.user.lastName ?? ''}`.trim() ||
       order.user.email
     : order.userId;
-  const createdAt = (order as { createdAt?: string }).createdAt;
 
   return (
     <AdminDetailPanelRoot>
       <AdminDetailPanelTop>
         <AdminDetailTitleRow
           title="Pedido"
-          subtitle={order.id}
           badges={
             <>
               <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
@@ -225,11 +202,6 @@ function OrderDetailsPanel({ order }: { order: Order }) {
             label="Cliente"
             value={clientLabel.length > 18 ? `${clientLabel.slice(0, 16)}…` : clientLabel}
             hint="comprador"
-          />
-          <AdminDetailStatTile
-            label="Fecha"
-            value={formatDate(createdAt)}
-            hint="alta"
           />
         </AdminDetailStatsGrid>
 
@@ -334,12 +306,16 @@ function OrderDetailsDrawer({
   isLoading,
   isError,
   order,
+  onDeleteOrder,
+  deletePending,
 }: {
   open: boolean;
   onClose: () => void;
   isLoading: boolean;
   isError: boolean;
   order?: Order;
+  onDeleteOrder?: (orderId: string) => void;
+  deletePending?: boolean;
 }) {
   useEffect(() => {
     if (!open) return;
@@ -409,6 +385,20 @@ function OrderDetailsDrawer({
             </p>
           )}
         </div>
+        {order && onDeleteOrder ? (
+          <div className="shrink-0 border-t border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-[#0d1938]">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full justify-center border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/30 sm:w-auto"
+              disabled={deletePending}
+              onClick={() => onDeleteOrder(order.id)}
+            >
+              <FiTrash2 className="mr-2 h-4 w-4" aria-hidden />
+              {deletePending ? 'Eliminando…' : 'Eliminar pedido'}
+            </Button>
+          </div>
+        ) : null}
       </aside>
     </div>,
     document.body,
@@ -477,16 +467,42 @@ export function AdminOrdersPage() {
   const isLoading = isSeller ? sellerOrdersQ.isLoading : adminOrdersQ.isLoading;
   const isError = isSeller ? sellerOrdersQ.isError : adminOrdersQ.isError;
   const [search, setSearch] = useState('');
-  const [sortKey, setSortKey] = useState<SortKey>('date');
+  const [sortKey, setSortKey] = useState<SortKey>('total');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [viewOrderId, setViewOrderId] = useState<string | null>(null);
   const [mode, setMode] = useState<'view' | 'edit'>('view');
+  const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
 
   const orderDetailQuery = useOrderDetailQuery(
     viewOrderId ?? undefined,
   );
+  const deleteOrderMut = useDeleteOrderMutation();
+
+  const openDeleteOrderModal = (orderId: string) => {
+    setOrderToDelete(orderId);
+  };
+
+  const closeDeleteOrderModal = () => {
+    if (!deleteOrderMut.isPending) setOrderToDelete(null);
+  };
+
+  const handleConfirmDeleteOrder = () => {
+    if (!orderToDelete) return;
+    const id = orderToDelete;
+    deleteOrderMut.mutate(id, {
+      onSuccess: () => {
+        toast.success('Pedido eliminado');
+        setOrderToDelete(null);
+        if (viewOrderId === id) {
+          setViewOrderId(null);
+          setMode('view');
+        }
+      },
+      onError: (e) => toast.error(getErrorMessage(e)),
+    });
+  };
 
   const tableHeaderScrollRef = useRef<HTMLDivElement>(null);
   const tableBodyScrollRef = useRef<HTMLDivElement>(null);
@@ -516,6 +532,22 @@ export function AdminOrdersPage() {
     }
     return raw as AdminOrderRow[];
   }, [data, isSeller]);
+
+  const orderPendingDeleteLabel = useMemo(() => {
+    if (!orderToDelete) return '';
+    const row = orders.find((o) => o.id === orderToDelete);
+    if (row?.user) {
+      const name = `${row.user.firstName ?? ''} ${row.user.lastName ?? ''}`.trim();
+      return name || row.user.email || orderToDelete.slice(0, 8);
+    }
+    const detail = orderDetailQuery.data;
+    if (detail?.id === orderToDelete && detail.user) {
+      const u = detail.user;
+      const name = `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim();
+      return name || u.email || orderToDelete.slice(0, 8);
+    }
+    return orderToDelete.slice(0, 8);
+  }, [orderToDelete, orders, orderDetailQuery.data]);
 
   const filteredSorted = useMemo(() => {
     const q = search.trim();
@@ -603,13 +635,6 @@ export function AdminOrdersPage() {
                   <thead className="bg-slate-100/92 backdrop-blur-md dark:bg-[#0f1a38]/95 dark:backdrop-blur-md">
                     <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
                       <SortHeader
-                        label="Fecha"
-                        sortKey="date"
-                        activeKey={sortKey}
-                        dir={sortDir}
-                        onSort={handleSort}
-                      />
-                      <SortHeader
                         label="Cliente"
                         sortKey="client"
                         activeKey={sortKey}
@@ -671,14 +696,6 @@ export function AdminOrdersPage() {
                           className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
                         >
                           <td className="px-4 py-2 align-middle">
-                            <p className="leading-tight text-slate-700 dark:text-slate-300">
-                              {renderTableCellString(formatDate(o.createdAt))}
-                            </p>
-                            <p className="mt-0.5 font-mono text-[11px] leading-tight text-slate-400 dark:text-slate-500">
-                              {o.id.slice(0, 8)}…
-                            </p>
-                          </td>
-                          <td className="px-4 py-2 align-middle">
                             {o.user ? (
                               <>
                                 <p className="leading-tight text-slate-700 dark:text-slate-300">
@@ -729,6 +746,16 @@ export function AdminOrdersPage() {
                                 }}
                               >
                                 <FiEdit2 className="h-4 w-4" aria-hidden />
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="icon"
+                                className="!text-red-600 hover:bg-red-500/10 dark:!text-red-400 dark:hover:bg-red-500/15"
+                                aria-label={`Eliminar pedido ${o.id.slice(0, 8)}`}
+                                disabled={deleteOrderMut.isPending}
+                                onClick={() => openDeleteOrderModal(o.id)}
+                              >
+                                <FiTrash2 className="h-4 w-4" aria-hidden />
                               </Button>
                             </div>
                           </td>
@@ -848,7 +875,45 @@ export function AdminOrdersPage() {
             isLoading={orderDetailQuery.isLoading}
             isError={orderDetailQuery.isError}
             order={orderDetailQuery.data}
+            onDeleteOrder={openDeleteOrderModal}
+            deletePending={deleteOrderMut.isPending}
           />
+
+          <Modal
+            open={orderToDelete != null}
+            onClose={closeDeleteOrderModal}
+            title="Confirmar eliminación"
+          >
+            <div className="space-y-4 px-5 py-4">
+              <p className="text-sm text-zinc-700 dark:text-zinc-200">
+                ¿Seguro que quieres eliminar el pedido de{' '}
+                <span className="font-semibold">{orderPendingDeleteLabel}</span>?
+              </p>
+              <p className="text-xs text-red-600 dark:text-red-400">
+                Esta acción es permanente y no se puede deshacer.
+              </p>
+            </div>
+            <div className="flex justify-end gap-2 border-t border-zinc-100 bg-zinc-50/90 px-5 py-4 dark:border-night-800 dark:bg-night-950/90">
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-10 w-40 justify-center border border-zinc-300 bg-white px-4 text-sm text-zinc-800 hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700"
+                onClick={closeDeleteOrderModal}
+                disabled={deleteOrderMut.isPending}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                className="h-10 w-40 justify-center border-0 bg-rose-700/90 px-4 text-sm text-white hover:bg-rose-800 dark:bg-rose-700/90 dark:hover:bg-rose-800"
+                onClick={handleConfirmDeleteOrder}
+                disabled={deleteOrderMut.isPending}
+              >
+                {deleteOrderMut.isPending ? 'Eliminando…' : 'Eliminar pedido'}
+              </Button>
+            </div>
+          </Modal>
         </div>
       )}
     </div>

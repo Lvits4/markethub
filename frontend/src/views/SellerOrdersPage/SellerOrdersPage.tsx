@@ -1,4 +1,5 @@
 import toast from 'react-hot-toast';
+import { FiTrash2 } from 'react-icons/fi';
 import { formatPrice } from '../../helpers/formatPrice';
 import {
   isOrderStatusValue,
@@ -8,6 +9,7 @@ import {
 import { FormSelect } from '../../components/CreateProductForm/FormSelect';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAdminOrderStatus } from '../../hooks/useAdminOrderStatus';
+import { useDeleteOrderMutation } from '../../hooks/useDeleteOrderMutation';
 import { useStoreOrdersSellerQuery } from '../../queries/useStoreOrdersSellerQuery';
 
 function numAmount(v: string | number) {
@@ -23,6 +25,7 @@ const ORDER_STATUS_OPTIONS = ORDER_STATUS_VALUES.map((st) => ({
 export function SellerOrdersPage() {
   const { data, isLoading, isError } = useStoreOrdersSellerQuery();
   const updateStatus = useAdminOrderStatus();
+  const deleteOrder = useDeleteOrderMutation();
 
   const onStatusChange = (orderId: string, status: string) => {
     if (!isOrderStatusValue(status)) return;
@@ -33,6 +36,20 @@ export function SellerOrdersPage() {
         onError: (e) => toast.error(getErrorMessage(e)),
       },
     );
+  };
+
+  const onDeleteOrder = (orderId: string) => {
+    if (
+      !window.confirm(
+        '¿Eliminar este pedido de forma permanente? No podrás recuperarlo.',
+      )
+    ) {
+      return;
+    }
+    deleteOrder.mutate(orderId, {
+      onSuccess: () => toast.success('Pedido eliminado'),
+      onError: (e) => toast.error(getErrorMessage(e)),
+    });
   };
 
   const itemsSummary = (
@@ -120,6 +137,17 @@ export function SellerOrdersPage() {
               <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
                 {itemsSummary(o.items)}
               </p>
+              <div className="mt-4 flex justify-end border-t border-zinc-100 pt-4 dark:border-night-800">
+                <button
+                  type="button"
+                  onClick={() => onDeleteOrder(o.id)}
+                  disabled={deleteOrder.isPending}
+                  className="inline-flex items-center gap-2 rounded-md border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 shadow-sm transition hover:bg-red-50 disabled:opacity-60 dark:border-red-900/50 dark:bg-night-900 dark:text-red-400 dark:hover:bg-red-950/40"
+                >
+                  <FiTrash2 className="h-4 w-4" aria-hidden />
+                  Eliminar pedido
+                </button>
+              </div>
             </div>
           ))}
         </div>

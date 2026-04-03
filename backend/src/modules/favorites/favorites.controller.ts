@@ -42,7 +42,10 @@ export class FavoritesController {
   }
 
   @Delete(':productId')
-  @ApiOperation({ summary: 'Quitar producto de favoritos' })
+  @ApiOperation({
+    summary: 'Quitar producto de favoritos',
+    description: 'Borrado definitivo del registro en base de datos.',
+  })
   remove(
     @CurrentUser() user: User,
     @Param('productId', ParseUUIDPipe) productId: string,

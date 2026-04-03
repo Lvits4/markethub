@@ -1,6 +1,14 @@
-import { useDeferredValue, useMemo, useState } from 'react';
+import {
+  useDeferredValue,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Link } from 'react-router-dom';
-import { FiShoppingBag } from 'react-icons/fi';
+import { Button } from '../../components/Button/Button';
+import { FormSelect } from '../../components/CreateProductForm/FormSelect';
 import { SearchInput } from '../../components/SearchInput/SearchInput';
 import { routePaths } from '../../config/routes';
 import { publicStorageImageSrc } from '../../helpers/storagePublicUrl';
@@ -8,6 +16,13 @@ import { usePublicStoresQuery } from '../../queries/usePublicStoresQuery';
 import type { Store } from '../../types/store';
 
 type SortMode = 'name_asc' | 'name_desc';
+
+const SORT_OPTIONS: { value: SortMode; label: string }[] = [
+  { value: 'name_asc', label: 'A → Z' },
+  { value: 'name_desc', label: 'Z → A' },
+];
+
+const DEFAULT_SORT: SortMode = 'name_asc';
 
 function matchesSearch(store: Store, q: string): boolean {
   if (!q) return true;
@@ -19,13 +34,84 @@ function matchesSearch(store: Store, q: string): boolean {
   );
 }
 
+/** Contenedor fijo + `object-cover` (como productos); formato 16:9 para que no ocupen tanto alto como un cuadrado. */
+function StoreCardMedia({ store }: { store: Store }) {
+  const { banner, logo, name } = store;
+  const candidates = useMemo(() => {
+    const b = banner?.trim();
+    const l = logo?.trim();
+    const list: string[] = [];
+    if (b) list.push(b);
+    if (l && l !== b) list.push(l);
+    return list;
+  }, [banner, logo]);
+
+  const [srcIndex, setSrcIndex] = useState(0);
+
+  useEffect(() => {
+    setSrcIndex(0);
+  }, [banner, logo]);
+
+  const src = srcIndex < candidates.length ? candidates[srcIndex] : null;
+
+  return (
+    <div className="relative aspect-video w-full overflow-hidden bg-zinc-100 dark:bg-night-800">
+      {src ? (
+        <img
+          key={`${store.id}-${srcIndex}`}
+          src={publicStorageImageSrc(src)}
+          alt={name}
+          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+          loading="lazy"
+          onError={() => setSrcIndex((i) => i + 1)}
+        />
+      ) : (
+        <div className="flex h-full w-full items-center justify-center text-sm text-zinc-400">
+          Sin imagen
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function StoresListPage() {
   const [search, setSearch] = useState('');
   const deferredSearch = useDeferredValue(search);
-  const [sort, setSort] = useState<SortMode>('name_asc');
+  const [sort, setSort] = useState<SortMode>(DEFAULT_SORT);
   const [onlyWithLogo, setOnlyWithLogo] = useState(false);
+  const [draftSort, setDraftSort] = useState<SortMode>(DEFAULT_SORT);
+  const [draftOnlyWithLogo, setDraftOnlyWithLogo] = useState(false);
+  const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
+  const filterPopoverRef = useRef<HTMLDivElement>(null);
+  const storesSortFieldId = useId();
 
   const { data: rawStores, isLoading, isError } = usePublicStoresQuery();
+
+  useEffect(() => {
+    if (!filterPopoverOpen) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const t = e.target;
+      if (
+        t instanceof Element &&
+        t.closest('[data-markethub-select-list]')
+      ) {
+        return;
+      }
+      const el = filterPopoverRef.current;
+      if (el && !el.contains(t as Node)) {
+        setFilterPopoverOpen(false);
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setFilterPopoverOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [filterPopoverOpen]);
 
   const filtered = useMemo(() => {
     let list = Array.isArray(rawStores) ? [...rawStores] : [];
@@ -40,6 +126,19 @@ export function StoresListPage() {
     return list;
   }, [rawStores, deferredSearch, onlyWithLogo, sort]);
 
+  const handleClearFilters = () => {
+    setSort(DEFAULT_SORT);
+    setOnlyWithLogo(false);
+    setDraftSort(DEFAULT_SORT);
+    setDraftOnlyWithLogo(false);
+  };
+
+  const handleApplyFilters = () => {
+    setSort(draftSort);
+    setOnlyWithLogo(draftOnlyWithLogo);
+    setFilterPopoverOpen(false);
+  };
+
   return (
     <div className="mx-auto max-w-6xl px-4 pt-6 sm:pt-8">
       <header className="mb-6 sm:mb-8">
@@ -51,35 +150,96 @@ export function StoresListPage() {
         </p>
       </header>
 
-      <SearchInput value={search} onChange={setSearch} className="mb-4" />
-
-      <details className="mb-6 rounded-md border border-zinc-200 bg-white/80 px-4 py-3 dark:border-night-700 dark:bg-night-900/50">
-        <summary className="cursor-pointer text-sm font-semibold text-zinc-800 dark:text-zinc-100">
-          Filtros
-        </summary>
-        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end">
-          <label className="flex min-w-[10rem] flex-col gap-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400">
-            Ordenar por nombre
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortMode)}
-              className="rounded-md border border-zinc-200 bg-zinc-50/80 px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100 dark:focus:border-[var(--color-market-dark-accent)]"
+      <div className="relative mb-5 flex min-h-[52px] items-stretch gap-2">
+        <SearchInput
+          value={search}
+          onChange={setSearch}
+          placeholder="Buscar tiendas…"
+          className="min-h-[52px] min-w-0 flex-1"
+        />
+        <div
+          className="relative flex shrink-0 self-stretch"
+          ref={filterPopoverRef}
+        >
+          <Button
+            type="button"
+            variant="outline"
+            className="h-full min-h-[52px] min-w-[5.5rem] shrink-0 px-4 py-0"
+            aria-expanded={filterPopoverOpen}
+            aria-controls="stores-filter-popover"
+            aria-haspopup="dialog"
+            onClick={() => {
+              setFilterPopoverOpen((open) => {
+                if (!open) {
+                  setDraftSort(sort);
+                  setDraftOnlyWithLogo(onlyWithLogo);
+                }
+                return !open;
+              });
+            }}
+          >
+            Filtrar
+          </Button>
+          {filterPopoverOpen ? (
+            <div
+              id="stores-filter-popover"
+              role="dialog"
+              aria-label="Filtros y orden"
+              className="catalog-filter-popover absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[min(calc(100vw-2rem),20rem)] rounded-xl border border-zinc-200/90 bg-white p-4 shadow-[0_16px_48px_-12px_rgb(0_0_0/0.18)] ring-1 ring-zinc-200/70 dark:border-night-600 dark:bg-night-900 dark:shadow-[0_20px_56px_-12px_rgb(0_0_0/0.55)] dark:ring-night-700/80"
             >
-              <option value="name_asc">A → Z</option>
-              <option value="name_desc">Z → A</option>
-            </select>
-          </label>
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
-            <input
-              type="checkbox"
-              checked={onlyWithLogo}
-              onChange={(e) => setOnlyWithLogo(e.target.checked)}
-              className="h-4 w-4 rounded border-zinc-300 text-[var(--color-forest)] focus:ring-[var(--color-forest)] dark:border-night-600 dark:bg-night-800"
-            />
-            Solo tiendas con logo
-          </label>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
+                    htmlFor={storesSortFieldId}
+                  >
+                    Orden
+                  </label>
+                  <FormSelect
+                    id={storesSortFieldId}
+                    value={draftSort}
+                    onChange={(v) => setDraftSort(v as SortMode)}
+                    options={SORT_OPTIONS.map((o) => ({
+                      value: o.value,
+                      label: o.label,
+                    }))}
+                    variant="field"
+                    triggerClassName="!mt-0 rounded-lg border-zinc-200 bg-zinc-50 py-2.5 dark:border-night-600 dark:bg-night-800/80"
+                    listClassName="rounded-xl border-zinc-200/90 dark:border-sky-500/25"
+                  />
+                </div>
+                <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+                  <input
+                    type="checkbox"
+                    checked={draftOnlyWithLogo}
+                    onChange={(e) => setDraftOnlyWithLogo(e.target.checked)}
+                    className="h-4 w-4 rounded border-zinc-300 text-[var(--color-forest)] focus:ring-[var(--color-forest)] dark:border-night-600 dark:bg-night-800"
+                  />
+                  Solo tiendas con logo
+                </label>
+                <div className="mt-1 flex gap-2 border-t border-zinc-200/80 pt-4 dark:border-night-700">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="flex-1 justify-center py-2.5 text-sm"
+                    onClick={handleClearFilters}
+                  >
+                    Limpiar
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="primary"
+                    className="flex-1 justify-center py-2.5 text-sm"
+                    onClick={handleApplyFilters}
+                  >
+                    Aplicar
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
-      </details>
+      </div>
 
       {isLoading ? (
         <p className="py-16 text-center text-sm text-zinc-500">Cargando…</p>
@@ -97,29 +257,9 @@ export function StoresListPage() {
             <li key={store.id}>
               <Link
                 to={routePaths.storeDetail(store.id)}
-                className="flex h-full flex-col overflow-hidden rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/60 transition hover:shadow-md dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800"
+                className="group flex h-full flex-col overflow-hidden rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/60 transition hover:shadow-md dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800"
               >
-                <div className="relative aspect-[16/9] w-full bg-zinc-100 dark:bg-night-800">
-                  {store.banner ? (
-                    <img
-                      src={publicStorageImageSrc(store.banner)}
-                      alt=""
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                    />
-                  ) : store.logo ? (
-                    <img
-                      src={publicStorageImageSrc(store.logo)}
-                      alt=""
-                      className="h-full w-full object-contain p-6"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-zinc-400">
-                      <FiShoppingBag className="h-14 w-14" aria-hidden />
-                    </div>
-                  )}
-                </div>
+                <StoreCardMedia store={store} />
                 <div className="flex flex-1 flex-col gap-2 p-4">
                   <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">
                     {store.name}

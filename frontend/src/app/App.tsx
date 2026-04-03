@@ -11,12 +11,12 @@ import { AdminRoute } from '../components/AdminRoute/AdminRoute';
 import { ProtectedRoute } from '../components/ProtectedRoute/ProtectedRoute';
 import { SellerRoute } from '../components/SellerRoute/SellerRoute';
 import { AdminLayout } from '../layouts/AdminLayout/AdminLayout';
+import { SellerCreateStoreModalProvider } from '../context/SellerCreateStoreModalProvider/SellerCreateStoreModalProvider';
 import { AdminCategoriesPage } from '../views/AdminCategoriesPage/AdminCategoriesPage';
 import { AdminDashboardPage } from '../views/AdminDashboardPage/AdminDashboardPage';
 import { AdminModerationPage } from '../views/AdminModerationPage/AdminModerationPage';
 import { AdminOrdersPage } from '../views/AdminOrdersPage/AdminOrdersPage';
 import { AdminProductsPage } from '../views/AdminProductsPage/AdminProductsPage';
-import { AdminSalesPage } from '../views/AdminSalesPage/AdminSalesPage';
 import { AdminStoresPage } from '../views/AdminStoresPage/AdminStoresPage';
 import { AdminUsersPage } from '../views/AdminUsersPage/AdminUsersPage';
 import { SellerLayout } from '../layouts/SellerLayout/SellerLayout';
@@ -85,7 +85,9 @@ export default function App() {
                 element={
                   <ProtectedRoute>
                     <AdminRoute>
-                      <AdminLayout />
+                      <SellerCreateStoreModalProvider>
+                        <AdminLayout />
+                      </SellerCreateStoreModalProvider>
                     </AdminRoute>
                   </ProtectedRoute>
                 }
@@ -110,7 +112,6 @@ export default function App() {
                 <Route path="stores" element={<AdminStoresPage />} />
                 <Route path="products" element={<AdminProductsPage />} />
                 <Route path="orders" element={<AdminOrdersPage />} />
-                <Route path="sales" element={<AdminSalesPage />} />
                 <Route
                   path="categories"
                   element={

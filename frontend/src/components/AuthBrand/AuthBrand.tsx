@@ -21,10 +21,10 @@ export function AuthBrand({
       } ${className}`.trim()}
     >
       <span
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-lg font-bold shadow-md ring-2 ${
+        className={`box-border flex aspect-square h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-[9999px] border-2 text-lg font-bold shadow-md ${
           onDark
-            ? 'bg-white/15 text-white shadow-black/20 ring-white/25'
-            : 'bg-auth-primary text-white shadow-auth-primary/40 ring-white/25 dark:ring-white/15'
+            ? 'border-white/30 bg-white/15 text-white shadow-black/25'
+            : 'border-white/35 bg-auth-primary text-white shadow-auth-primary/35 dark:border-white/25'
         }`}
       >
         M

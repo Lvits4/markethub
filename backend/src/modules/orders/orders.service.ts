@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, IsNull, Repository } from 'typeorm';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { CreateOrderDto, UpdateOrderStatusDto } from './dto';
@@ -76,10 +76,18 @@ export class OrdersService {
 
   async findByUserId(userId: string): Promise<Order[]> {
     return this.ordersRepository.find({
-      where: { userId },
+      where: { userId, buyerHiddenAt: IsNull() },
       relations: ['items', 'items.product', 'store'],
       order: { createdAt: 'DESC' },
     });
+  }
+
+  /** Oculta todos los pedidos del comprador en su historial (no borra datos de tienda ni informes). */
+  async clearHistoryForUser(userId: string): Promise<void> {
+    await this.ordersRepository.update(
+      { userId, buyerHiddenAt: IsNull() },
+      { buyerHiddenAt: new Date() },
+    );
   }
 
   async findByStoreId(storeId: string): Promise<Order[]> {
@@ -109,7 +117,7 @@ export class OrdersService {
     });
   }
 
-  async findById(id: string): Promise<Order> {
+  async findById(id: string, viewer: User): Promise<Order> {
     const order = await this.ordersRepository.findOne({
       where: { id },
       relations: ['items', 'items.product', 'store', 'user'],
@@ -117,6 +125,27 @@ export class OrdersService {
     if (!order) {
       throw new NotFoundException('Pedido no encontrado');
     }
+
+    if (viewer.role === Role.ADMIN) {
+      return order;
+    }
+
+    if (viewer.role === Role.SELLER) {
+      const ownerId = order.store?.userId;
+      if (ownerId && ownerId === viewer.id) {
+        return order;
+      }
+      throw new ForbiddenException('No tienes permiso para ver este pedido');
+    }
+
+    if (order.userId !== viewer.id) {
+      throw new ForbiddenException('No tienes permiso para ver este pedido');
+    }
+
+    if (order.buyerHiddenAt) {
+      throw new NotFoundException('Pedido no encontrado');
+    }
+
     return order;
   }
 
@@ -125,7 +154,7 @@ export class OrdersService {
     dto: UpdateOrderStatusDto,
     user: User,
   ): Promise<Order> {
-    const order = await this.findById(id);
+    const order = await this.findById(id, user);
 
     if (user.role === Role.SELLER) {
       const store = order.store;
@@ -138,6 +167,38 @@ export class OrdersService {
 
     order.status = dto.status;
     return this.ordersRepository.save(order);
+  }
+
+  /**
+   * Borrado definitivo del pedido y sus líneas.
+   * ADMIN: cualquier pedido. SELLER: solo pedidos de sus tiendas. CUSTOMER: solo los propios.
+   */
+  async remove(id: string, user: User): Promise<void> {
+    const order = await this.ordersRepository.findOne({
+      where: { id },
+      relations: ['store'],
+    });
+    if (!order) {
+      throw new NotFoundException('Pedido no encontrado');
+    }
+
+    if (user.role === Role.ADMIN) {
+      // permitido
+    } else if (user.role === Role.SELLER) {
+      const ownerId = order.store?.userId;
+      if (!ownerId || ownerId !== user.id) {
+        throw new ForbiddenException('No tienes permiso para eliminar este pedido');
+      }
+    } else if (user.role === Role.CUSTOMER) {
+      if (order.userId !== user.id) {
+        throw new ForbiddenException('No tienes permiso para eliminar este pedido');
+      }
+    } else {
+      throw new ForbiddenException('No tienes permiso para eliminar este pedido');
+    }
+
+    await this.paymentsService.deleteByOrderId(id);
+    await this.ordersRepository.delete(id);
   }
 
   async getSellerReport(storeId: string) {

@@ -6,6 +6,7 @@ import {
 } from '../requests/cartRequests';
 import { useAuth } from './useAuth';
 import { queryKeys } from '../helpers/queryKeys';
+import type { Cart } from '../types/cart';
 import type { AddToCartPayload } from '../validations/addToCartSchema';
 import type { UpdateCartItemPayload } from '../validations/updateCartItemSchema';
 
@@ -13,15 +14,15 @@ export function useCartMutations() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
 
-  const invalidate = () => {
-    void queryClient.invalidateQueries({ queryKey: queryKeys.cart });
+  const syncCartCache = (cart: Cart) => {
+    queryClient.setQueryData(queryKeys.cart, cart);
     void queryClient.invalidateQueries({ queryKey: queryKeys.cartSummary });
   };
 
   const addItem = useMutation({
     mutationFn: (body: AddToCartPayload) =>
       addCartItem({ token }, body),
-    onSuccess: invalidate,
+    onSuccess: syncCartCache,
   });
 
   const updateItem = useMutation({
@@ -32,12 +33,12 @@ export function useCartMutations() {
       itemId: string;
       body: UpdateCartItemPayload;
     }) => updateCartItem({ token }, itemId, body),
-    onSuccess: invalidate,
+    onSuccess: syncCartCache,
   });
 
   const removeItem = useMutation({
     mutationFn: (itemId: string) => removeCartItem({ token }, itemId),
-    onSuccess: invalidate,
+    onSuccess: syncCartCache,
   });
 
   return { addItem, updateItem, removeItem };

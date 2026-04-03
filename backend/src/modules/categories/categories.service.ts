@@ -91,7 +91,7 @@ export class CategoriesService {
       .set({ categoryId: null })
       .where('category_id = :id', { id })
       .execute();
-    await this.categoriesRepository.remove(category);
+    await this.categoriesRepository.delete({ id });
   }
 
   private generateSlug(name: string): string {

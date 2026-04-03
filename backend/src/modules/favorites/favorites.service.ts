@@ -33,7 +33,7 @@ export class FavoritesService {
     if (!favorite) {
       throw new NotFoundException('El producto no está en favoritos');
     }
-    await this.favoritesRepository.remove(favorite);
+    await this.favoritesRepository.delete({ id: favorite.id });
   }
 
   async findByUser(userId: string): Promise<Favorite[]> {

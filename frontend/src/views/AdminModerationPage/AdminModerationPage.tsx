@@ -164,13 +164,6 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
     ? `${store.user.firstName} ${store.user.lastName}`.trim()
     : '';
   const st = getAdminStorePanelStats(store);
-  const createdLabel = store.createdAt
-    ? new Date(store.createdAt).toLocaleDateString('es', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      })
-    : '—';
   const descText = store.description?.trim() || 'Sin descripción';
   const shipText = store.shippingPolicy?.trim() || 'No definida';
   const retText = store.returnPolicy?.trim() || 'No definida';
@@ -209,7 +202,6 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
             value={formatPrice(st.revenue)}
             hint="excl. cancelados"
           />
-          <AdminDetailStatTile label="Alta" value={createdLabel} hint="registro" />
         </AdminDetailStatsGrid>
 
         <AdminDetailHeroSplit

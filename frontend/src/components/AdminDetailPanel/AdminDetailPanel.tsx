@@ -65,7 +65,7 @@ export function AdminDetailStatTile({
   hint?: string;
 }) {
   return (
-    <div className="rounded-md border border-slate-200/80 bg-white px-2 py-1.5 shadow-sm dark:border-sky-500/20 dark:bg-[#0f1a38]">
+    <div className="box-border w-full min-w-0 max-w-[11rem] shrink-0 basis-[9.25rem] grow-0 rounded-md border border-slate-200/80 bg-white px-2 py-1.5 shadow-sm sm:basis-[9.75rem] dark:border-sky-500/20 dark:bg-[#0f1a38]">
       <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
         {label}
       </p>
@@ -83,7 +83,7 @@ export function AdminDetailStatTile({
 
 export function AdminDetailStatsGrid({ children }: { children: ReactNode }) {
   return (
-    <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">{children}</div>
+    <div className="flex flex-wrap justify-center gap-1.5">{children}</div>
   );
 }
 

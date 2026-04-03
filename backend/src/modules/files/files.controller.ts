@@ -98,7 +98,10 @@ export class FilesController {
   }
 
   @Delete()
-  @ApiOperation({ summary: 'Eliminar un archivo' })
+  @ApiOperation({
+    summary: 'Eliminar un archivo',
+    description: 'Eliminación definitiva del objeto en almacenamiento (no hay borrado lógico).',
+  })
   @ApiQuery({ name: 'path', required: true })
   async delete(@Query('path') filePath: string) {
     await this.filesService.delete(filePath);

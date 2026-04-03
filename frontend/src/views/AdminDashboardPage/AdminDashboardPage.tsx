@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { NavLink } from 'react-router-dom';
 import {
   Bar,
   BarChart,
@@ -9,9 +8,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { FiPlus } from 'react-icons/fi';
 import { FormSelect } from '../../components/CreateProductForm/FormSelect';
-import { routePaths } from '../../config/routes';
 import { formatPrice } from '../../helpers/formatPrice';
 import { useAuth } from '../../hooks/useAuth';
 import { useAdminDashboardQuery } from '../../queries/useAdminDashboardQuery';
@@ -25,55 +22,14 @@ const CHART_PERIOD_FORM_OPTIONS = [
   { value: '12', label: '12 meses' },
 ] as const;
 
-const KPI_VARIANTS = [
-  {
-    shell:
-      'border-blue-200/80 bg-linear-to-br from-blue-50/90 via-white/70 to-sky-100/50 shadow-[0_8px_30px_-10px_rgb(37_99_235_/_0.2)] dark:border-sky-500/25 dark:from-blue-950/55 dark:via-night-900/30 dark:to-sky-950/25 dark:shadow-[0_12px_40px_-12px_rgb(14_165_233_/_0.15)]',
-    glow: 'bg-sky-400/35 dark:bg-sky-400/25',
-    glowPos: '-right-10 -top-10 h-28 w-28',
-    label: 'text-blue-800/80 dark:text-sky-200/90',
-    value: 'text-blue-950 dark:text-sky-50',
-  },
-  {
-    shell:
-      'border-indigo-200/80 bg-linear-to-br from-indigo-50/90 via-white/70 to-blue-100/45 shadow-[0_8px_30px_-10px_rgb(79_70_229_/_0.18)] dark:border-indigo-400/30 dark:from-indigo-950/50 dark:via-night-900/35 dark:to-blue-950/30 dark:shadow-[0_12px_40px_-12px_rgb(99_102_241_/_0.2)]',
-    glow: 'bg-indigo-400/30 dark:bg-indigo-400/22',
-    glowPos: '-left-8 -bottom-10 h-32 w-32',
-    label: 'text-indigo-900/75 dark:text-indigo-200/85',
-    value: 'text-indigo-950 dark:text-indigo-50',
-  },
-  {
-    shell:
-      'border-sky-200/85 bg-linear-to-br from-sky-50/95 via-white/65 to-blue-50/55 shadow-[0_8px_30px_-10px_rgb(14_165_233_/_0.18)] dark:border-blue-400/28 dark:from-sky-950/45 dark:via-night-900/40 dark:to-blue-900/35 dark:shadow-[0_12px_40px_-12px_rgb(59_130_246_/_0.18)]',
-    glow: 'bg-blue-400/28 dark:bg-blue-400/20',
-    glowPos: 'right-4 -top-14 h-24 w-36',
-    label: 'text-sky-900/80 dark:text-blue-200/88',
-    value: 'text-sky-950 dark:text-blue-50',
-  },
-  {
-    shell:
-      'border-cyan-200/75 bg-linear-to-br from-cyan-50/85 via-white/72 to-blue-50/50 shadow-[0_8px_30px_-10px_rgb(6_182_212_/_0.16)] dark:border-cyan-500/22 dark:from-cyan-950/40 dark:via-night-900/38 dark:to-blue-950/28 dark:shadow-[0_12px_40px_-12px_rgb(34_211_238_/_0.12)]',
-    glow: 'bg-cyan-400/25 dark:bg-cyan-400/18',
-    glowPos: '-right-6 bottom-0 h-24 w-24',
-    label: 'text-cyan-900/78 dark:text-cyan-200/85',
-    value: 'text-cyan-950 dark:text-cyan-50',
-  },
-  {
-    shell:
-      'border-violet-200/80 bg-linear-to-br from-violet-50/90 via-white/70 to-fuchsia-50/45 shadow-[0_8px_30px_-10px_rgb(139_92_246_/_0.16)] dark:border-violet-400/28 dark:from-violet-950/45 dark:via-night-900/38 dark:to-fuchsia-950/25 dark:shadow-[0_12px_40px_-12px_rgb(167_139_250_/_0.15)]',
-    glow: 'bg-violet-400/28 dark:bg-violet-400/18',
-    glowPos: '-left-10 top-2 h-28 w-28',
-    label: 'text-violet-900/78 dark:text-violet-200/88',
-    value: 'text-violet-950 dark:text-violet-50',
-  },
-  {
-    shell:
-      'border-blue-200/75 bg-linear-to-br from-slate-50/90 via-blue-50/50 to-indigo-50/40 shadow-[0_8px_30px_-10px_rgb(30_58_138_/_0.14)] dark:border-slate-500/25 dark:from-slate-900/50 dark:via-night-900/35 dark:to-indigo-950/30 dark:shadow-[0_12px_40px_-12px_rgb(99_102_241_/_0.12)]',
-    glow: 'bg-indigo-300/22 dark:bg-indigo-500/15',
-    glowPos: 'right-0 -bottom-8 h-28 w-28',
-    label: 'text-slate-700 dark:text-slate-300',
-    value: 'text-slate-900 dark:text-slate-50',
-  },
+/** Acento discreto por tarjeta (misma base que el resto del admin). */
+const KPI_ACCENT_LEFT = [
+  'border-l-blue-500 dark:border-l-blue-400',
+  'border-l-indigo-500 dark:border-l-indigo-400',
+  'border-l-sky-500 dark:border-l-sky-400',
+  'border-l-cyan-500 dark:border-l-cyan-400',
+  'border-l-violet-500 dark:border-l-violet-400',
+  'border-l-zinc-400 dark:border-l-zinc-500',
 ] as const;
 
 function KpiCard({
@@ -85,31 +41,17 @@ function KpiCard({
   value: string | number;
   variant: 0 | 1 | 2 | 3 | 4 | 5;
 }) {
-  const v = KPI_VARIANTS[variant];
+  const accent = KPI_ACCENT_LEFT[variant];
   return (
     <div
-      className={`relative isolate h-full min-w-0 w-full overflow-hidden rounded-md border px-2 py-2.5 backdrop-blur-xl backdrop-saturate-150 sm:px-2.5 sm:py-3 ${v.shell}`}
+      className={`flex h-full min-h-[5.75rem] min-w-0 w-full flex-col justify-center rounded-md border border-[var(--admin-border)] border-l-4 bg-[var(--admin-card)] px-4 py-3.5 shadow-sm dark:shadow-none sm:min-h-[6.25rem] sm:px-4 sm:py-4 ${accent}`}
     >
-      <div
-        className={`pointer-events-none absolute rounded-md blur-2xl ${v.glowPos} ${v.glow}`}
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-0 bg-linear-to-t from-white/25 to-transparent dark:from-night-950/20 dark:to-transparent"
-        aria-hidden
-      />
-      <div className="relative">
-        <p
-          className={`line-clamp-2 min-h-[2.25rem] text-[9px] font-semibold uppercase leading-snug tracking-wide sm:text-[10px] ${v.label}`}
-        >
-          {label}
-        </p>
-        <p
-          className={`mt-0.5 text-base font-bold tabular-nums tracking-tight sm:mt-1 sm:text-lg lg:text-xl ${v.value}`}
-        >
-          {value}
-        </p>
-      </div>
+      <p className="line-clamp-2 text-xs font-medium leading-snug text-zinc-600 dark:text-zinc-400 sm:text-[13px]">
+        {label}
+      </p>
+      <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-50 sm:mt-2 sm:text-3xl">
+        {value}
+      </p>
     </div>
   );
 }
@@ -160,8 +102,6 @@ export function AdminDashboardPage() {
     }));
   }, [sales.data]);
 
-  const CHART_H = 168;
-
   if (isLoading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
@@ -179,7 +119,7 @@ export function AdminDashboardPage() {
   }
 
   return (
-    <div className="flex min-h-0 flex-col gap-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
       <header className="flex shrink-0 flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-2xl">
@@ -191,41 +131,41 @@ export function AdminDashboardPage() {
         </div>
       </header>
 
-      <div className="flex min-w-0 flex-nowrap items-stretch gap-2 overflow-x-auto pb-0.5 md:gap-2.5">
+      <div className="grid shrink-0 grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-3 xl:grid-cols-6">
         {isSeller ? (
           <>
-            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+            <div className="min-w-0">
               <KpiCard
                 variant={0}
                 label="Ingresos"
                 value={formatPrice(data.revenue.totalSales)}
               />
             </div>
-            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+            <div className="min-w-0">
               <KpiCard
                 variant={1}
                 label="Productos activos"
                 value={data.products.active}
               />
             </div>
-            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+            <div className="min-w-0">
               <KpiCard
                 variant={2}
                 label="Mis tiendas"
                 value={data.stores.total}
               />
             </div>
-            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+            <div className="min-w-0">
               <KpiCard
                 variant={3}
                 label="Aprobadas"
                 value={data.stores.approved}
               />
             </div>
-            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+            <div className="min-w-0">
               <KpiCard variant={4} label="Órdenes" value={data.orders.total} />
             </div>
-            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+            <div className="min-w-0">
               <KpiCard
                 variant={5}
                 label="Completadas"
@@ -235,49 +175,38 @@ export function AdminDashboardPage() {
           </>
         ) : (
           <>
-            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+            <div className="min-w-0">
               <KpiCard variant={0} label="Vendedores" value={data.users.sellers} />
             </div>
-            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+            <div className="min-w-0">
               <KpiCard variant={1} label="Clientes" value={data.users.customers} />
             </div>
-            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+            <div className="min-w-0">
               <KpiCard
                 variant={2}
                 label="Tiendas aprobadas"
                 value={data.stores.approved}
               />
             </div>
-            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+            <div className="min-w-0">
               <KpiCard
                 variant={3}
                 label="Tiendas rechazadas"
                 value={data.stores.rejected}
               />
             </div>
-            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+            <div className="min-w-0">
               <KpiCard variant={4} label="Órdenes" value={data.orders.total} />
             </div>
-            <div className="min-w-[4.25rem] shrink-0 grow basis-0 md:min-w-0 md:shrink">
+            <div className="min-w-0">
               <KpiCard variant={5} label="Productos" value={data.products.total} />
             </div>
           </>
         )}
-        <NavLink
-          to={routePaths.adminSales}
-          className="flex min-h-[76px] min-w-[4.25rem] shrink-0 grow basis-0 flex-col items-center justify-center gap-0.5 rounded-md border-2 border-dashed border-blue-300/80 bg-blue-50/30 px-1 py-1.5 text-center backdrop-blur-md transition-colors hover:border-[var(--admin-primary)] hover:bg-[var(--admin-primary-soft)] md:min-w-0 md:shrink dark:border-blue-500/35 dark:bg-blue-950/25 dark:hover:bg-blue-950/40"
-        >
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-blue-100/90 text-blue-600 shadow-sm dark:bg-blue-500/15 dark:text-blue-300">
-            <FiPlus className="h-3.5 w-3.5" aria-hidden />
-          </span>
-          <span className="line-clamp-2 text-[8px] font-semibold uppercase leading-tight tracking-wide text-blue-900/85 sm:text-[9px] dark:text-blue-200/90">
-            Informes
-          </span>
-        </NavLink>
       </div>
 
-      <div className="grid min-h-0 shrink-0 grid-cols-1 gap-3 lg:grid-cols-2">
-        <section className="flex min-h-0 flex-col rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 shadow-sm dark:shadow-none">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-none lg:flex-row lg:items-stretch">
+        <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">
           <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
             <div className="min-w-0">
               <h2
@@ -305,8 +234,7 @@ export function AdminDashboardPage() {
             />
           </div>
           <div
-            className="w-full min-w-0"
-            style={{ height: CHART_H }}
+            className="flex min-h-[200px] w-full min-w-0 flex-1 lg:h-[300px] lg:min-h-[300px] lg:flex-none"
             role="img"
             aria-label="Gráfico de ingresos y pedidos por mes"
           >
@@ -347,6 +275,7 @@ export function AdminDashboardPage() {
                     width={28}
                   />
                   <Tooltip
+                    cursor={false}
                     formatter={(value: number, name: string) =>
                       name === 'ingresos'
                         ? [formatPrice(value), 'Ingresos']
@@ -388,7 +317,7 @@ export function AdminDashboardPage() {
           </div>
         </section>
 
-        <section className="flex min-h-0 flex-col rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 shadow-sm dark:shadow-none">
+        <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">
           <div className="mb-2 min-w-0">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               Top tiendas por ingresos
@@ -398,8 +327,7 @@ export function AdminDashboardPage() {
             </p>
           </div>
           <div
-            className="w-full min-w-0"
-            style={{ height: CHART_H }}
+            className="flex min-h-[200px] w-full min-w-0 flex-1 lg:h-[300px] lg:min-h-[300px] lg:flex-none"
             role="img"
             aria-label="Gráfico horizontal de ingresos por tienda"
           >
@@ -434,6 +362,7 @@ export function AdminDashboardPage() {
                     tickLine={false}
                   />
                   <Tooltip
+                    cursor={false}
                     formatter={(value: number) => formatPrice(value)}
                     labelFormatter={(_, payload) => {
                       const row = payload?.[0]?.payload as

@@ -1,7 +1,11 @@
-import { Link, useParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { FiTrash2 } from 'react-icons/fi';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { routePaths } from '../../config/routes';
+import { getErrorMessage } from '../../helpers/mapApiError';
 import { formatPrice } from '../../helpers/formatPrice';
 import { formatOrderStatus } from '../../helpers/orderStatus';
+import { useDeleteOrderMutation } from '../../hooks/useDeleteOrderMutation';
 import { useOrderDetailQuery } from '../../queries/useOrderDetailQuery';
 import { usePaymentByOrderQuery } from '../../queries/usePaymentByOrderQuery';
 
@@ -12,8 +16,28 @@ function numAmount(v: string | number) {
 
 export function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { data: order, isLoading, isError } = useOrderDetailQuery(id);
   const { data: payment } = usePaymentByOrderQuery(id);
+  const deleteOrder = useDeleteOrderMutation();
+
+  const onDelete = () => {
+    if (!id) return;
+    if (
+      !window.confirm(
+        '¿Eliminar este pedido de forma permanente? No podrás recuperarlo.',
+      )
+    ) {
+      return;
+    }
+    deleteOrder.mutate(id, {
+      onSuccess: () => {
+        toast.success('Pedido eliminado');
+        void navigate(routePaths.orders);
+      },
+      onError: (e) => toast.error(getErrorMessage(e)),
+    });
+  };
 
   if (isLoading) {
     return (
@@ -48,10 +72,20 @@ export function OrderDetailPage() {
         </Link>
       </div>
 
-      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-        Pedido
-      </h1>
-      <p className="mt-1 font-mono text-xs text-zinc-400">{order.id}</p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+          Pedido
+        </h1>
+        <button
+          type="button"
+          onClick={onDelete}
+          disabled={deleteOrder.isPending}
+          className="inline-flex items-center justify-center gap-2 self-start rounded-md border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 shadow-sm transition hover:bg-red-50 disabled:opacity-60 dark:border-red-900/50 dark:bg-night-900 dark:text-red-400 dark:hover:bg-red-950/40"
+        >
+          <FiTrash2 className="h-4 w-4" aria-hidden />
+          {deleteOrder.isPending ? 'Eliminando…' : 'Eliminar pedido'}
+        </button>
+      </div>
 
       <div className="mt-6 rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
         <dl className="grid gap-3 text-sm sm:grid-cols-2">

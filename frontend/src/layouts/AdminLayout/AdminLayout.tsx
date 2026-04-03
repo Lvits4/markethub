@@ -19,7 +19,6 @@ import {
 } from 'react-icons/fi';
 import { AdminAccountSettingsDrawer } from '../../components/AdminAccountSettingsDrawer/AdminAccountSettingsDrawer';
 import { Button } from '../../components/Button/Button';
-import { SellerCreateStoreModalProvider } from '../../context/SellerCreateStoreModalProvider/SellerCreateStoreModalProvider';
 import { useTheme } from '../../hooks/useTheme';
 import { routePaths } from '../../config/routes';
 import { useAuth } from '../../hooks/useAuth';
@@ -116,7 +115,7 @@ export function AdminLayout() {
     ) : null;
 
   return (
-    <SellerCreateStoreModalProvider>
+    <>
     <div className="admin-shell flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-[var(--admin-page-bg)] text-zinc-800 dark:text-zinc-100">
       <aside
         className={`flex min-h-0 shrink-0 flex-col overflow-x-hidden border-r border-[var(--admin-border)] bg-[var(--admin-card)] transition-[width] duration-200 ease-out dark:bg-night-900 ${collapsed ? 'w-[72px]' : 'w-[248px]'}`}
@@ -129,7 +128,7 @@ export function AdminLayout() {
             className={`flex min-w-0 items-center ${collapsed ? 'justify-center' : 'gap-2.5'}`}
           >
             <div
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[var(--admin-primary)] text-sm font-bold text-white"
+              className="box-border flex aspect-square h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[9999px] border border-white/30 bg-[var(--admin-primary)] text-sm font-bold text-white shadow-sm"
               aria-hidden
             >
               M
@@ -251,7 +250,7 @@ export function AdminLayout() {
               <button
                 type="button"
                 onClick={toggleTheme}
-                className="rounded-full p-1.5 text-zinc-500 transition-colors hover:bg-zinc-100 dark:hover:bg-night-800"
+                className="box-border inline-flex aspect-square h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full text-zinc-500 transition-colors hover:bg-zinc-100 dark:hover:bg-night-800"
                 aria-label="Cambiar tema"
               >
                 {theme === 'dark' ? (
@@ -331,6 +330,6 @@ export function AdminLayout() {
         navigate(routePaths.login, { replace: true });
       }}
     />
-    </SellerCreateStoreModalProvider>
+    </>
   );
 }

@@ -121,7 +121,7 @@ function DetailField({
 function CategoryDetailContent({ category, list }: { category: Category; list: Category[] }) {
   return (
     <div className="space-y-4 px-5 py-4">
-      <div className="space-y-3">
+      <div className="space-y-3 text-center">
         <div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
             {category.name}
@@ -131,7 +131,7 @@ function CategoryDetailContent({ category, list }: { category: Category; list: C
           </p>
         </div>
       </div>
-      <div className="grid gap-2 sm:grid-cols-2">
+      <div className="mx-auto grid max-w-2xl gap-2 sm:grid-cols-2">
         <DetailField label="Padre">
           {parentLabel(list, category.parentId)}
         </DetailField>
@@ -139,9 +139,6 @@ function CategoryDetailContent({ category, list }: { category: Category; list: C
           {category.description?.trim() ? category.description : '—'}
         </DetailField>
       </div>
-      <DetailField label="ID">
-        <span className="break-all font-mono text-[11px]">{category.id}</span>
-      </DetailField>
     </div>
   );
 }

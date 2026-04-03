@@ -132,8 +132,6 @@ function formatDate(iso?: string) {
 function UserDetailsPanel({ user }: { user: AdminUserRow }) {
   const [detailTab, setDetailTab] = useState<'cuenta' | 'ayuda'>('cuenta');
   const displayName = fullName(user) || user.email;
-  const idShort =
-    user.id.length > 10 ? `…${user.id.slice(-8)}` : user.id;
 
   return (
     <AdminDetailPanelRoot>
@@ -159,16 +157,10 @@ function UserDetailsPanel({ user }: { user: AdminUserRow }) {
         <AdminDetailStatsGrid>
           <AdminDetailStatTile label="Rol" value={user.role} hint="permiso" />
           <AdminDetailStatTile
-            label="Alta"
-            value={formatDate(user.createdAt)}
-            hint="registro"
-          />
-          <AdminDetailStatTile
             label="Estado"
             value={user.isActive ? 'Activo' : 'Inactivo'}
             hint="cuenta"
           />
-          <AdminDetailStatTile label="ID" value={idShort} hint="recorte" />
         </AdminDetailStatsGrid>
 
         <AdminDetailHeroSplit

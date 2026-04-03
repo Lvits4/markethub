@@ -43,7 +43,6 @@ export function AuthHero({ variant }: AuthHeroProps) {
         aria-hidden
       />
       <div className="relative">
-        <AuthBrand surface="dark" className="mb-3" />
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-white/70">
           Bienvenido
         </p>
@@ -60,7 +59,7 @@ export function AuthHero({ variant }: AuthHeroProps) {
           {[0, 1, 2].map((i) => (
             <span
               key={i}
-              className="h-9 w-9 rounded-md border-2 border-white/30 bg-white/20 ring-2 ring-auth-primary"
+              className="box-border aspect-square h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-white/30 bg-white/20 ring-2 ring-auth-primary"
             />
           ))}
         </div>

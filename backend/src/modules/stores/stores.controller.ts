@@ -105,7 +105,7 @@ export class StoresController {
   @Delete(':id')
   @ApiOperation({
     summary:
-      'Eliminar tienda (dueño o admin). Borra productos, pedidos asociados y datos dependientes.',
+      'Eliminar tienda (dueño o admin). Borrado definitivo en BD: productos, pedidos de la tienda y datos dependientes.',
   })
   async remove(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: User) {
     await this.storesService.remove(id, user);

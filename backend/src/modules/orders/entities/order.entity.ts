@@ -28,6 +28,10 @@ export class Order {
   @Column({ name: 'shipping_address', type: 'text', nullable: true })
   shippingAddress: string;
 
+  /** Oculta el pedido en el historial del comprador; vendedores/admin siguen viendo el registro. */
+  @Column({ name: 'buyer_hidden_at', type: 'timestamptz', nullable: true })
+  buyerHiddenAt: Date | null;
+
   @Column({ name: 'user_id', type: 'uuid' })
   userId: string;
 

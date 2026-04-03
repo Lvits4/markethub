@@ -49,7 +49,10 @@ export class CartController {
   }
 
   @Delete('items/:itemId')
-  @ApiOperation({ summary: 'Eliminar item del carrito' })
+  @ApiOperation({
+    summary: 'Eliminar item del carrito',
+    description: 'Borrado definitivo de la fila en base de datos.',
+  })
   removeItem(
     @CurrentUser() user: User,
     @Param('itemId', ParseUUIDPipe) itemId: string,
@@ -58,7 +61,11 @@ export class CartController {
   }
 
   @Delete()
-  @ApiOperation({ summary: 'Vaciar carrito' })
+  @ApiOperation({
+    summary: 'Vaciar carrito',
+    description:
+      'Borrado definitivo: elimina todos los ítems y el registro del carrito en base de datos.',
+  })
   clearCart(@CurrentUser() user: User) {
     return this.cartService.clearCart(user.id);
   }

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
+import { AuthBrand } from '../../components/AuthBrand/AuthBrand';
 import { AuthHero } from '../../components/AuthHero/AuthHero';
 import { ThemeToggle } from '../../components/ThemeToggle/ThemeToggle';
 
@@ -27,8 +28,9 @@ export function AuthPage() {
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(37,99,235,0.06),transparent)] dark:bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(59,130,246,0.08),transparent)]"
             aria-hidden
           />
-          <div className="relative z-10 flex shrink-0 justify-end self-end pt-4 sm:pt-5 lg:w-full lg:self-auto lg:pt-9">
-            <ThemeToggle className="shadow-md" />
+          <div className="relative z-10 flex w-full shrink-0 items-center justify-between gap-3 pt-4 sm:pt-5 lg:pt-9">
+            <AuthBrand surface="light" className="min-w-0" />
+            <ThemeToggle className="shrink-0 shadow-md" />
           </div>
           <div className="relative z-10 flex min-h-0 w-full min-w-0 flex-1 flex-col items-center justify-center pt-2 sm:pt-3 max-lg:w-fit max-lg:self-center lg:w-full">
             <div className="w-full max-w-sm min-w-0 max-lg:w-fit lg:w-full">
