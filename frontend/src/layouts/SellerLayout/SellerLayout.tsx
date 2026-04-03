@@ -6,7 +6,7 @@ const navClass =
   'rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-night-800 dark:hover:text-zinc-100';
 
 const activeClass =
-  'bg-[var(--color-forest)]/10 text-[var(--color-forest)] dark:bg-blue-500/15 dark:text-blue-400';
+  'bg-[var(--color-forest)]/10 text-[var(--color-forest)] dark:bg-[color:rgb(16_34_81/0.65)] dark:text-[var(--color-market-dark-accent)]';
 
 export function SellerLayout() {
   return (

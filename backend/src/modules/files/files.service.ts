@@ -1,6 +1,7 @@
 import {
-  Injectable,
   BadRequestException,
+  ForbiddenException,
+  Injectable,
   NotFoundException,
   StreamableFile,
 } from '@nestjs/common';
@@ -9,9 +10,38 @@ import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import { Readable } from 'stream';
 
+const PUBLIC_MARKET_PREFIXES = ['stores/', 'products/'] as const;
+
 @Injectable()
 export class FilesService {
   constructor(private readonly storage: StorageService) {}
+
+  /** Rutas de almacenamiento visibles en catálogo / tiendas públicas (sin credenciales). */
+  private assertPublicMarketplacePath(filePath: string | undefined): string {
+    const p = this.assertPath(filePath);
+    const normalized = p.replace(/^\/+/, '');
+    if (
+      normalized.includes('..') ||
+      normalized.includes('\\') ||
+      normalized.includes('\0')
+    ) {
+      throw new BadRequestException('Ruta de archivo inválida');
+    }
+    const allowed = PUBLIC_MARKET_PREFIXES.some((prefix) =>
+      normalized.startsWith(prefix),
+    );
+    if (!allowed) {
+      throw new ForbiddenException(
+        'Este archivo no está disponible de forma pública',
+      );
+    }
+    return normalized;
+  }
+
+  async downloadPublicMarketplace(filePath: string) {
+    const safe = this.assertPublicMarketplacePath(filePath);
+    return this.download(safe);
+  }
 
   private assertPath(filePath: string | undefined): string {
     if (filePath === undefined || filePath === null || String(filePath).trim() === '') {

@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react';
 import { FiHeart } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { routePaths } from '../../config/routes';
@@ -5,6 +6,7 @@ import { formatPrice } from '../../helpers/formatPrice';
 import { getPrimaryImageUrl } from '../../helpers/productImageUrl';
 import type { Product } from '../../types/product';
 import { Badge } from '../Badge/Badge';
+import { Button } from '../Button/Button';
 
 type ProductCardProps = {
   product: Product;
@@ -12,6 +14,8 @@ type ProductCardProps = {
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
   favoriteDisabled?: boolean;
+  onAddToCart?: (e: MouseEvent<HTMLButtonElement>) => void;
+  addToCartDisabled?: boolean;
 };
 
 export function ProductCard({
@@ -20,6 +24,8 @@ export function ProductCard({
   isFavorite,
   onToggleFavorite,
   favoriteDisabled,
+  onAddToCart,
+  addToCartDisabled,
 }: ProductCardProps) {
   const img = getPrimaryImageUrl(product);
 
@@ -27,7 +33,7 @@ export function ProductCard({
     <article className="group relative flex flex-col overflow-hidden rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/60 transition hover:shadow-md dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">
       <Link
         to={routePaths.productDetail(product.id)}
-        className="relative aspect-[4/5] w-full overflow-hidden bg-zinc-100 dark:bg-night-800"
+        className="relative aspect-square w-full overflow-hidden bg-zinc-100 dark:bg-night-800"
       >
         {img ? (
           <img
@@ -52,23 +58,38 @@ export function ProductCard({
             e.preventDefault();
             onToggleFavorite();
           }}
-          className="absolute right-3 top-3 cursor-pointer rounded-md bg-white/90 p-2 text-zinc-900 shadow-sm backdrop-blur-sm transition hover:bg-white disabled:cursor-not-allowed dark:bg-night-900/90 dark:text-zinc-100 dark:hover:bg-night-800"
+          className="absolute right-2 top-2 cursor-pointer rounded-full bg-transparent p-1 text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <FiHeart
-            className={`h-5 w-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`}
+            className={`h-7 w-7 drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)] ${isFavorite ? 'fill-[var(--color-forest)] text-[var(--color-forest)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]' : ''}`}
           />
         </button>
       ) : null}
-      <div className="flex flex-1 flex-col gap-1 p-4">
+      <div className="flex flex-1 flex-col gap-0.5 p-3">
         <Link
           to={routePaths.productDetail(product.id)}
-          className="line-clamp-2 text-sm font-semibold leading-snug text-zinc-900 dark:text-zinc-50"
+          className="line-clamp-2 text-sm font-semibold leading-tight text-zinc-900 dark:text-zinc-50"
         >
           {product.name}
         </Link>
-        <p className="text-sm font-medium text-[var(--color-forest)] dark:text-blue-400">
+        <p className="text-sm font-medium text-[var(--color-forest)]">
           {formatPrice(product.price)}
         </p>
+        {onAddToCart ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="mt-2 w-full justify-center py-1.5 text-xs"
+            disabled={addToCartDisabled}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onAddToCart(e);
+            }}
+          >
+            Añadir al carrito
+          </Button>
+        ) : null}
       </div>
     </article>
   );

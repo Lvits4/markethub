@@ -9,6 +9,8 @@ export const routePaths = {
   forgotPassword: '/auth/forgot-password',
   resetPassword: '/auth/reset-password',
   favorites: '/favorites',
+  stores: '/stores',
+  storeDetail: (id: string) => `/stores/${id}`,
   cart: '/cart',
   orders: '/orders',
   orderDetail: (id: string) => `/orders/${id}`,

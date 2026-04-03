@@ -1,5 +1,5 @@
 export const marketingCopy = {
   catalogTitle: 'Catálogo',
-  catalogSubtitle: 'Muebles con estilo para tu hogar.',
+  catalogSubtitle: 'Explora productos de tiendas verificadas en un solo lugar.',
   heroTagline: 'Haz espacio para algo mejor.',
 } as const;

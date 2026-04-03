@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { FiChevronDown } from 'react-icons/fi';
 
@@ -33,6 +40,11 @@ export type FormSelectProps = {
   variant?: 'field' | 'compact';
   triggerClassName?: string;
   listClassName?: string;
+  /** Altura máxima del panel desplegable (px). Útil para listas largas (p. ej. categorías). */
+  listMaxHeightPx?: number;
+  /** Campo de texto para filtrar opciones por etiqueta (p. ej. muchas categorías). */
+  searchable?: boolean;
+  searchPlaceholder?: string;
 };
 
 const fieldTriggerBaseClass =
@@ -52,11 +64,20 @@ const compactTriggerBaseClass =
 
 const compactTriggerDisabledClass = 'cursor-not-allowed opacity-60';
 
-const fieldListClass =
-  'market-scroll fixed z-[90] overflow-y-auto overscroll-contain rounded-md border border-zinc-200/90 bg-white py-1 shadow-lg ring-1 ring-black/5 dark:border-sky-500/20 dark:bg-[#121a2e] dark:shadow-[0_16px_40px_-12px_rgb(0_0_0/0.55)] dark:ring-sky-500/10';
+const fieldListPanelClass =
+  'fixed z-[90] flex flex-col overflow-hidden overscroll-contain rounded-md border border-zinc-200/90 bg-white shadow-lg ring-1 ring-black/5 dark:border-sky-500/20 dark:bg-[#121a2e] dark:shadow-[0_16px_40px_-12px_rgb(0_0_0/0.55)] dark:ring-sky-500/10';
 
-const compactListClass =
-  'market-scroll fixed z-[90] min-w-full overflow-y-auto overscroll-contain rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] py-0.5 shadow-lg ring-1 ring-black/5 dark:ring-white/10';
+const fieldListUlClass =
+  'market-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain py-1';
+
+const compactListPanelClass =
+  'fixed z-[90] flex min-w-full flex-col overflow-hidden overscroll-contain rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] shadow-lg ring-1 ring-black/5 dark:ring-white/10';
+
+const compactListUlClass =
+  'market-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain py-0.5';
+
+const listSearchInputClass =
+  'w-full rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/20 dark:border-night-600 dark:bg-night-900 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-[#1f6feb] dark:focus:ring-[#1f6feb]/25';
 
 export function FormSelect({
   id,
@@ -70,18 +91,32 @@ export function FormSelect({
   variant = 'field',
   triggerClassName,
   listClassName,
+  listMaxHeightPx = 280,
+  searchable = false,
+  searchPlaceholder = 'Buscar…',
 }: FormSelectProps) {
   const listboxId = useId();
+  const listSearchInputId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const listRef = useRef<HTMLUListElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState<ListPlacementCoords | null>(null);
+  const [listFilter, setListFilter] = useState('');
 
   const selected =
     value === '' ? undefined : options.find((o) => o.value === value);
   const displayLabel = selected?.label ?? placeholder;
   const displayMuted = value === '';
+
+  const filteredOptions = useMemo(() => {
+    if (!searchable) return options;
+    const q = listFilter.trim().toLowerCase();
+    if (!q) return options;
+    return options.filter(
+      (o) => o.value === '' || o.label.toLowerCase().includes(q),
+    );
+  }, [searchable, options, listFilter]);
 
   const measureAndPlace = useCallback(() => {
     const el = triggerRef.current;
@@ -96,7 +131,10 @@ export function FormSelect({
 
     if (openAbove) {
       const bottom = window.innerHeight - rect.top + gap;
-      const maxHeight = Math.min(280, Math.max(80, spaceAbove));
+      const maxHeight = Math.min(
+        listMaxHeightPx,
+        Math.max(80, spaceAbove),
+      );
       setCoords({
         placement: 'above',
         bottom,
@@ -106,7 +144,10 @@ export function FormSelect({
       });
     } else {
       const top = rect.bottom + gap;
-      const maxHeight = Math.min(280, Math.max(80, spaceBelow));
+      const maxHeight = Math.min(
+        listMaxHeightPx,
+        Math.max(80, spaceBelow),
+      );
       setCoords({
         placement: 'below',
         top,
@@ -115,19 +156,25 @@ export function FormSelect({
         maxHeight,
       });
     }
-  }, []);
+  }, [listMaxHeightPx]);
+
+  useEffect(() => {
+    if (open && searchable) {
+      setListFilter('');
+    }
+  }, [open, searchable]);
 
   useEffect(() => {
     if (!open) return;
 
-    function isScrollInsideList(target: EventTarget | null) {
-      const list = listRef.current;
-      if (!list || !(target instanceof Node)) return false;
-      return target === list || list.contains(target);
+    function isScrollInsidePanel(target: EventTarget | null) {
+      const panel = panelRef.current;
+      if (!panel || !(target instanceof Node)) return false;
+      return target === panel || panel.contains(target);
     }
 
     const onScroll = (e: Event) => {
-      if (isScrollInsideList(e.target)) return;
+      if (isScrollInsidePanel(e.target)) return;
       setOpen(false);
     };
 
@@ -137,13 +184,13 @@ export function FormSelect({
 
     const onPointerDown = (e: PointerEvent) => {
       const root = rootRef.current;
-      const list = listRef.current;
+      const panel = panelRef.current;
       const t = e.target;
       if (t instanceof Node) {
-        if (root?.contains(t) || list?.contains(t)) return;
+        if (root?.contains(t) || panel?.contains(t)) return;
       }
-      if (list) {
-        const r = list.getBoundingClientRect();
+      if (panel) {
+        const r = panel.getBoundingClientRect();
         const { clientX: x, clientY: y } = e;
         if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
           return;
@@ -198,59 +245,86 @@ export function FormSelect({
       ? `${compactTriggerBaseClass}${disabled ? ` ${compactTriggerDisabledClass}` : ''}${triggerClassName ? ` ${triggerClassName}` : ''}`
       : `${fieldTriggerBaseClass} ${error ? fieldTriggerErrorClass : fieldTriggerNormalClass}${disabled ? ` ${fieldTriggerDisabledClass}` : ''}${triggerClassName ? ` ${triggerClassName}` : ''}`;
 
-  const listBoxClass = `${isCompact ? compactListClass : fieldListClass}${listClassName ? ` ${listClassName}` : ''}`;
+  const panelBoxClass = `${isCompact ? compactListPanelClass : fieldListPanelClass}${listClassName ? ` ${listClassName}` : ''}`;
+  const ulScrollClass = isCompact ? compactListUlClass : fieldListUlClass;
 
   const chevronClass = isCompact ? 'h-3.5 w-3.5' : 'h-4 w-4';
 
+  const panelPositionStyle =
+    coords?.placement === 'below'
+      ? {
+          top: coords.top,
+          left: coords.left,
+          width: coords.width,
+          maxHeight: coords.maxHeight,
+          bottom: 'auto' as const,
+        }
+      : coords
+        ? {
+            bottom: coords.bottom,
+            left: coords.left,
+            width: coords.width,
+            maxHeight: coords.maxHeight,
+            top: 'auto' as const,
+          }
+        : null;
+
   const listPortal =
-    open && coords
+    open && coords && panelPositionStyle
       ? createPortal(
-          <ul
-            ref={listRef}
-            id={listboxId}
-            role="listbox"
-            className={listBoxClass}
-            style={
-              coords.placement === 'below'
-                ? {
-                    top: coords.top,
-                    left: coords.left,
-                    width: coords.width,
-                    maxHeight: coords.maxHeight,
-                    bottom: 'auto',
-                  }
-                : {
-                    bottom: coords.bottom,
-                    left: coords.left,
-                    width: coords.width,
-                    maxHeight: coords.maxHeight,
-                    top: 'auto',
-                  }
-            }
+          <div
+            ref={panelRef}
+            data-markethub-select-list
+            className={panelBoxClass}
+            style={panelPositionStyle}
           >
-            {options.map((opt) => {
-              const isSelected = opt.value === value;
-              const optionClass = isCompact
-                ? isSelected
-                  ? 'cursor-pointer px-3 py-1.5 text-left text-xs font-semibold text-[var(--admin-primary)] bg-[var(--admin-primary-soft)] dark:text-blue-400'
-                  : 'cursor-pointer px-3 py-1.5 text-left text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800/80'
-                : isSelected
-                  ? 'mx-1 cursor-pointer rounded-md px-3 py-2.5 text-sm font-medium bg-blue-50 text-blue-900 dark:bg-sky-500/15 dark:text-sky-100'
-                  : 'mx-1 cursor-pointer rounded-md px-3 py-2.5 text-sm text-zinc-800 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-white/[0.06]';
-              return (
-                <li
-                  key={opt.value === '' ? '__empty__' : opt.value}
-                  role="option"
-                  aria-selected={isSelected}
-                  className={optionClass}
-                  onPointerDown={(e) => e.preventDefault()}
-                  onClick={() => handlePick(opt.value)}
-                >
-                  {opt.label}
+            {searchable ? (
+              <div className="shrink-0 border-b border-zinc-200/90 p-2 dark:border-sky-500/20">
+                <input
+                  id={listSearchInputId}
+                  type="search"
+                  value={listFilter}
+                  onChange={(e) => setListFilter(e.target.value)}
+                  placeholder={searchPlaceholder}
+                  autoComplete="off"
+                  aria-label={searchPlaceholder}
+                  className={listSearchInputClass}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
+            ) : null}
+            <ul id={listboxId} role="listbox" className={ulScrollClass}>
+              {filteredOptions.length === 0 ? (
+                <li className="px-3 py-2.5 text-sm text-zinc-500 dark:text-zinc-400">
+                  Sin coincidencias
                 </li>
-              );
-            })}
-          </ul>,
+              ) : (
+                filteredOptions.map((opt) => {
+                  const isSelected = opt.value === value;
+                  const optionClass = isCompact
+                    ? isSelected
+                      ? 'cursor-pointer px-3 py-1.5 text-left text-xs font-semibold text-[var(--admin-primary)] bg-[var(--admin-primary-soft)] dark:text-[var(--color-market-dark-accent)]'
+                      : 'cursor-pointer px-3 py-1.5 text-left text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800/80'
+                    : isSelected
+                      ? 'mx-1 cursor-pointer rounded-md px-3 py-2.5 text-sm font-medium bg-blue-50 text-blue-900 dark:bg-sky-500/15 dark:text-sky-100'
+                      : 'mx-1 cursor-pointer rounded-md px-3 py-2.5 text-sm text-zinc-800 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-white/[0.06]';
+                  return (
+                    <li
+                      key={opt.value === '' ? '__empty__' : opt.value}
+                      role="option"
+                      aria-selected={isSelected}
+                      className={optionClass}
+                      onPointerDown={(e) => e.preventDefault()}
+                      onClick={() => handlePick(opt.value)}
+                    >
+                      {opt.label}
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+          </div>,
           document.body,
         )
       : null;

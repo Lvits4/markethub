@@ -18,6 +18,7 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { Public } from '../../common/decorators';
 import { FilesService } from './files.service';
 
 @ApiTags('Files')
@@ -67,6 +68,18 @@ export class FilesController {
     @Query('folder') folder?: string,
   ) {
     return this.filesService.uploadMultiple(files, folder);
+  }
+
+  @Public()
+  @Get('public')
+  @ApiOperation({
+    summary:
+      'Descargar imagen de tienda o producto (público; solo rutas stores/* y products/*)',
+  })
+  @ApiQuery({ name: 'path', required: true })
+  async publicDownload(@Query('path') filePath: string): Promise<StreamableFile> {
+    const readable = await this.filesService.downloadPublicMarketplace(filePath);
+    return new StreamableFile(readable);
   }
 
   @Get('download')

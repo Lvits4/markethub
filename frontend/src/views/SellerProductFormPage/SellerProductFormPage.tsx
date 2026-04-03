@@ -199,7 +199,7 @@ export function SellerProductFormPage() {
       <div className="mb-6">
         <Link
           to={backHref}
-          className="text-sm font-medium text-[var(--color-forest)] dark:text-blue-400"
+          className="text-sm font-medium text-[var(--color-forest)]"
         >
           ← Volver
         </Link>

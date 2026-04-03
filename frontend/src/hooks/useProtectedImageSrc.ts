@@ -1,12 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-
-function apiBaseTrimmed(): string {
-  const v = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim();
-  const resolved =
-    v ||
-    (import.meta.env.DEV ? 'http://localhost:3000/api' : '');
-  return resolved.endsWith('/') ? resolved.slice(0, -1) : resolved;
-}
+import { apiBaseTrimmed } from '../helpers/storagePublicUrl';
 
 /** URL absoluta para pedir el binario (con Authorization si hace falta). */
 export function absoluteFileFetchUrl(raw: string): string {

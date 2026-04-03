@@ -1,3 +1,4 @@
+import { publicStorageImageSrc } from './storagePublicUrl';
 import type { Product, ProductImage } from '../types/product';
 
 function sortImages(imgs: ProductImage[]): ProductImage[] {
@@ -14,5 +15,8 @@ export function getSortedProductImages(product: Product): ProductImage[] {
 
 export function getPrimaryImageUrl(product: Product): string | null {
   const sorted = getSortedProductImages(product);
-  return sorted[0]?.url ?? null;
+  const raw = sorted[0]?.url;
+  if (!raw?.trim()) return null;
+  const src = publicStorageImageSrc(raw);
+  return src || null;
 }

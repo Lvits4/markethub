@@ -32,7 +32,7 @@ export function OrdersPage() {
           Aún no tienes pedidos.{' '}
           <Link
             to={routePaths.catalog}
-            className="font-semibold text-[var(--color-forest)] dark:text-blue-400"
+            className="font-semibold text-[var(--color-forest)]"
           >
             Ir al catálogo
           </Link>

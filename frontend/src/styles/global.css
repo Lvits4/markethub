@@ -42,19 +42,19 @@
 
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  /* Marca y admin: azul principal */
-  --color-admin-primary: #2563eb;
-  --color-admin-primary-hover: #1d4ed8;
+  /* Marca y admin: azul principal (más tenue, alineado con acentos tipo modo oscuro) */
+  --color-admin-primary: #3b82f6;
+  --color-admin-primary-hover: #2563eb;
   --color-admin-surface: #f4f6f9;
   --color-admin-card: #ffffff;
   --color-surface-cream: #f7f8fc;
   /* Tokens de marca (nombre histórico --color-forest; valores azules) */
-  --color-forest: #1d4ed8;
-  --color-forest-muted: #2563eb;
+  --color-forest: #3b82f6;
+  --color-forest-muted: #60a5fa;
   --color-accent-warm: #c45c3e;
   --color-terracotta: #b8614a;
-  --color-auth-primary: #2563eb;
-  --color-auth-primary-hover: #1d4ed8;
+  --color-auth-primary: #3b82f6;
+  --color-auth-primary-hover: #2563eb;
   --color-auth-bg: #eef2fb;
   /* Modo noche: superficies azul profundo (no gris neutro) */
   --color-night-950: #060a14;
@@ -76,6 +76,13 @@
   --radius-market: 0.375rem;
   --shadow-market: 0 10px 40px -12px rgb(0 0 0 / 0.08);
   --shadow-market-dark: 0 16px 48px -10px rgb(15 23 42 / 0.55), 0 0 0 1px rgb(59 130 246 / 0.06);
+  /*
+   * Marketplace oscuro: misma línea que .dark .admin-cta-solid (“Nueva categoría”):
+   * fondo navy #102251, texto azul suave #458bde (no azules saturados tipo blue-600).
+   */
+  --color-market-dark-surface: #102251;
+  --color-market-dark-surface-hover: #152a5e;
+  --color-market-dark-accent: #458bde;
 }
 
 @font-face {
@@ -100,6 +107,9 @@ html.dark {
   background-color: var(--color-night-base);
   position: relative;
   isolation: isolate;
+  /* Precios, enlaces y acentos “marca” en oscuro: azul tenue (#458bde), no blue-600 */
+  --color-forest: var(--color-market-dark-accent);
+  --color-forest-muted: #6ea8ee;
 }
 
 html.dark::before {
@@ -109,9 +119,9 @@ html.dark::before {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 55% 45% at 20% 15%, rgb(37 99 235 / 0.2), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 85% 75%, rgb(59 130 246 / 0.14), transparent 50%),
-    radial-gradient(ellipse 40% 35% at 50% 100%, rgb(30 64 175 / 0.18), transparent 45%);
+    radial-gradient(ellipse 55% 45% at 20% 15%, rgb(69 139 222 / 0.16), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 85% 75%, rgb(69 139 222 / 0.1), transparent 50%),
+    radial-gradient(ellipse 40% 35% at 50% 100%, rgb(45 100 180 / 0.14), transparent 45%);
   filter: blur(72px);
   opacity: 0.95;
 }
@@ -257,7 +267,7 @@ body {
 }
 
 .dark .admin-nav-link--active {
-  @apply text-blue-400;
+  color: var(--color-market-dark-accent);
   box-shadow: none;
 }
 
@@ -321,4 +331,25 @@ body {
 
 .admin-sidebar-nav--collapsed .admin-nav-link--active {
   @apply mx-auto size-11 shrink-0 rounded-full px-0 py-0;
+}
+
+/* Catálogo: popover de filtros — lista nativa del <select> acorde al tema */
+.catalog-filter-popover {
+  color-scheme: light;
+}
+
+.dark .catalog-filter-popover {
+  color-scheme: dark;
+}
+
+.catalog-filter-popover select option,
+.catalog-filter-popover select optgroup {
+  background-color: #ffffff;
+  color: #18181b;
+}
+
+.dark .catalog-filter-popover select option,
+.dark .catalog-filter-popover select optgroup {
+  background-color: var(--color-night-900);
+  color: rgb(244 244 245);
 }

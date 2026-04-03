@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { queryKeys } from '../helpers/queryKeys';
 import { fetchProductsByStore } from '../requests/productRequests';
 import type { ProductFilters } from '../types/product';
@@ -13,5 +13,6 @@ export function useProductsByStoreQuery(
       : ['products', 'store', 'none'],
     queryFn: () => fetchProductsByStore(storeId!, filters),
     enabled: Boolean(storeId),
+    placeholderData: keepPreviousData,
   });
 }

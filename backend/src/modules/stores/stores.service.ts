@@ -94,7 +94,7 @@ export class StoresService {
 
     if (UUID_PATTERN.test(t)) {
       const byId = await this.storesRepository.findOne({
-        where: { id: t },
+        where: { id: t, isActive: true, isApproved: true },
         relations: ['user'],
       });
       if (byId) {
@@ -104,7 +104,7 @@ export class StoresService {
     }
 
     let store = await this.storesRepository.findOne({
-      where: { slug: t },
+      where: { slug: t, isActive: true, isApproved: true },
       relations: ['user'],
     });
     if (store) {
@@ -114,7 +114,7 @@ export class StoresService {
     const normalizedSlug = this.generateSlug(t);
     if (normalizedSlug && normalizedSlug !== t) {
       store = await this.storesRepository.findOne({
-        where: { slug: normalizedSlug },
+        where: { slug: normalizedSlug, isActive: true, isApproved: true },
         relations: ['user'],
       });
       if (store) {
@@ -126,6 +126,8 @@ export class StoresService {
       .createQueryBuilder('store')
       .leftJoinAndSelect('store.user', 'user')
       .where('LOWER(store.name) = LOWER(:name)', { name: t })
+      .andWhere('store.isActive = :ia', { ia: true })
+      .andWhere('store.isApproved = :ap', { ap: true })
       .getOne();
     if (store) {
       return store;

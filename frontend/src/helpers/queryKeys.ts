@@ -11,6 +11,7 @@ export const queryKeys = {
   favoriteCheck: (productId: string) => ['favorites', 'check', productId] as const,
   userProfile: ['users', 'profile'] as const,
   publicStores: ['stores', 'public'] as const,
+  storePublicLookup: (term: string) => ['stores', 'public', 'lookup', term] as const,
   myStores: ['stores', 'my'] as const,
   ordersMy: ['orders', 'my'] as const,
   order: (id: string) => ['orders', id] as const,

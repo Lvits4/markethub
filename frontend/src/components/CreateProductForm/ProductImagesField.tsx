@@ -106,7 +106,7 @@ export function ProductImagesField({
         }`}
       >
         Arrastra imágenes aquí o{' '}
-        <span className="text-[var(--color-forest)] underline decoration-transparent underline-offset-2 transition-colors group-hover:decoration-current dark:text-sky-400">
+        <span className="text-[var(--color-forest)] underline decoration-transparent underline-offset-2 transition-colors group-hover:decoration-current">
           elige archivos
         </span>
       </span>

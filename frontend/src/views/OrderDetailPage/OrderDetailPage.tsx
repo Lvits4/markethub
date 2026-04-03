@@ -29,7 +29,7 @@ export function OrderDetailPage() {
         Pedido no encontrado.{' '}
         <Link
           to={routePaths.orders}
-          className="font-semibold text-[var(--color-forest)] dark:text-blue-400"
+          className="font-semibold text-[var(--color-forest)]"
         >
           Volver a mis pedidos
         </Link>
@@ -63,7 +63,7 @@ export function OrderDetailPage() {
           </div>
           <div>
             <dt className="text-zinc-500">Total</dt>
-            <dd className="font-semibold tabular-nums text-[var(--color-forest)] dark:text-blue-400">
+            <dd className="font-semibold tabular-nums text-[var(--color-forest)]">
               {formatPrice(numAmount(order.totalAmount))}
             </dd>
           </div>

@@ -135,7 +135,7 @@ export function SellerMyStoresPanel() {
                       <p className="text-xs text-zinc-500">{s.slug}</p>
                       <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
                         {s.isApproved ? (
-                          <span className="text-[var(--color-forest)] dark:text-blue-400">
+                          <span className="text-[var(--color-forest)]">
                             Aprobada
                           </span>
                         ) : (
@@ -147,7 +147,7 @@ export function SellerMyStoresPanel() {
                     </div>
                     <Link
                       to={routePaths.sellerStoreProducts(s.id)}
-                      className="inline-flex items-center justify-center rounded-md border-2 border-[var(--color-forest)] px-5 py-2 text-sm font-medium text-[var(--color-forest)] hover:bg-[var(--color-forest)]/8 dark:border-blue-500 dark:text-blue-400"
+                      className="inline-flex items-center justify-center rounded-md border-2 border-[var(--color-forest)] px-5 py-2 text-sm font-medium text-[var(--color-forest)] hover:bg-[var(--color-forest)]/8 dark:border-[color:rgb(69_139_222/0.45)]"
                     >
                       Productos
                     </Link>

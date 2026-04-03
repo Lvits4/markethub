@@ -17,6 +17,7 @@ declare module 'react-icons/fi' {
   export const FiHeart: I;
   export const FiHome: I;
   export const FiImage: I;
+  export const FiLayers: I;
   export const FiLogOut: I;
   export const FiMail: I;
   export const FiMenu: I;

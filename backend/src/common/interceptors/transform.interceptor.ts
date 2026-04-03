@@ -78,7 +78,8 @@ export class TransformInterceptor<T>
       const pathWithQuery = req.originalUrl ?? req.url ?? '';
       if (
         req.method === 'GET' &&
-        pathWithQuery.includes('/files/download')
+        (pathWithQuery.includes('/files/download') ||
+          pathWithQuery.includes('/files/public'))
       ) {
         return next.handle() as Observable<ApiResponse<T>>;
       }

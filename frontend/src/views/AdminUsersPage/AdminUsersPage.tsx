@@ -324,7 +324,7 @@ function SortHeader({
         <span className="inline-flex shrink-0 flex-col items-center gap-0 leading-none">
           <button
             type="button"
-            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'asc' ? 'text-[var(--color-forest)] dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}`}
+            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'asc' ? 'text-[var(--color-forest)]' : 'text-slate-400 dark:text-slate-500'}`}
             aria-label={`Ordenar ${label} ascendente`}
             onClick={() => onSort(sortKey, 'asc')}
           >
@@ -332,7 +332,7 @@ function SortHeader({
           </button>
           <button
             type="button"
-            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'desc' ? 'text-[var(--color-forest)] dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'}`}
+            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'desc' ? 'text-[var(--color-forest)]' : 'text-slate-400 dark:text-slate-500'}`}
             aria-label={`Ordenar ${label} descendente`}
             onClick={() => onSort(sortKey, 'desc')}
           >

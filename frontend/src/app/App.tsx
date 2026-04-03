@@ -37,6 +37,8 @@ import { ForgotPasswordPage } from '../views/ForgotPasswordPage/ForgotPasswordPa
 import { ResetPasswordPage } from '../views/ResetPasswordPage/ResetPasswordPage';
 import { OrdersPage } from '../views/OrdersPage/OrdersPage';
 import { OrderDetailPage } from '../views/OrderDetailPage/OrderDetailPage';
+import { StoresListPage } from '../views/StoresListPage/StoresListPage';
+import { StorePublicPage } from '../views/StorePublicPage/StorePublicPage';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -151,6 +153,8 @@ export default function App() {
               <Route path="/" element={<MainLayout />}>
                 <Route index element={<CatalogEntry />} />
                 <Route path="browse" element={<CatalogPage />} />
+                <Route path="stores/:storeId" element={<StorePublicPage />} />
+                <Route path="stores" element={<StoresListPage />} />
                 <Route path="product/:id" element={<ProductDetailPage />} />
                 <Route
                   path="favorites"

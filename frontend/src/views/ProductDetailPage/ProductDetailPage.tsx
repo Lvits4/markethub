@@ -1,11 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import {
-  FiArrowLeft,
-  FiHeart,
-  FiMessageCircle,
-  FiShare2,
-} from 'react-icons/fi';
+import { FiArrowLeft, FiHeart, FiShare2 } from 'react-icons/fi';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
 import { QuantitySelector } from '../../components/QuantitySelector/QuantitySelector';
@@ -16,6 +11,7 @@ import {
   getPrimaryImageUrl,
   getSortedProductImages,
 } from '../../helpers/productImageUrl';
+import { publicStorageImageSrc } from '../../helpers/storagePublicUrl';
 import { useAuth } from '../../hooks/useAuth';
 import { useCartMutations } from '../../hooks/useCartMutations';
 import { useFavoriteToggle } from '../../hooks/useFavoriteToggle';
@@ -50,7 +46,11 @@ export function ProductDetailPage() {
   );
 
   const mainImageUrl = useMemo(() => {
-    if (images[activeImage]?.url) return images[activeImage].url;
+    const raw = images[activeImage]?.url;
+    if (raw) {
+      const src = publicStorageImageSrc(raw);
+      return src || null;
+    }
     return product ? getPrimaryImageUrl(product) : null;
   }, [images, activeImage, product]);
 
@@ -142,13 +142,13 @@ export function ProductDetailPage() {
         className="mb-4 flex flex-wrap items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 sm:text-sm"
         aria-label="Migas de pan"
       >
-        <Link to={routePaths.catalog} className="hover:text-[var(--color-forest)] dark:hover:text-blue-400">
+        <Link to={routePaths.catalog} className="hover:text-[var(--color-forest)] dark:hover:text-[var(--color-forest-muted)]">
           Inicio
         </Link>
         <span aria-hidden>/</span>
         <Link
           to={routePaths.catalog}
-          className="hover:text-[var(--color-forest)] dark:hover:text-blue-400"
+          className="hover:text-[var(--color-forest)] dark:hover:text-[var(--color-forest-muted)]"
         >
           Catálogo
         </Link>
@@ -175,7 +175,7 @@ export function ProductDetailPage() {
               aria-label="Favorito"
             >
               <FiHeart
-                className={`h-5 w-5 ${isFav ? 'fill-red-500 text-red-500' : ''}`}
+                className={`h-5 w-5 ${isFav ? 'fill-[var(--color-forest)] text-[var(--color-forest)]' : ''}`}
               />
             </button>
             {mainImageUrl ? (
@@ -200,12 +200,12 @@ export function ProductDetailPage() {
                   onClick={() => setActiveImage(i)}
                   className={`h-16 w-16 shrink-0 overflow-hidden rounded-md ring-2 transition sm:h-20 sm:w-20 ${
                     i === activeImage
-                      ? 'ring-[var(--color-forest)] dark:ring-blue-500'
+                      ? 'ring-[var(--color-forest)]'
                       : 'ring-transparent opacity-80 hover:opacity-100'
                   }`}
                 >
                   <img
-                    src={img.url}
+                    src={publicStorageImageSrc(img.url)}
                     alt={img.altText ?? product.name}
                     className="h-full w-full object-cover"
                   />
@@ -225,27 +225,20 @@ export function ProductDetailPage() {
                 {product.description}
               </p>
             ) : null}
-            <p className="mt-6 text-3xl font-bold text-[var(--color-forest)] dark:text-blue-400">
+            <p className="mt-6 text-3xl font-bold text-[var(--color-forest)]">
               {formatPrice(product.price)}
             </p>
           </div>
 
           <div className="rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">
-            <label className="block text-xs font-semibold uppercase tracking-wide text-zinc-400">
-              Entrega
-            </label>
-            <div className="mt-2 flex cursor-default items-center justify-between rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm font-medium text-zinc-800 dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100">
-              España (península)
-            </div>
-
-            <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
               {maxQty === 0 ? (
                 <span className="font-medium text-amber-700 dark:text-amber-400">
                   Sin stock disponible
                 </span>
               ) : (
                 <>
-                  <span className="font-semibold text-[var(--color-forest)] dark:text-blue-400">
+                  <span className="font-semibold text-[var(--color-forest)]">
                     En stock
                   </span>
                   {` · ${maxQty} unidades`}
@@ -296,7 +289,7 @@ export function ProductDetailPage() {
               </Button>
             </div>
 
-            <div className="mt-4 flex justify-center gap-2">
+            <div className="mt-4 flex justify-center">
               <Button
                 type="button"
                 variant="ghost"
@@ -305,17 +298,6 @@ export function ProductDetailPage() {
               >
                 <FiShare2 className="h-4 w-4" />
                 Compartir
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                className="gap-2 text-sm text-zinc-600 dark:text-zinc-400"
-                onClick={() =>
-                  toast('Pronto podrás chatear con la tienda', { icon: '💬' })
-                }
-              >
-                <FiMessageCircle className="h-4 w-4" />
-                Chat
               </Button>
             </div>
           </div>

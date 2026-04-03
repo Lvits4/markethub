@@ -3,6 +3,7 @@ import {
   FiHeart,
   FiGrid,
   FiHome,
+  FiLayers,
   FiPackage,
   FiSettings,
   FiShoppingBag,
@@ -15,7 +16,7 @@ const navInactive =
   'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-night-800 dark:hover:text-zinc-100';
 
 const navActive =
-  'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold bg-[var(--color-forest)]/10 text-[var(--color-forest)] dark:bg-blue-500/15 dark:text-blue-400';
+  'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold bg-[var(--color-forest)]/10 text-[var(--color-forest)] dark:bg-[var(--color-market-dark-surface)] dark:text-[var(--color-market-dark-accent)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2)]';
 
 export function MarketHeader() {
   const { isAuthenticated, user } = useAuth();
@@ -27,7 +28,7 @@ export function MarketHeader() {
         <NavLink
           to={routePaths.catalog}
           end
-          className="shrink-0 text-lg font-bold tracking-tight text-[var(--color-forest)] dark:text-blue-400"
+          className="shrink-0 text-lg font-bold tracking-tight text-[var(--color-forest)]"
         >
           MarketHub
         </NavLink>
@@ -45,6 +46,13 @@ export function MarketHeader() {
           >
             <FiHome className="h-4 w-4" aria-hidden />
             Inicio
+          </NavLink>
+          <NavLink
+            to={routePaths.stores}
+            className={({ isActive }) => (isActive ? navActive : navInactive)}
+          >
+            <FiLayers className="h-4 w-4" aria-hidden />
+            Tiendas
           </NavLink>
           <NavLink
             to={routePaths.favorites}
@@ -87,6 +95,13 @@ export function MarketHeader() {
           </NavLink>
         </nav>
 
+        <NavLink
+          to={routePaths.stores}
+          className="flex rounded-md p-2.5 text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800 lg:hidden"
+          aria-label="Tiendas"
+        >
+          <FiLayers className="h-5 w-5" />
+        </NavLink>
         <NavLink
           to={routePaths.cart}
           className="flex rounded-md p-2.5 text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800 lg:hidden"

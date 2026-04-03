@@ -90,6 +90,24 @@ export function CartPage() {
       <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-3xl">
         Carrito
       </h1>
+      <p
+        className="mt-3 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400"
+        role="status"
+      >
+        <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+          1. Revisa
+        </span>
+        {' · '}
+        <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+          2. Envío
+        </span>
+        {' · '}
+        <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+          3. Confirmar
+        </span>
+        {' — '}
+        El pago se simula al confirmar el pedido.
+      </p>
 
       {isLoading ? (
         <p className="mt-10 text-center text-sm text-zinc-500">Cargando…</p>
@@ -102,7 +120,7 @@ export function CartPage() {
           Tu carrito está vacío.{' '}
           <Link
             to={routePaths.catalog}
-            className="font-semibold text-[var(--color-forest)] dark:text-blue-400"
+            className="font-semibold text-[var(--color-forest)]"
           >
             Ir al catálogo
           </Link>
@@ -138,7 +156,7 @@ export function CartPage() {
                     >
                       {product?.name ?? 'Producto'}
                     </Link>
-                    <p className="text-sm font-medium text-[var(--color-forest)] dark:text-blue-400">
+                    <p className="text-sm font-medium text-[var(--color-forest)]">
                       {product ? formatPrice(product.price) : ''}
                     </p>
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -177,7 +195,7 @@ export function CartPage() {
                   value={coupon}
                   onChange={(e) => setCoupon(e.target.value)}
                   placeholder="Código cupón"
-                  className="min-w-0 flex-1 rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100 dark:focus:border-blue-500"
+                  className="min-w-0 flex-1 rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100 dark:focus:border-[var(--color-market-dark-accent)]"
                 />
                 <Button
                   type="button"
@@ -201,7 +219,7 @@ export function CartPage() {
                 onChange={(e) => setShippingAddress(e.target.value)}
                 rows={3}
                 placeholder="Calle, número, ciudad, código postal…"
-                className="mt-2 w-full resize-none rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100 dark:focus:border-blue-500"
+                className="mt-2 w-full resize-none rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100 dark:focus:border-[var(--color-market-dark-accent)]"
               />
 
               <label className="mt-5 block text-xs font-semibold uppercase tracking-wide text-zinc-400">
@@ -212,7 +230,7 @@ export function CartPage() {
                 onChange={(e) => setOrderNote(e.target.value)}
                 rows={2}
                 placeholder="Instrucciones de entrega, regalo, etc."
-                className="mt-2 w-full resize-none rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100 dark:focus:border-blue-500"
+                className="mt-2 w-full resize-none rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100 dark:focus:border-[var(--color-market-dark-accent)]"
               />
 
               <dl className="mt-6 space-y-3 border-t border-zinc-100 pt-6 text-sm dark:border-night-800">
@@ -230,7 +248,7 @@ export function CartPage() {
                 </div>
                 <div className="flex justify-between border-t border-zinc-100 pt-3 text-base font-bold dark:border-night-800">
                   <dt className="text-zinc-900 dark:text-zinc-50">Total</dt>
-                  <dd className="text-[var(--color-forest)] dark:text-blue-400">
+                  <dd className="text-[var(--color-forest)]">
                     {formatPrice(total)}
                   </dd>
                 </div>
