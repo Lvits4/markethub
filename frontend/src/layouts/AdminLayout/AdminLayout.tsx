@@ -1,5 +1,5 @@
 import { useState, type ComponentType, type ReactNode } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
   FiChevronLeft,
@@ -34,6 +34,9 @@ type NavItemProps = {
   collapsedBadgeCount?: number;
 };
 
+const sidebarLabelGrid =
+  'grid min-w-0 transition-[grid-template-columns] duration-200 ease-out motion-reduce:transition-none';
+
 function SidebarNavItem({
   to,
   end,
@@ -45,7 +48,7 @@ function SidebarNavItem({
 }: NavItemProps) {
   const collapsedBadge =
     collapsed && collapsedBadgeCount != null && collapsedBadgeCount > 0 ? (
-      <span className="absolute right-0 top-0 inline-flex h-4 min-w-4 translate-x-0.5 -translate-y-0.5 items-center justify-center rounded-full bg-[var(--admin-primary)] px-0.5 text-[9px] font-bold leading-none tabular-nums text-white">
+      <span className="absolute right-0 top-0 inline-flex h-4 min-w-4 translate-x-0.5 -translate-y-0.5 items-center justify-center rounded-full bg-admin-primary px-0.5 text-[9px] font-bold leading-none tabular-nums text-white">
         {collapsedBadgeCount > 9 ? '9+' : collapsedBadgeCount}
       </span>
     ) : null;
@@ -55,6 +58,7 @@ function SidebarNavItem({
       to={to}
       end={end}
       title={collapsed ? label : undefined}
+      aria-label={collapsed ? label : undefined}
       className={({ isActive }) =>
         [
           'admin-nav-link relative',
@@ -68,12 +72,17 @@ function SidebarNavItem({
         <Icon className="h-[18px] w-[18px]" aria-hidden />
         {collapsedBadge}
       </span>
-      {!collapsed ? (
-        <>
-          <span className="min-w-0 flex-1 truncate">{label}</span>
-          {badge}
-        </>
-      ) : null}
+      <div
+        className={`${sidebarLabelGrid} ${collapsed ? 'grid-cols-[0fr]' : 'grid-cols-[1fr]'}`}
+        aria-hidden={collapsed}
+      >
+        <div className="min-w-0 overflow-hidden">
+          <span className="flex min-w-0 items-center gap-2">
+            <span className="min-w-0 flex-1 truncate">{label}</span>
+            {badge}
+          </span>
+        </div>
+      </div>
     </NavLink>
   );
 }
@@ -82,6 +91,7 @@ export function AdminLayout() {
   const { logout, user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
   const navigate = useNavigate();
+  const { pathname: adminOutletPath } = useLocation();
   const { theme, toggleTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   const [accountSettingsOpen, setAccountSettingsOpen] = useState(false);
@@ -109,7 +119,7 @@ export function AdminLayout() {
 
   const moderationBadge =
     pendingCount > 0 ? (
-      <span className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-[var(--admin-primary)] px-1 text-[10px] font-bold leading-none tabular-nums text-white">
+      <span className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-admin-primary px-1 text-[10px] font-bold leading-none tabular-nums text-white">
         {pendingCount > 99 ? '99+' : pendingCount}
       </span>
     ) : null;
@@ -128,18 +138,26 @@ export function AdminLayout() {
             className={`flex min-w-0 items-center ${collapsed ? 'justify-center' : 'gap-2.5'}`}
           >
             <div
-              className="box-border flex aspect-square h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[9999px] border border-white/30 bg-[var(--admin-primary)] text-sm font-bold text-white shadow-sm"
+              className="box-border flex aspect-square h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[9999px] border border-white/30 bg-admin-primary text-sm font-bold text-white shadow-sm"
               aria-hidden
             >
               M
             </div>
-            {!collapsed ? (
-              <span className="truncate text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-                MarketHub
-              </span>
-            ) : (
+            <div
+              className={`${sidebarLabelGrid} min-w-0 ${collapsed ? 'grid-cols-[0fr]' : 'grid-cols-[1fr] flex-1'}`}
+            >
+              <div className="min-w-0 overflow-hidden">
+                <span
+                  className={`block truncate text-lg font-bold tracking-tight text-zinc-900 transition-opacity duration-200 ease-out motion-reduce:transition-none dark:text-zinc-50 ${collapsed ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+                  aria-hidden={collapsed}
+                >
+                  MarketHub
+                </span>
+              </div>
+            </div>
+            {collapsed ? (
               <span className="sr-only">MarketHub</span>
-            )}
+            ) : null}
           </div>
           <button
             type="button"
@@ -157,7 +175,7 @@ export function AdminLayout() {
         </div>
 
         <nav
-          className={`market-scroll min-h-0 flex-1 space-y-0.5 overflow-y-auto overflow-x-hidden overscroll-contain ${collapsed ? 'admin-sidebar-nav--collapsed px-1.5 py-2' : 'p-3'}`}
+          className={`market-scroll min-h-0 flex-1 space-y-0.5 overflow-y-auto overflow-x-hidden overscroll-contain [scrollbar-gutter:stable] ${collapsed ? 'admin-sidebar-nav--collapsed px-1.5 py-2' : 'p-3'}`}
         >
           <SidebarNavItem
             to={routePaths.admin}
@@ -217,9 +235,14 @@ export function AdminLayout() {
             className={`admin-nav-link w-full ${collapsed ? 'text-center' : 'text-left'}`}
           >
             <FiExternalLink className="h-[18px] w-[18px] shrink-0" aria-hidden />
-            {!collapsed ? (
-              <span className="truncate">Ver tienda pública</span>
-            ) : null}
+            <div
+              className={`${sidebarLabelGrid} ${collapsed ? 'grid-cols-[0fr]' : 'grid-cols-[1fr]'}`}
+              aria-hidden={collapsed}
+            >
+              <div className="min-w-0 overflow-hidden">
+                <span className="block truncate">Ver tienda pública</span>
+              </div>
+            </div>
           </button>
           <div
             className={`admin-sidebar-icon-row flex items-center gap-3 rounded-md py-2.5 ${collapsed ? '' : 'px-3'}`}
@@ -239,7 +262,7 @@ export function AdminLayout() {
                   role="switch"
                   aria-checked={theme === 'dark'}
                   onClick={toggleTheme}
-                  className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--admin-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--admin-card)] dark:focus-visible:ring-offset-night-900 ${theme === 'dark' ? 'bg-[var(--admin-primary)]' : 'bg-zinc-200 dark:bg-night-700'}`}
+                  className={`relative flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-admin-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--admin-card)] dark:focus-visible:ring-offset-night-900 ${theme === 'dark' ? 'bg-admin-primary' : 'bg-zinc-200 dark:bg-night-700'}`}
                 >
                   <span
                     className={`h-3 w-3 rounded-full bg-white shadow-sm ring-1 ring-black/5 transition-transform duration-200 ease-out dark:ring-white/10 ${theme === 'dark' ? 'translate-x-5' : 'translate-x-0'}`}
@@ -276,9 +299,14 @@ export function AdminLayout() {
             <span className="relative inline-flex shrink-0">
               <FiSettings className="h-[18px] w-[18px]" aria-hidden />
             </span>
-            {!collapsed ? (
-              <span className="min-w-0 flex-1 truncate">Ajustes cuenta</span>
-            ) : null}
+            <div
+              className={`${sidebarLabelGrid} ${collapsed ? 'grid-cols-[0fr]' : 'grid-cols-[1fr]'}`}
+              aria-hidden={collapsed}
+            >
+              <div className="min-w-0 overflow-hidden">
+                <span className="block min-w-0 flex-1 truncate">Ajustes cuenta</span>
+              </div>
+            </div>
           </button>
         </nav>
 
@@ -288,19 +316,26 @@ export function AdminLayout() {
           <div
             className={`flex rounded-md bg-zinc-50 dark:bg-night-800/60 ${collapsed ? 'w-full flex-col items-center gap-1 p-2' : 'w-full items-center gap-3 p-2.5'}`}
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[var(--admin-primary-soft)] text-sm font-semibold text-[var(--admin-primary)]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[var(--admin-primary-soft)] text-sm font-semibold text-admin-primary">
               {initials}
             </div>
-            {!collapsed ? (
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-                  {displayName}
-                </p>
-                <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
-                  {user?.email ?? (isAdmin ? 'Administrador' : 'Vendedor')}
-                </p>
+            <div
+              className={`${sidebarLabelGrid} min-w-0 ${collapsed ? 'grid-cols-[0fr]' : 'grid-cols-[1fr] flex-1'}`}
+            >
+              <div className="min-w-0 overflow-hidden">
+                <div
+                  className={`min-w-0 flex-1 transition-opacity duration-200 ease-out motion-reduce:transition-none ${collapsed ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+                  aria-hidden={collapsed}
+                >
+                  <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                    {displayName}
+                  </p>
+                  <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                    {user?.email ?? (isAdmin ? 'Administrador' : 'Vendedor')}
+                  </p>
+                </div>
               </div>
-            ) : null}
+            </div>
           </div>
           <Button
             type="button"
@@ -309,15 +344,27 @@ export function AdminLayout() {
             onClick={handleLogout}
           >
             <FiLogOut className="h-4 w-4 shrink-0" aria-hidden />
-            {!collapsed ? 'Cerrar sesión' : null}
+            <span
+              className={`${sidebarLabelGrid} min-w-0 ${collapsed ? 'grid-cols-[0fr]' : 'grid-cols-[1fr]'}`}
+              aria-hidden={collapsed}
+            >
+              <span className="min-w-0 overflow-hidden whitespace-nowrap">
+                Cerrar sesión
+              </span>
+            </span>
           </Button>
         </div>
       </aside>
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <main className="flex min-h-0 flex-1 flex-col overflow-hidden p-5 md:p-8">
-          <div className="mx-auto flex min-h-0 w-full max-w-[1360px] flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain">
-            <Outlet />
+          <div className="mx-auto flex min-h-0 w-full max-w-[1360px] flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain [scrollbar-gutter:stable]">
+            <div
+              key={adminOutletPath}
+              className="route-outlet-fade flex min-h-0 min-w-0 flex-1 flex-col"
+            >
+              <Outlet />
+            </div>
           </div>
         </main>
       </div>

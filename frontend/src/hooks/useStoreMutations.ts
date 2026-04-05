@@ -25,7 +25,7 @@ export function useCreateStoreMutation() {
       void qc.invalidateQueries({ queryKey: queryKeys.sellerDashboard });
       void qc.invalidateQueries({ queryKey: queryKeys.sellerProducts });
       void qc.invalidateQueries({ queryKey: queryKeys.sellerSalesReport });
-      void qc.invalidateQueries({ queryKey: queryKeys.sellerStoreReport });
+      void qc.invalidateQueries({ queryKey: queryKeys.adminPlatformReport });
     },
   });
 }
@@ -46,6 +46,7 @@ export function useUpdateStoreMutation() {
       void qc.invalidateQueries({ queryKey: queryKeys.sellerStore(id) });
       void qc.invalidateQueries({ queryKey: queryKeys.sellerDashboard });
       void qc.invalidateQueries({ queryKey: queryKeys.sellerProducts });
+      void qc.invalidateQueries({ queryKey: queryKeys.adminPlatformReport });
     },
   });
 }
@@ -65,7 +66,7 @@ export function useDeleteStoreMutation() {
       void qc.invalidateQueries({ queryKey: queryKeys.sellerDashboard });
       void qc.invalidateQueries({ queryKey: queryKeys.sellerProducts });
       void qc.invalidateQueries({ queryKey: queryKeys.sellerSalesReport });
-      void qc.invalidateQueries({ queryKey: queryKeys.sellerStoreReport });
+      void qc.invalidateQueries({ queryKey: queryKeys.adminPlatformReport });
       void qc.invalidateQueries({ queryKey: queryKeys.ordersStore });
     },
   });

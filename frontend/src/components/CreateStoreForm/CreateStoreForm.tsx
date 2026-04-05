@@ -10,7 +10,7 @@ import { uploadFile } from '../../requests/fileRequests';
 import type { CreateStorePayload } from '../../requests/storeRequests';
 
 const fieldClass =
-  'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';
+  'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-hidden transition placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';
 
 const textareaClass = `${fieldClass} resize-none`;
 
@@ -172,7 +172,7 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
                 role="listitem"
                 className={`h-1 flex-1 rounded-full transition-colors ${
                   i <= step
-                    ? 'bg-[var(--color-forest)] dark:bg-blue-500'
+                    ? 'bg-forest dark:bg-blue-500'
                     : 'bg-zinc-200 dark:bg-night-700'
                 }`}
               />
@@ -186,12 +186,11 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
         <div className="flex flex-col gap-3">
           {step === 0 ? (
             <>
-              <div>
-                <label htmlFor="create-store-name" className={labelClass}>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>
                   Nombre <span className="text-red-600 dark:text-red-400">*</span>
-                </label>
+                </span>
                 <input
-                  id="create-store-name"
                   autoComplete="organization"
                   placeholder="Ej. Mi tienda online"
                   value={name}
@@ -206,20 +205,17 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
                     {errors.name}
                   </p>
                 ) : null}
-              </div>
-              <div>
-                <label htmlFor="create-store-description" className={labelClass}>
-                  Descripción
-                </label>
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>Descripción</span>
                 <textarea
-                  id="create-store-description"
                   rows={3}
                   placeholder="Qué vendes, para quién…"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className={textareaClass}
                 />
-              </div>
+              </label>
               <LogoUploadField
                 value={logo}
                 onChange={setLogo}
@@ -234,12 +230,9 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
 
           {step === 1 ? (
             <>
-              <div>
-                <label htmlFor="create-store-email" className={labelClass}>
-                  Correo de contacto
-                </label>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>Correo de contacto</span>
                 <input
-                  id="create-store-email"
                   type="email"
                   autoComplete="email"
                   placeholder="tienda@ejemplo.com"
@@ -255,13 +248,10 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
                     {errors.contactEmail}
                   </p>
                 ) : null}
-              </div>
-              <div>
-                <label htmlFor="create-store-phone" className={labelClass}>
-                  Teléfono de contacto
-                </label>
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>Teléfono de contacto</span>
                 <input
-                  id="create-store-phone"
                   type="tel"
                   autoComplete="tel"
                   placeholder="+34 …"
@@ -269,33 +259,27 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
                   onChange={(e) => setContactPhone(e.target.value)}
                   className={fieldClass}
                 />
-              </div>
-              <div>
-                <label htmlFor="create-store-shipping" className={labelClass}>
-                  Política de envíos
-                </label>
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>Política de envíos</span>
                 <textarea
-                  id="create-store-shipping"
                   rows={2}
                   placeholder="Plazos, costes, zonas…"
                   value={shippingPolicy}
                   onChange={(e) => setShippingPolicy(e.target.value)}
                   className={textareaClass}
                 />
-              </div>
-              <div>
-                <label htmlFor="create-store-returns" className={labelClass}>
-                  Política de devoluciones
-                </label>
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>Política de devoluciones</span>
                 <textarea
-                  id="create-store-returns"
                   rows={2}
                   placeholder="Plazo, condiciones…"
                   value={returnPolicy}
                   onChange={(e) => setReturnPolicy(e.target.value)}
                   className={textareaClass}
                 />
-              </div>
+              </label>
             </>
           ) : null}
         </div>
@@ -313,7 +297,7 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
               variant="ghost"
               disabled={disabledNav}
               onClick={onCancel}
-              className="h-11 min-h-11 min-w-0 flex-1 basis-0 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:min-w-[7.5rem]"
+              className="h-11 min-h-11 min-w-0 flex-1 basis-0 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:w-44"
             >
               Cancelar
             </Button>
@@ -324,7 +308,7 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
               variant="ghost"
               disabled={disabledNav}
               onClick={goBack}
-              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:min-w-[7.5rem]"
+              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:w-44"
             >
               <FiChevronLeft className="h-4 w-4 shrink-0" aria-hidden />
               Atrás
@@ -338,7 +322,7 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
               variant="cta"
               disabled={disabledNav}
               onClick={goNext}
-              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 px-3 sm:min-w-[11rem]"
+              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 px-3 sm:w-44 sm:flex-none"
             >
               Siguiente
               <FiChevronRight className="h-4 w-4 shrink-0" aria-hidden />
@@ -349,7 +333,7 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
               variant="cta"
               disabled={disabledNav}
               onClick={() => void handleCreateStore()}
-              className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:min-w-[11rem]"
+              className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:w-44 sm:flex-none"
             >
               {createMut.isPending ? 'Creando…' : 'Crear tienda'}
             </Button>

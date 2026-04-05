@@ -85,7 +85,7 @@ export function SellerOrdersPage() {
           {data.map((o) => (
             <div
               key={o.id}
-              className="rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800"
+              className="rounded-md bg-white p-5 shadow-market ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800"
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
                 <div>
@@ -107,15 +107,12 @@ export function SellerOrdersPage() {
                   </p>
                 </div>
                 <div className="flex w-full min-w-0 flex-col gap-2 sm:w-auto sm:items-end">
-                  <label
-                    htmlFor={`seller-order-status-${o.id}`}
-                    className="text-xs font-medium uppercase tracking-wide text-zinc-400"
-                  >
-                    Estado
-                  </label>
-                  <div className="w-full min-w-[10rem] sm:w-auto sm:min-w-[12rem]">
+                  <fieldset className="m-0 min-w-0 w-full border-0 p-0 sm:w-auto sm:items-end">
+                    <legend className="text-xs font-medium uppercase tracking-wide text-zinc-400">
+                      Estado
+                    </legend>
+                    <div className="mt-1 w-full min-w-40 sm:w-auto sm:min-w-48">
                     <FormSelect
-                      id={`seller-order-status-${o.id}`}
                       value={
                         isOrderStatusValue(o.status) ? o.status : 'PENDING'
                       }
@@ -124,6 +121,7 @@ export function SellerOrdersPage() {
                       options={ORDER_STATUS_OPTIONS}
                     />
                   </div>
+                  </fieldset>
                 </div>
               </div>
               {o.shippingAddress ? (

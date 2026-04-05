@@ -28,7 +28,7 @@ function unitPriceNumber(price: string | number | undefined): number {
 }
 
 const checkoutFieldClass =
-  'w-full rounded-lg border border-zinc-200/90 bg-white px-3.5 py-2.5 text-sm text-zinc-900 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/15 dark:border-night-600 dark:bg-night-900/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-[var(--color-market-dark-accent)] dark:focus:ring-[var(--color-market-dark-accent)]/20';
+  'w-full rounded-lg border border-zinc-200/90 bg-white px-3.5 py-2.5 text-sm text-zinc-900 shadow-sm outline-hidden transition placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/15 dark:border-night-600 dark:bg-night-900/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-market-dark-accent dark:focus:ring-market-dark-accent/20';
 
 export function CartPage() {
   const navigate = useNavigate();
@@ -145,7 +145,7 @@ export function CartPage() {
           Tu carrito está vacío.{' '}
           <Link
             to={routePaths.catalog}
-            className="font-semibold text-[var(--color-forest)]"
+            className="font-semibold text-forest"
           >
             Ir al catálogo
           </Link>
@@ -159,7 +159,7 @@ export function CartPage() {
               return (
                 <li
                   key={it.id}
-                  className="flex gap-4 rounded-md bg-white p-4 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800 sm:p-5"
+                  className="flex gap-4 rounded-md bg-white p-4 shadow-market ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-market-dark dark:ring-night-800 sm:p-5"
                 >
                   <div className="h-24 w-24 shrink-0 overflow-hidden rounded-md bg-zinc-100 dark:bg-night-800 sm:h-28 sm:w-28">
                     {img ? (
@@ -192,7 +192,7 @@ export function CartPage() {
                     </Link>
                     {product ? (
                       <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                        <span className="font-medium text-[var(--color-forest)] dark:text-[var(--color-market-dark-accent)]">
+                        <span className="font-medium text-forest dark:text-market-dark-accent">
                           {formatPrice(product.price)}
                         </span>
                         <span className="mx-1">×</span>
@@ -215,8 +215,7 @@ export function CartPage() {
                       />
                       <Button
                         type="button"
-                        variant="outline"
-                        className="shrink-0 gap-1.5 border-red-300 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 dark:border-red-800/80 dark:text-red-400 dark:hover:bg-red-950/40"
+                        className="shrink-0 gap-1.5 bg-red-600! px-3 py-2 text-xs font-semibold text-white! shadow-sm hover:bg-red-700! dark:bg-red-700! dark:hover:bg-red-600!"
                         onClick={() => void handleRemove(it.id)}
                         disabled={removeItem.isPending}
                         aria-label="Quitar del carrito"
@@ -243,13 +242,10 @@ export function CartPage() {
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5 pb-5 pt-1">
 
               <section
-                aria-labelledby="modal-cart-totals-heading"
+                aria-label="Importes del pedido"
                 className="mt-4 rounded-lg border border-zinc-100 bg-zinc-50/50 p-4 dark:border-night-700/80 dark:bg-night-800/35"
               >
-                <h3
-                  id="modal-cart-totals-heading"
-                  className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400"
-                >
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
                   Importes
                 </h3>
                 <dl className="mt-3 space-y-2.5 text-sm">
@@ -267,7 +263,7 @@ export function CartPage() {
                   </div>
                   <div className="flex justify-between gap-3 border-t border-zinc-200/80 pt-3 text-base font-bold dark:border-night-700">
                     <dt className="text-zinc-900 dark:text-zinc-50">Total</dt>
-                    <dd className="tabular-nums text-[var(--color-forest)] dark:text-[var(--color-market-dark-accent)]">
+                    <dd className="tabular-nums text-forest dark:text-market-dark-accent">
                       {formatPrice(total)}
                     </dd>
                   </div>
@@ -275,34 +271,30 @@ export function CartPage() {
               </section>
 
               <section
-                aria-labelledby="modal-cart-shipping-heading"
+                aria-label="Dirección de entrega"
                 className="mt-4 rounded-lg border border-zinc-100 p-4 dark:border-night-700/80"
               >
                 <div className="flex items-start gap-3">
-                  <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-500/10 text-sky-600 dark:bg-[color:rgb(21_42_94/0.55)] dark:text-[var(--color-market-dark-accent)]">
+                  <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-500/10 text-sky-600 dark:bg-[rgb(21_42_94/0.55)] dark:text-market-dark-accent">
                     <FiPackage className="h-4 w-4" aria-hidden />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <h3
-                      id="modal-cart-shipping-heading"
-                      className="text-sm font-semibold text-zinc-900 dark:text-zinc-50"
-                    >
+                    <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
                       Dirección de entrega
                     </h3>
                     <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
                       La usaremos para todos los pedidos de esta compra.
                     </p>
-                    <label htmlFor="modal-cart-shipping-address" className="sr-only">
-                      Dirección completa
+                    <label className="mt-3 flex flex-col gap-1">
+                      <span className="sr-only">Dirección completa</span>
+                      <textarea
+                        value={shippingAddress}
+                        onChange={(e) => setShippingAddress(e.target.value)}
+                        rows={3}
+                        placeholder="Calle, número, piso, ciudad, código postal…"
+                        className={`${checkoutFieldClass} resize-none`}
+                      />
                     </label>
-                    <textarea
-                      id="modal-cart-shipping-address"
-                      value={shippingAddress}
-                      onChange={(e) => setShippingAddress(e.target.value)}
-                      rows={3}
-                      placeholder="Calle, número, piso, ciudad, código postal…"
-                      className={`${checkoutFieldClass} mt-3 resize-none`}
-                    />
                   </div>
                 </div>
               </section>
@@ -359,17 +351,16 @@ export function CartPage() {
                 </button>
                 {noteOpen ? (
                   <div className="rounded-lg border border-zinc-100 bg-zinc-50/40 p-3 dark:border-night-700/60 dark:bg-night-800/25">
-                    <label htmlFor="modal-cart-order-note" className="sr-only">
-                      Nota opcional para el pedido
+                    <label className="flex flex-col gap-1">
+                      <span className="sr-only">Nota opcional para el pedido</span>
+                      <textarea
+                        value={orderNote}
+                        onChange={(e) => setOrderNote(e.target.value)}
+                        rows={2}
+                        placeholder="Ej. timbre roto, dejar con portero…"
+                        className={`${checkoutFieldClass} resize-none`}
+                      />
                     </label>
-                    <textarea
-                      id="modal-cart-order-note"
-                      value={orderNote}
-                      onChange={(e) => setOrderNote(e.target.value)}
-                      rows={2}
-                      placeholder="Ej. timbre roto, dejar con portero…"
-                      className={`${checkoutFieldClass} resize-none`}
-                    />
                   </div>
                 ) : null}
               </div>

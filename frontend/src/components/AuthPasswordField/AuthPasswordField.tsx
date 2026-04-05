@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 
 const fieldClass =
-  'w-full rounded-md border border-zinc-200/90 bg-zinc-50/80 py-3 pl-4 pr-11 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-auth-primary focus:bg-white focus:ring-2 focus:ring-auth-primary/18 dark:border-night-600 dark:bg-night-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:bg-night-950';
+  'w-full rounded-md border border-zinc-200/90 bg-zinc-50/80 py-3 pl-4 pr-11 text-sm text-zinc-900 outline-hidden transition placeholder:text-zinc-400 focus:border-auth-primary focus:bg-white focus:ring-2 focus:ring-auth-primary/18 dark:border-night-600 dark:bg-night-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:bg-night-950';
 
 type AuthPasswordFieldProps = {
-  id: string;
   label: string;
   value: string;
   onChange: (value: string) => void;
@@ -15,7 +14,6 @@ type AuthPasswordFieldProps = {
 };
 
 export function AuthPasswordField({
-  id,
   label,
   value,
   onChange,
@@ -27,15 +25,12 @@ export function AuthPasswordField({
 
   return (
     <div>
-      <label
-        htmlFor={id}
-        className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
-      >
-        {label}
-      </label>
-      <div className="relative mt-1">
+      <label className="block">
+        <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
+          {label}
+        </span>
+        <div className="relative mt-1">
         <input
-          id={id}
           type={visible ? 'text' : 'password'}
           autoComplete={autoComplete}
           placeholder={placeholder}
@@ -56,6 +51,7 @@ export function AuthPasswordField({
           )}
         </button>
       </div>
+      </label>
       {error ? (
         <p className="mt-1 text-xs text-red-600">{error}</p>
       ) : null}

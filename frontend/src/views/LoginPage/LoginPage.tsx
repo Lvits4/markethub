@@ -8,7 +8,7 @@ import { useLogin } from '../../hooks/useLogin';
 import { loginSchema } from '../../validations/loginSchema';
 
 const inputClass =
-  'mt-1 w-full rounded-md border border-zinc-200/90 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-auth-primary focus:bg-white focus:ring-2 focus:ring-auth-primary/18 dark:border-night-600 dark:bg-night-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:bg-night-950';
+  'mt-1 w-full rounded-md border border-zinc-200/90 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-hidden transition placeholder:text-zinc-400 focus:border-auth-primary focus:bg-white focus:ring-2 focus:ring-auth-primary/18 dark:border-night-600 dark:bg-night-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:bg-night-950';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -65,15 +65,11 @@ export function LoginPage() {
       </p>
 
       <form onSubmit={handleSubmit} className="mt-3 flex flex-col gap-2">
-        <div>
-          <label
-            htmlFor="email"
-            className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
-          >
+        <label className="flex flex-col gap-1">
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
             Correo electrónico
-          </label>
+          </span>
           <input
-            id="email"
             type="email"
             autoComplete="email"
             placeholder="nombre@email.com"
@@ -84,9 +80,8 @@ export function LoginPage() {
           {fieldErrors.email ? (
             <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
           ) : null}
-        </div>
+        </label>
         <AuthPasswordField
-          id="password"
           label="Contraseña"
           value={password}
           onChange={setPassword}

@@ -209,10 +209,7 @@ export function AdminDashboardPage() {
         <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">
           <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
             <div className="min-w-0">
-              <h2
-                id="chart-monthly-title"
-                className="text-sm font-semibold text-zinc-900 dark:text-zinc-50"
-              >
+              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
                 Ingresos por mes
               </h2>
               <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
@@ -220,9 +217,8 @@ export function AdminDashboardPage() {
               </p>
             </div>
             <FormSelect
-              id="admin-chart-period"
               variant="compact"
-              aria-labelledby="chart-monthly-title"
+              aria-label="Rango de meses del gráfico"
               value={String(periodMonths)}
               onChange={(v) => {
                 const n = Number(v);

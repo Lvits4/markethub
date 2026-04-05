@@ -12,7 +12,7 @@ import type { AdminStoreDetail } from '../../types/admin';
 import type { UpdateStorePayload } from '../../requests/storeRequests';
 
 const fieldClass =
-  'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';
+  'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-hidden transition placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';
 
 const textareaClass = `${fieldClass} resize-none`;
 
@@ -218,7 +218,7 @@ export function AdminEditStoreForm({
                 role="listitem"
                 className={`h-1 flex-1 rounded-full transition-colors ${
                   i <= step
-                    ? 'bg-[var(--color-forest)] dark:bg-blue-500'
+                    ? 'bg-forest dark:bg-blue-500'
                     : 'bg-zinc-200 dark:bg-night-700'
                 }`}
               />
@@ -233,19 +233,20 @@ export function AdminEditStoreForm({
           {step === 0 ? (
             <>
               <div>
-                <label htmlFor="edit-store-name" className={labelClass}>
-                  Nombre <span className="text-red-600 dark:text-red-400">*</span>
+                <label className="flex flex-col gap-1">
+                  <span className={labelClass}>
+                    Nombre <span className="text-red-600 dark:text-red-400">*</span>
+                  </span>
+                  <input
+                    autoComplete="organization"
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      setErrors((prev) => ({ ...prev, name: undefined }));
+                    }}
+                    className={`${fieldClass} ${errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400/20' : ''}`}
+                  />
                 </label>
-                <input
-                  id="edit-store-name"
-                  autoComplete="organization"
-                  value={name}
-                  onChange={(e) => {
-                    setName(e.target.value);
-                    setErrors((prev) => ({ ...prev, name: undefined }));
-                  }}
-                  className={`${fieldClass} ${errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400/20' : ''}`}
-                />
                 {errors.name ? (
                   <p className="mt-1 text-xs text-red-600 dark:text-red-400">
                     {errors.name}
@@ -260,26 +261,20 @@ export function AdminEditStoreForm({
                 </p>
               </div>
 
-              <div>
-                <label htmlFor="edit-store-description" className={labelClass}>
-                  Descripción
-                </label>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>Descripción</span>
                 <textarea
-                  id="edit-store-description"
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className={textareaClass}
                 />
-              </div>
+              </label>
 
               {allowCommissionEdit ? (
-                <div>
-                  <label htmlFor="edit-store-commission" className={labelClass}>
-                    Comisión (%)
-                  </label>
+                <label className="flex flex-col gap-1">
+                  <span className={labelClass}>Comisión (%)</span>
                   <input
-                    id="edit-store-commission"
                     type="text"
                     inputMode="decimal"
                     value={commission}
@@ -288,32 +283,25 @@ export function AdminEditStoreForm({
                       setErrors((prev) => ({ ...prev, commission: undefined }));
                     }}
                     className={`${fieldClass} ${errors.commission ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400/20' : ''}`}
-                    aria-describedby="edit-store-commission-hint"
                   />
                   {errors.commission ? (
                     <p className="mt-1 text-xs text-red-600 dark:text-red-400">
                       {errors.commission}
                     </p>
                   ) : null}
-                  <p
-                    id="edit-store-commission-hint"
-                    className="mt-1 text-xs text-zinc-500 dark:text-zinc-400"
-                  >
+                  <span className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                     Porcentaje de comisión de la plataforma (0–100).
-                  </p>
-                </div>
+                  </span>
+                </label>
               ) : null}
             </>
           ) : null}
 
           {step === 1 ? (
             <>
-              <div>
-                <label htmlFor="edit-store-email" className={labelClass}>
-                  Correo de contacto
-                </label>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>Correo de contacto</span>
                 <input
-                  id="edit-store-email"
                   type="email"
                   autoComplete="email"
                   value={contactEmail}
@@ -328,21 +316,18 @@ export function AdminEditStoreForm({
                     {errors.contactEmail}
                   </p>
                 ) : null}
-              </div>
+              </label>
 
-              <div>
-                <label htmlFor="edit-store-phone" className={labelClass}>
-                  Teléfono de contacto
-                </label>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>Teléfono de contacto</span>
                 <input
-                  id="edit-store-phone"
                   type="tel"
                   autoComplete="tel"
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
                   className={fieldClass}
                 />
-              </div>
+              </label>
 
               <LogoUploadField
                 value={logo}
@@ -354,31 +339,25 @@ export function AdminEditStoreForm({
                 onUploadingChange={setLogoUploading}
               />
 
-              <div>
-                <label htmlFor="edit-store-shipping" className={labelClass}>
-                  Política de envíos
-                </label>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>Política de envíos</span>
                 <textarea
-                  id="edit-store-shipping"
                   rows={2}
                   value={shippingPolicy}
                   onChange={(e) => setShippingPolicy(e.target.value)}
                   className={textareaClass}
                 />
-              </div>
+              </label>
 
-              <div>
-                <label htmlFor="edit-store-returns" className={labelClass}>
-                  Política de devoluciones
-                </label>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>Política de devoluciones</span>
                 <textarea
-                  id="edit-store-returns"
                   rows={2}
                   value={returnPolicy}
                   onChange={(e) => setReturnPolicy(e.target.value)}
                   className={textareaClass}
                 />
-              </div>
+              </label>
             </>
           ) : null}
         </div>
@@ -396,7 +375,7 @@ export function AdminEditStoreForm({
               variant="ghost"
               disabled={busy}
               onClick={onCancel}
-              className="h-11 min-h-11 min-w-0 flex-1 basis-0 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:min-w-[7.5rem]"
+              className="h-11 min-h-11 min-w-0 flex-1 basis-0 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:w-44"
             >
               Cancelar
             </Button>
@@ -407,7 +386,7 @@ export function AdminEditStoreForm({
               variant="ghost"
               disabled={busy}
               onClick={goBack}
-              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:min-w-[7.5rem]"
+              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:w-44"
             >
               <FiChevronLeft className="h-4 w-4 shrink-0" aria-hidden />
               Atrás
@@ -421,7 +400,7 @@ export function AdminEditStoreForm({
               variant="cta"
               disabled={busy}
               onClick={goNext}
-              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 px-3 sm:min-w-[11rem]"
+              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 px-3 sm:w-44 sm:flex-none"
             >
               Siguiente
               <FiChevronRight className="h-4 w-4 shrink-0" aria-hidden />
@@ -432,7 +411,7 @@ export function AdminEditStoreForm({
               variant="cta"
               disabled={busy}
               onClick={handleSaveStore}
-              className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:min-w-[11rem]"
+              className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:w-44 sm:flex-none"
             >
               {busy ? 'Guardando…' : 'Guardar cambios'}
             </Button>

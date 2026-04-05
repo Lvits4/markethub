@@ -29,7 +29,7 @@ export function SellerStoreProductsPage() {
       <div className="mb-6">
         <Link
           to={routePaths.seller}
-          className="text-sm font-medium text-[var(--color-forest)]"
+          className="text-sm font-medium text-forest"
         >
           ← Inicio
         </Link>
@@ -40,7 +40,7 @@ export function SellerStoreProductsPage() {
       <div className="mt-4">
         <Link
           to={`${routePaths.sellerProductNew}?storeId=${encodeURIComponent(storeId ?? '')}`}
-          className="inline-flex rounded-md bg-[var(--color-forest)] px-5 py-2.5 text-sm font-semibold text-white dark:bg-[var(--color-market-dark-surface)] dark:text-[var(--color-market-dark-accent)] dark:hover:bg-[var(--color-market-dark-surface-hover)]"
+          className="inline-flex rounded-md bg-forest px-5 py-2.5 text-sm font-semibold text-white dark:bg-market-dark-surface dark:text-market-dark-accent dark:hover:bg-market-dark-surface-hover"
         >
           Nuevo producto
         </Link>
@@ -86,7 +86,7 @@ export function SellerStoreProductsPage() {
                     <div className="flex justify-end gap-2">
                       <Link
                         to={routePaths.sellerProductEdit(p.id)}
-                        className="text-sm font-medium text-[var(--color-forest)]"
+                        className="text-sm font-medium text-forest"
                       >
                         Editar
                       </Link>

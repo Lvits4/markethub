@@ -27,7 +27,6 @@ export function useAdminOrderStatus() {
       queryClient.invalidateQueries({ queryKey: queryKeys.adminPlatformReport });
       queryClient.invalidateQueries({ queryKey: queryKeys.sellerDashboard });
       queryClient.invalidateQueries({ queryKey: queryKeys.sellerSalesReport });
-      queryClient.invalidateQueries({ queryKey: queryKeys.sellerStoreReport });
       queryClient.invalidateQueries({
         queryKey: queryKeys.order(variables.orderId),
       });

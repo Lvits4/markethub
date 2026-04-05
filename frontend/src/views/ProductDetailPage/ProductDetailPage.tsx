@@ -142,13 +142,13 @@ export function ProductDetailPage() {
         className="mb-4 flex flex-wrap items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 sm:text-sm"
         aria-label="Migas de pan"
       >
-        <Link to={routePaths.catalog} className="hover:text-[var(--color-forest)] dark:hover:text-[var(--color-forest-muted)]">
+        <Link to={routePaths.catalog} className="hover:text-forest dark:hover:text-forest-muted">
           Inicio
         </Link>
         <span aria-hidden>/</span>
         <Link
           to={routePaths.catalog}
-          className="hover:text-[var(--color-forest)] dark:hover:text-[var(--color-forest-muted)]"
+          className="hover:text-forest dark:hover:text-forest-muted"
         >
           Catálogo
         </Link>
@@ -160,7 +160,7 @@ export function ProductDetailPage() {
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_min(100%,380px)] lg:items-start lg:gap-10">
         <div>
-          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-md bg-zinc-100 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/60 dark:bg-night-800 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-700/50 sm:aspect-[5/6] lg:aspect-square">
+          <div className="relative aspect-4/5 w-full overflow-hidden rounded-md bg-zinc-100 shadow-market ring-1 ring-zinc-200/60 dark:bg-night-800 dark:shadow-market-dark dark:ring-night-700/50 sm:aspect-5/6 lg:aspect-square">
             <Link
               to={routePaths.catalog}
               className="absolute left-3 top-3 z-10 rounded-md bg-white/95 p-2.5 text-zinc-900 shadow-sm backdrop-blur-sm dark:bg-night-900/95 dark:text-zinc-100"
@@ -175,7 +175,7 @@ export function ProductDetailPage() {
               aria-label="Favorito"
             >
               <FiHeart
-                className={`h-5 w-5 ${isFav ? 'fill-[var(--color-forest)] text-[var(--color-forest)]' : ''}`}
+                className={`h-5 w-5 ${isFav ? 'fill-forest text-forest' : ''}`}
               />
             </button>
             {mainImageUrl ? (
@@ -200,7 +200,7 @@ export function ProductDetailPage() {
                   onClick={() => setActiveImage(i)}
                   className={`h-16 w-16 shrink-0 overflow-hidden rounded-md ring-2 transition sm:h-20 sm:w-20 ${
                     i === activeImage
-                      ? 'ring-[var(--color-forest)]'
+                      ? 'ring-forest'
                       : 'ring-transparent opacity-80 hover:opacity-100'
                   }`}
                 >
@@ -215,7 +215,7 @@ export function ProductDetailPage() {
           ) : null}
         </div>
 
-        <div className="flex flex-col gap-6 lg:sticky lg:top-[5.25rem]">
+        <div className="flex flex-col gap-6 lg:sticky lg:top-21">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">
               {product.name}
@@ -225,12 +225,12 @@ export function ProductDetailPage() {
                 {product.description}
               </p>
             ) : null}
-            <p className="mt-6 text-3xl font-bold text-[var(--color-forest)]">
+            <p className="mt-6 text-3xl font-bold text-forest">
               {formatPrice(product.price)}
             </p>
           </div>
 
-          <div className="rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">
+          <div className="rounded-md bg-white p-5 shadow-market ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-market-dark dark:ring-night-800">
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
               {maxQty === 0 ? (
                 <span className="font-medium text-amber-700 dark:text-amber-400">
@@ -238,7 +238,7 @@ export function ProductDetailPage() {
                 </span>
               ) : (
                 <>
-                  <span className="font-semibold text-[var(--color-forest)]">
+                  <span className="font-semibold text-forest">
                     En stock
                   </span>
                   {` · ${maxQty} unidades`}
@@ -280,7 +280,6 @@ export function ProductDetailPage() {
               </Button>
               <Button
                 type="button"
-                variant="outline"
                 className="w-full justify-center py-3.5 text-base"
                 disabled={maxQty === 0 || addItem.isPending}
                 onClick={() => void handleBuyNow()}

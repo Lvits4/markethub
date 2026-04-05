@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
@@ -43,8 +43,6 @@ export function SellerProductFormPage() {
   const [categoryId, setCategoryId] = useState('');
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
-  const productImagesFieldId = useId();
-
   const categoryOptions = useMemo(
     () => [
       { value: '', label: '—' },
@@ -181,7 +179,7 @@ export function SellerProductFormPage() {
         Abre “Nuevo producto” desde una tienda.{' '}
         <Link
           to={routePaths.seller}
-          className="font-semibold text-[var(--color-forest)]"
+          className="font-semibold text-forest"
         >
           Ir al panel vendedor
         </Link>
@@ -199,7 +197,7 @@ export function SellerProductFormPage() {
       <div className="mb-6">
         <Link
           to={backHref}
-          className="text-sm font-medium text-[var(--color-forest)]"
+          className="text-sm font-medium text-forest"
         >
           ← Volver
         </Link>
@@ -208,7 +206,7 @@ export function SellerProductFormPage() {
         {isEdit ? 'Editar producto' : 'Nuevo producto'}
       </h2>
 
-      <div className="mt-6 max-w-xl space-y-4 rounded-md bg-white p-6 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
+      <div className="mt-6 max-w-xl space-y-4 rounded-md bg-white p-6 shadow-market ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
         <div>
           <label className="text-xs text-zinc-500">Nombre</label>
           <input
@@ -249,32 +247,24 @@ export function SellerProductFormPage() {
             />
           </div>
         </div>
-        <div>
-          <label
-            htmlFor="seller-product-category"
-            className="text-xs text-zinc-500"
-          >
-            Categoría
-          </label>
-          <FormSelect
-            id="seller-product-category"
-            value={categoryId}
-            onChange={setCategoryId}
-            options={categoryOptions}
-            placeholder="—"
-            triggerClassName="!mt-1"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor={productImagesFieldId}
-            className="text-xs text-zinc-500 dark:text-zinc-400"
-          >
+        <fieldset className="m-0 min-w-0 border-0 p-0">
+          <legend className="text-xs text-zinc-500">Categoría</legend>
+          <div className="mt-1">
+            <FormSelect
+              value={categoryId}
+              onChange={setCategoryId}
+              options={categoryOptions}
+              placeholder="—"
+              triggerClassName="!mt-0"
+            />
+          </div>
+        </fieldset>
+        <fieldset className="m-0 min-w-0 border-0 p-0">
+          <legend className="text-xs text-zinc-500 dark:text-zinc-400">
             Imágenes
-          </label>
+          </legend>
           <div className="mt-1">
             <ProductImagesField
-              id={productImagesFieldId}
               files={[]}
               onChange={() => {}}
               remoteUrls={imageUrls}
@@ -286,7 +276,7 @@ export function SellerProductFormPage() {
               hintText="PNG, JPG, WebP… Se suben al elegir o soltar archivos."
             />
           </div>
-        </div>
+        </fieldset>
         <Button
           type="button"
           variant="primary"

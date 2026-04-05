@@ -1,7 +1,6 @@
 import {
   useDeferredValue,
   useEffect,
-  useId,
   useMemo,
   useRef,
   useState,
@@ -30,7 +29,9 @@ const SORT_OPTIONS: { value: ProductSortBy; label: string }[] = [
 const DEFAULT_SORT: ProductSortBy = 'newest';
 
 const filterFieldClass =
-  'page-size-input w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm text-zinc-900 outline-none transition-[border-color,box-shadow] placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/25 dark:border-night-600 dark:bg-night-800/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-[var(--color-market-dark-accent)] dark:focus:ring-[color:rgb(69_139_222/0.22)]';
+  'page-size-input w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm text-zinc-900 outline-hidden transition-[border-color,box-shadow] placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/25 dark:border-night-600 dark:bg-night-800/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-market-dark-accent dark:focus:ring-market-dark-accent/22';
+
+const filterFieldsetClass = 'm-0 min-w-0 border-0 p-0';
 
 function storeInitials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -48,8 +49,6 @@ function storeInitials(name: string): string {
 export function StorePublicPage() {
   const { storeId } = useParams<{ storeId: string }>();
   const navigate = useNavigate();
-  const storeCategoryFieldId = useId();
-  const storeSortFieldId = useId();
   const {
     data: store,
     isLoading: storeLoading,
@@ -201,7 +200,6 @@ export function StorePublicPage() {
         <p className="text-sm text-zinc-500">Tienda no válida.</p>
         <Button
           type="button"
-          variant="outline"
           className="mt-6"
           onClick={() => navigate(routePaths.stores)}
         >
@@ -225,7 +223,6 @@ export function StorePublicPage() {
         <p className="text-sm text-red-600">No se encontró esta tienda.</p>
         <Button
           type="button"
-          variant="outline"
           className="mt-6"
           onClick={() => navigate(routePaths.stores)}
         >
@@ -244,7 +241,7 @@ export function StorePublicPage() {
         <button
           type="button"
           onClick={goBack}
-          className="group -mx-1 inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 text-sm font-normal text-zinc-600 transition-colors hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-forest)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-surface-cream)] dark:text-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:ring-[color:rgb(69_139_222/0.4)] dark:focus-visible:ring-offset-[var(--color-night-base)]"
+          className="group -mx-1 inline-flex items-center gap-1.5 rounded-md px-1 py-0.5 text-sm font-normal text-zinc-600 transition-colors hover:text-zinc-900 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-forest/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-cream dark:text-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:ring-market-dark-accent/40 dark:focus-visible:ring-offset-night-base"
         >
           <FiArrowLeft
             className="h-3.5 w-3.5 shrink-0 transition-transform group-hover:-translate-x-0.5"
@@ -254,9 +251,9 @@ export function StorePublicPage() {
         </button>
       </div>
 
-      <section className="mb-8 overflow-hidden rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/60 dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">
+      <section className="mb-8 overflow-hidden rounded-md bg-white shadow-market ring-1 ring-zinc-200/60 dark:bg-night-900 dark:shadow-market-dark dark:ring-night-800">
         <div className="grid grid-cols-1 sm:grid-cols-[minmax(11rem,min(38vw,20rem))_1fr]">
-          <div className="relative aspect-[5/3] w-full min-h-[11rem] border-b border-zinc-200 bg-zinc-100 dark:border-night-700 dark:bg-night-800 sm:aspect-auto sm:min-h-0 sm:border-b-0 sm:border-r">
+          <div className="relative aspect-5/3 w-full min-h-44 border-b border-zinc-200 bg-zinc-100 dark:border-night-700 dark:bg-night-800 sm:aspect-auto sm:min-h-0 sm:border-b-0 sm:border-r">
             {store.logo ? (
               <img
                 src={publicStorageImageSrc(store.logo)}
@@ -265,10 +262,10 @@ export function StorePublicPage() {
               />
             ) : (
               <div
-                className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[var(--color-forest)]/30 to-zinc-200 dark:from-sky-600/28 dark:to-night-800"
+                className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-forest/30 to-zinc-200 dark:from-sky-600/28 dark:to-night-800"
                 aria-hidden
               >
-                <span className="text-4xl font-bold tracking-tight text-[var(--color-forest)] dark:text-[var(--color-market-dark-accent)] sm:text-5xl md:text-6xl">
+                <span className="text-4xl font-bold tracking-tight text-forest dark:text-market-dark-accent sm:text-5xl md:text-6xl">
                   {storeInitials(store.name)}
                 </span>
               </div>
@@ -335,10 +332,8 @@ export function StorePublicPage() {
         >
           <Button
             type="button"
-            variant="outline"
-            className="h-full min-h-[52px] min-w-[5.5rem] shrink-0 px-4 py-0"
+            className="h-full min-h-[52px] min-w-22 shrink-0 px-4 py-0"
             aria-expanded={filterPopoverOpen}
-            aria-controls="store-public-filter-popover"
             aria-haspopup="dialog"
             onClick={() => {
               setFilterPopoverOpen((open) => {
@@ -356,53 +351,48 @@ export function StorePublicPage() {
           </Button>
           {filterPopoverOpen ? (
             <div
-              id="store-public-filter-popover"
               role="dialog"
               aria-label="Filtros y orden"
               className="catalog-filter-popover absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[min(calc(100vw-2rem),20rem)] rounded-xl border border-zinc-200/90 bg-white p-4 shadow-[0_16px_48px_-12px_rgb(0_0_0/0.18)] ring-1 ring-zinc-200/70 dark:border-night-600 dark:bg-night-900 dark:shadow-[0_20px_56px_-12px_rgb(0_0_0/0.55)] dark:ring-night-700/80"
             >
               <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
-                    htmlFor={storeCategoryFieldId}
-                  >
+                <fieldset className={filterFieldsetClass}>
+                  <legend className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
                     Categoría
-                  </label>
-                  <FormSelect
-                    id={storeCategoryFieldId}
-                    value={draftCategoryId}
-                    onChange={setDraftCategoryId}
-                    options={categorySelectOptions}
-                    placeholder="Todas las categorías"
-                    variant="field"
-                    searchable
-                    searchPlaceholder="Buscar categoría…"
-                    listMaxHeightPx={320}
-                    triggerClassName="!mt-0 rounded-lg border-zinc-200 bg-zinc-50 py-2.5 dark:border-night-600 dark:bg-night-800/80"
-                    listClassName="rounded-xl border-zinc-200/90 dark:border-sky-500/25"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
-                    htmlFor={storeSortFieldId}
-                  >
+                  </legend>
+                  <div className="mt-1">
+                    <FormSelect
+                      value={draftCategoryId}
+                      onChange={setDraftCategoryId}
+                      options={categorySelectOptions}
+                      placeholder="Todas las categorías"
+                      variant="field"
+                      searchable
+                      searchPlaceholder="Buscar categoría…"
+                      listMaxHeightPx={320}
+                      triggerClassName="!mt-0 rounded-lg border-zinc-200 bg-zinc-50 py-2.5 dark:border-night-600 dark:bg-night-800/80"
+                      listClassName="rounded-xl border-zinc-200/90 dark:border-sky-500/25"
+                    />
+                  </div>
+                </fieldset>
+                <fieldset className={filterFieldsetClass}>
+                  <legend className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
                     Orden
-                  </label>
-                  <FormSelect
-                    id={storeSortFieldId}
-                    value={draftSortBy}
-                    onChange={(v) => setDraftSortBy(v as ProductSortBy)}
-                    options={SORT_OPTIONS.map((o) => ({
-                      value: o.value,
-                      label: o.label,
-                    }))}
-                    variant="field"
-                    triggerClassName="!mt-0 rounded-lg border-zinc-200 bg-zinc-50 py-2.5 dark:border-night-600 dark:bg-night-800/80"
-                    listClassName="rounded-xl border-zinc-200/90 dark:border-sky-500/25"
-                  />
-                </div>
+                  </legend>
+                  <div className="mt-1">
+                    <FormSelect
+                      value={draftSortBy}
+                      onChange={(v) => setDraftSortBy(v as ProductSortBy)}
+                      options={SORT_OPTIONS.map((o) => ({
+                        value: o.value,
+                        label: o.label,
+                      }))}
+                      variant="field"
+                      triggerClassName="!mt-0 rounded-lg border-zinc-200 bg-zinc-50 py-2.5 dark:border-night-600 dark:bg-night-800/80"
+                      listClassName="rounded-xl border-zinc-200/90 dark:border-sky-500/25"
+                    />
+                  </div>
+                </fieldset>
                 <label className="flex flex-col gap-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300">
                   Precio mín.
                   <input
@@ -454,7 +444,7 @@ export function StorePublicPage() {
       </div>
 
       <section
-        className="relative min-h-[12rem]"
+        className="relative min-h-48"
         aria-label="Listado de productos"
         aria-live="polite"
       >
@@ -492,8 +482,7 @@ export function StorePublicPage() {
               <div className="flex justify-center pb-8">
                 <Button
                   type="button"
-                  variant="outline"
-                  className="min-w-[12rem] justify-center"
+                  className="min-w-48 justify-center"
                   disabled={isFetching}
                   onClick={() => setPage((p) => p + 1)}
                 >

@@ -1,7 +1,6 @@
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
 export type StepperNumberInputProps = {
-  id: string;
   value: string;
   onChange: (value: string) => void;
   /** Paso al pulsar flechas (p. ej. 0.01 para precio, 1 para stock). */
@@ -18,13 +17,13 @@ const shellBase =
   'mt-0.5 flex w-full min-h-[2.75rem] overflow-hidden rounded-md border bg-zinc-50 transition dark:bg-night-950';
 
 const shellNormal =
-  'border-zinc-200 focus-within:border-[var(--color-forest)] focus-within:ring-2 focus-within:ring-[var(--color-forest)]/20 dark:border-night-700 dark:focus-within:border-[#1f6feb] dark:focus-within:ring-[#1f6feb]/25';
+  'border-zinc-200 focus-within:border-forest focus-within:ring-2 focus-within:ring-forest/20 dark:border-night-700 dark:focus-within:border-code-blue dark:focus-within:ring-code-blue/25';
 
 const shellError =
   'border-red-500 focus-within:border-red-500 focus-within:ring-red-500/20 dark:border-red-400 dark:focus-within:border-red-400 dark:focus-within:ring-red-400/20';
 
 const inputClass =
-  'min-w-0 flex-1 border-0 bg-transparent px-3 py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 dark:text-zinc-100 dark:placeholder:text-zinc-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none';
+  'min-w-0 flex-1 border-0 bg-transparent px-3 py-2 text-sm text-zinc-900 outline-hidden placeholder:text-zinc-400 dark:text-zinc-100 dark:placeholder:text-zinc-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none';
 
 const railBtnClass =
   'flex flex-1 items-center justify-center text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 disabled:pointer-events-none disabled:opacity-40 dark:text-zinc-400 dark:hover:bg-night-800 dark:hover:text-zinc-100';
@@ -47,7 +46,6 @@ function parseIntLoose(s: string): number {
 }
 
 export function StepperNumberInput({
-  id,
   value,
   onChange,
   step,
@@ -74,7 +72,6 @@ export function StepperNumberInput({
       className={`${shellBase} ${error ? shellError : shellNormal}`}
     >
       <input
-        id={id}
         type="number"
         min={min}
         step={step}

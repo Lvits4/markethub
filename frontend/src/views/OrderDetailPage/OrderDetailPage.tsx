@@ -53,7 +53,7 @@ export function OrderDetailPage() {
         Pedido no encontrado.{' '}
         <Link
           to={routePaths.orders}
-          className="font-semibold text-[var(--color-forest)]"
+          className="font-semibold text-forest"
         >
           Volver a mis pedidos
         </Link>
@@ -87,7 +87,7 @@ export function OrderDetailPage() {
         </button>
       </div>
 
-      <div className="mt-6 rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
+      <div className="mt-6 rounded-md bg-white p-5 shadow-market ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
         <dl className="grid gap-3 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-zinc-500">Estado</dt>
@@ -97,7 +97,7 @@ export function OrderDetailPage() {
           </div>
           <div>
             <dt className="text-zinc-500">Total</dt>
-            <dd className="font-semibold tabular-nums text-[var(--color-forest)]">
+            <dd className="font-semibold tabular-nums text-forest">
               {formatPrice(numAmount(order.totalAmount))}
             </dd>
           </div>
@@ -111,7 +111,7 @@ export function OrderDetailPage() {
       </div>
 
       {payment ? (
-        <div className="mt-6 rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
+        <div className="mt-6 rounded-md bg-white p-5 shadow-market ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">
             Pago
           </h2>

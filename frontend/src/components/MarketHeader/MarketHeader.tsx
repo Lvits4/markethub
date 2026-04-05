@@ -1,7 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import {
   FiHeart,
-  FiGrid,
   FiHome,
   FiLayers,
   FiPackage,
@@ -10,26 +9,30 @@ import {
 } from 'react-icons/fi';
 import { routePaths } from '../../config/routes';
 import { useAuth } from '../../hooks/useAuth';
+import { MarketHubMark } from '../AuthBrand/AuthBrand';
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
 
 const navInactive =
   'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-night-800 dark:hover:text-zinc-100';
 
 const navActive =
-  'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold bg-[var(--color-forest)]/10 text-[var(--color-forest)] dark:bg-[var(--color-market-dark-surface)] dark:text-[var(--color-market-dark-accent)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2)]';
+  'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold bg-forest/10 text-forest dark:bg-market-dark-surface dark:text-market-dark-accent dark:shadow-[0_1px_2px_rgba(0,0,0,0.2)]';
+
+const headerBarClass =
+  'fixed top-0 right-0 left-0 z-50 h-14 border-b border-zinc-300/70 bg-white/75 shadow-[0_10px_40px_-18px_rgba(15,23,42,0.18)] backdrop-blur-2xl backdrop-saturate-150 supports-[backdrop-filter]:bg-white/65 dark:border-night-600/70 dark:bg-night-950/75 dark:shadow-[0_12px_40px_-14px_rgba(0,0,0,0.55)] dark:backdrop-blur-3xl dark:backdrop-saturate-150 supports-[backdrop-filter]:dark:bg-night-950/65';
 
 export function MarketHeader() {
-  const { isAuthenticated, user } = useAuth();
-  const showSeller = user?.role === 'SELLER' || user?.role === 'ADMIN';
+  const { isAuthenticated } = useAuth();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-[var(--color-surface-cream)]/90 backdrop-blur-md dark:border-night-700/80 dark:bg-night-950/75 dark:backdrop-blur-xl dark:backdrop-saturate-150">
-      <div className="mx-auto flex w-full max-w-6xl items-center gap-2 px-4 py-3 sm:gap-3">
+    <header className={headerBarClass}>
+      <div className="mx-auto flex h-full w-full max-w-6xl items-center gap-2 px-4 sm:gap-3">
         <NavLink
           to={routePaths.catalog}
           end
-          className="shrink-0 text-lg font-bold tracking-tight text-[var(--color-forest)]"
+          className="flex shrink-0 items-center gap-2 text-lg font-bold tracking-tight text-forest"
         >
+          <MarketHubMark size="nav" />
           MarketHub
         </NavLink>
 
@@ -77,15 +80,6 @@ export function MarketHeader() {
               Pedidos
             </NavLink>
           ) : null}
-          {showSeller ? (
-            <NavLink
-              to={routePaths.admin}
-              className={({ isActive }) => (isActive ? navActive : navInactive)}
-            >
-              <FiGrid className="h-4 w-4" aria-hidden />
-              Vender
-            </NavLink>
-          ) : null}
           <NavLink
             to={routePaths.settings}
             className={({ isActive }) => (isActive ? navActive : navInactive)}
@@ -95,29 +89,6 @@ export function MarketHeader() {
           </NavLink>
         </nav>
 
-        <NavLink
-          to={routePaths.stores}
-          className="flex rounded-md p-2.5 text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800 lg:hidden"
-          aria-label="Tiendas"
-        >
-          <FiLayers className="h-5 w-5" />
-        </NavLink>
-        <NavLink
-          to={routePaths.cart}
-          className="flex rounded-md p-2.5 text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800 lg:hidden"
-          aria-label="Carrito"
-        >
-          <FiShoppingBag className="h-5 w-5" />
-        </NavLink>
-        {isAuthenticated ? (
-          <NavLink
-            to={routePaths.orders}
-            className="flex rounded-md p-2.5 text-zinc-700 transition hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800 lg:hidden"
-            aria-label="Mis pedidos"
-          >
-            <FiPackage className="h-5 w-5" />
-          </NavLink>
-        ) : null}
         <ThemeToggle />
       </div>
     </header>

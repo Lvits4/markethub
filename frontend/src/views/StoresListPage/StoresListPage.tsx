@@ -1,7 +1,6 @@
 import {
   useDeferredValue,
   useEffect,
-  useId,
   useMemo,
   useRef,
   useState,
@@ -23,6 +22,8 @@ const SORT_OPTIONS: { value: SortMode; label: string }[] = [
 ];
 
 const DEFAULT_SORT: SortMode = 'name_asc';
+
+const filterFieldsetClass = 'm-0 min-w-0 border-0 p-0';
 
 function matchesSearch(store: Store, q: string): boolean {
   if (!q) return true;
@@ -83,7 +84,6 @@ export function StoresListPage() {
   const [draftOnlyWithLogo, setDraftOnlyWithLogo] = useState(false);
   const [filterPopoverOpen, setFilterPopoverOpen] = useState(false);
   const filterPopoverRef = useRef<HTMLDivElement>(null);
-  const storesSortFieldId = useId();
 
   const { data: rawStores, isLoading, isError } = usePublicStoresQuery();
 
@@ -163,10 +163,8 @@ export function StoresListPage() {
         >
           <Button
             type="button"
-            variant="outline"
-            className="h-full min-h-[52px] min-w-[5.5rem] shrink-0 px-4 py-0"
+            className="h-full min-h-[52px] min-w-22 shrink-0 px-4 py-0"
             aria-expanded={filterPopoverOpen}
-            aria-controls="stores-filter-popover"
             aria-haspopup="dialog"
             onClick={() => {
               setFilterPopoverOpen((open) => {
@@ -182,38 +180,35 @@ export function StoresListPage() {
           </Button>
           {filterPopoverOpen ? (
             <div
-              id="stores-filter-popover"
               role="dialog"
               aria-label="Filtros y orden"
               className="catalog-filter-popover absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[min(calc(100vw-2rem),20rem)] rounded-xl border border-zinc-200/90 bg-white p-4 shadow-[0_16px_48px_-12px_rgb(0_0_0/0.18)] ring-1 ring-zinc-200/70 dark:border-night-600 dark:bg-night-900 dark:shadow-[0_20px_56px_-12px_rgb(0_0_0/0.55)] dark:ring-night-700/80"
             >
               <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
-                    htmlFor={storesSortFieldId}
-                  >
+                <fieldset className={filterFieldsetClass}>
+                  <legend className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
                     Orden
-                  </label>
-                  <FormSelect
-                    id={storesSortFieldId}
-                    value={draftSort}
-                    onChange={(v) => setDraftSort(v as SortMode)}
-                    options={SORT_OPTIONS.map((o) => ({
-                      value: o.value,
-                      label: o.label,
-                    }))}
-                    variant="field"
-                    triggerClassName="!mt-0 rounded-lg border-zinc-200 bg-zinc-50 py-2.5 dark:border-night-600 dark:bg-night-800/80"
-                    listClassName="rounded-xl border-zinc-200/90 dark:border-sky-500/25"
-                  />
-                </div>
+                  </legend>
+                  <div className="mt-1">
+                    <FormSelect
+                      value={draftSort}
+                      onChange={(v) => setDraftSort(v as SortMode)}
+                      options={SORT_OPTIONS.map((o) => ({
+                        value: o.value,
+                        label: o.label,
+                      }))}
+                      variant="field"
+                      triggerClassName="!mt-0 rounded-lg border-zinc-200 bg-zinc-50 py-2.5 dark:border-night-600 dark:bg-night-800/80"
+                      listClassName="rounded-xl border-zinc-200/90 dark:border-sky-500/25"
+                    />
+                  </div>
+                </fieldset>
                 <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
                   <input
                     type="checkbox"
                     checked={draftOnlyWithLogo}
                     onChange={(e) => setDraftOnlyWithLogo(e.target.checked)}
-                    className="h-4 w-4 rounded border-zinc-300 text-[var(--color-forest)] focus:ring-[var(--color-forest)] dark:border-night-600 dark:bg-night-800"
+                    className="h-4 w-4 rounded border-zinc-300 text-forest focus:ring-forest dark:border-night-600 dark:bg-night-800"
                   />
                   Solo tiendas con logo
                 </label>
@@ -257,7 +252,7 @@ export function StoresListPage() {
             <li key={store.id}>
               <Link
                 to={routePaths.storeDetail(store.id)}
-                className="group flex h-full flex-col overflow-hidden rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/60 transition hover:shadow-md dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800"
+                className="group flex h-full flex-col overflow-hidden rounded-md bg-white shadow-market ring-1 ring-zinc-200/60 transition hover:shadow-md dark:bg-night-900 dark:shadow-market-dark dark:ring-night-800"
               >
                 <StoreCardMedia store={store} />
                 <div className="flex flex-1 flex-col gap-2 p-4">
@@ -269,7 +264,7 @@ export function StoresListPage() {
                       {store.description}
                     </p>
                   ) : null}
-                  <span className="mt-auto pt-2 text-sm font-semibold text-[var(--color-forest)]">
+                  <span className="mt-auto pt-2 text-sm font-semibold text-forest">
                     Ver tienda
                   </span>
                 </div>

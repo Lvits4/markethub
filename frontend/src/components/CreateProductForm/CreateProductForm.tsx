@@ -13,11 +13,13 @@ import { useAdminStoresQuery } from '../../queries/useAdminStoresQuery';
 import { uploadFile } from '../../requests/fileRequests';
 
 const fieldClass =
-  'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';
+  'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-hidden transition placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';
 
 const textareaClass = `${fieldClass} resize-none`;
 
 const labelClass = 'text-xs font-medium text-zinc-600 dark:text-zinc-300';
+
+const fieldsetResetClass = 'm-0 min-w-0 border-0 p-0';
 
 const STEPS = [
   { title: 'Tienda y datos básicos' },
@@ -196,7 +198,7 @@ export function CreateProductForm({
                 role="listitem"
                 className={`h-1 flex-1 rounded-full transition-colors ${
                   i <= step
-                    ? 'bg-[var(--color-forest)] dark:bg-blue-500'
+                    ? 'bg-forest dark:bg-blue-500'
                     : 'bg-zinc-200 dark:bg-night-700'
                 }`}
               />
@@ -210,35 +212,35 @@ export function CreateProductForm({
         <div className="flex flex-col gap-3">
           {step === 0 ? (
             <>
-              <div>
-                <label htmlFor="create-product-store" className={labelClass}>
+              <fieldset className={fieldsetResetClass}>
+                <legend className={labelClass}>
                   Tienda{' '}
                   <span className="text-red-600 dark:text-red-400">*</span>
-                </label>
-                <FormSelect
-                  id="create-product-store"
-                  value={storeId}
-                  onChange={(v) => {
-                    setStoreId(v);
-                    setErrors((prev) => ({ ...prev, storeId: undefined }));
-                  }}
-                  options={storeOptions}
-                  placeholder="— Selecciona una tienda —"
-                  error={Boolean(errors.storeId)}
-                />
+                </legend>
+                <div className="mt-1">
+                  <FormSelect
+                    value={storeId}
+                    onChange={(v) => {
+                      setStoreId(v);
+                      setErrors((prev) => ({ ...prev, storeId: undefined }));
+                    }}
+                    options={storeOptions}
+                    placeholder="— Selecciona una tienda —"
+                    error={Boolean(errors.storeId)}
+                  />
+                </div>
                 {errors.storeId ? (
                   <p className="mt-1 text-xs text-red-600 dark:text-red-400">
                     {errors.storeId}
                   </p>
                 ) : null}
-              </div>
-              <div>
-                <label htmlFor="create-product-name" className={labelClass}>
+              </fieldset>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>
                   Nombre{' '}
                   <span className="text-red-600 dark:text-red-400">*</span>
-                </label>
+                </span>
                 <input
-                  id="create-product-name"
                   placeholder="Ej. Camiseta deportiva"
                   value={name}
                   onChange={(e) => {
@@ -252,54 +254,40 @@ export function CreateProductForm({
                     {errors.name}
                   </p>
                 ) : null}
-              </div>
-              <div>
-                <label
-                  htmlFor="create-product-description"
-                  className={labelClass}
-                >
-                  Descripción
-                </label>
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>Descripción</span>
                 <textarea
-                  id="create-product-description"
                   rows={3}
                   placeholder="Descripción del producto…"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className={textareaClass}
                 />
-              </div>
-              <div>
-                <label
-                  htmlFor="create-product-category"
-                  className={labelClass}
-                >
-                  Categoría
-                </label>
-                <FormSelect
-                  id="create-product-category"
-                  value={categoryId}
-                  onChange={setCategoryId}
-                  options={categoryOptions}
-                  placeholder="— Sin categoría —"
-                />
-              </div>
+              </label>
+              <fieldset className={fieldsetResetClass}>
+                <legend className={labelClass}>Categoría</legend>
+                <div className="mt-1">
+                  <FormSelect
+                    value={categoryId}
+                    onChange={setCategoryId}
+                    options={categoryOptions}
+                    placeholder="— Sin categoría —"
+                  />
+                </div>
+              </fieldset>
             </>
           ) : null}
 
           {step === 1 ? (
             <>
               <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="create-product-price"
-                    className={labelClass}
-                  >
+                <label className="flex flex-col gap-1">
+                  <span className={labelClass}>
                     Precio{' '}
                     <span className="text-red-600 dark:text-red-400">*</span>
-                  </label>
+                  </span>
                   <StepperNumberInput
-                    id="create-product-price"
                     mode="money"
                     step={0.01}
                     min={0}
@@ -317,17 +305,13 @@ export function CreateProductForm({
                       {errors.price}
                     </p>
                   ) : null}
-                </div>
-                <div>
-                  <label
-                    htmlFor="create-product-stock"
-                    className={labelClass}
-                  >
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className={labelClass}>
                     Stock{' '}
                     <span className="text-red-600 dark:text-red-400">*</span>
-                  </label>
+                  </span>
                   <StepperNumberInput
-                    id="create-product-stock"
                     mode="int"
                     step={1}
                     min={0}
@@ -345,27 +329,21 @@ export function CreateProductForm({
                       {errors.stock}
                     </p>
                   ) : null}
-                </div>
-              </div>
-              <div>
-                <label
-                  htmlFor="create-product-images"
-                  className={labelClass}
-                >
-                  Imágenes
                 </label>
+              </div>
+              <fieldset className={fieldsetResetClass}>
+                <legend className={labelClass}>Imágenes</legend>
                 <p className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-500">
                   Opcional. Se suben al pulsar «Crear producto».
                 </p>
                 <div className="mt-2">
                   <ProductImagesField
-                    id="create-product-images"
                     files={imageFiles}
                     onChange={setImageFiles}
                     disabled={disabledNav || !token}
                   />
                 </div>
-              </div>
+              </fieldset>
             </>
           ) : null}
         </div>
@@ -383,7 +361,7 @@ export function CreateProductForm({
               variant="ghost"
               disabled={disabledNav}
               onClick={onCancel}
-              className="h-11 min-h-11 min-w-0 flex-1 basis-0 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:min-w-[7.5rem]"
+              className="h-11 min-h-11 min-w-0 flex-1 basis-0 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:w-44"
             >
               Cancelar
             </Button>
@@ -394,7 +372,7 @@ export function CreateProductForm({
               variant="ghost"
               disabled={disabledNav}
               onClick={goBack}
-              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:min-w-[7.5rem]"
+              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:w-44"
             >
               <FiChevronLeft className="h-4 w-4 shrink-0" aria-hidden />
               Atrás
@@ -408,7 +386,7 @@ export function CreateProductForm({
               variant="cta"
               disabled={disabledNav}
               onClick={goNext}
-              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 px-3 sm:min-w-[11rem]"
+              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 px-3 sm:w-44 sm:flex-none"
             >
               Siguiente
               <FiChevronRight className="h-4 w-4 shrink-0" aria-hidden />
@@ -419,7 +397,7 @@ export function CreateProductForm({
               variant="cta"
               disabled={disabledNav}
               onClick={() => void handleCreate()}
-              className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:min-w-[11rem]"
+              className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:w-44 sm:flex-none"
             >
               {isUploadingImages
                 ? 'Subiendo imágenes…'

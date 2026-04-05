@@ -83,6 +83,26 @@
   --color-market-dark-surface: #102251;
   --color-market-dark-surface-hover: #152a5e;
   --color-market-dark-accent: #458bde;
+  /* Superficies admin (drawers, tablas oscuras): evita decenas de hex arbitrarios en JSX */
+  --color-admin-drawer: #0b152f;
+  --color-admin-drawer-head: #0d1938;
+  --color-admin-canvas: #f5f8fc;
+  --color-admin-canvas-dark: #091126;
+  --color-admin-elevated: #0f1a38;
+  --color-admin-footer: #0c1630;
+  --color-admin-field: #0b1735;
+  --color-admin-dropdown: #121a2e;
+  --color-admin-media-bg: #0a1228;
+  --color-admin-pill-dark: #162647;
+  --color-auth-screen-from: #e6eaf3;
+  --color-auth-screen-to: #dce3ef;
+  --color-auth-hero-end: #172554;
+  --color-code-blue: #1f6feb;
+  --shadow-admin-dropdown: 0 16px 40px -12px rgb(0 0 0 / 0.55);
+  --max-width-admin-drawer: 40rem;
+  --z-auth-underlay: 1;
+  --z-admin-overlay: 80;
+  --z-popover-layer: 90;
   /* Scrollbars tema claro: mismo azul que botones (.admin-cta-solid / --color-admin-primary) */
   --scrollbar-thumb: var(--color-admin-primary);
   --scrollbar-thumb-hover: var(--color-admin-primary-hover);
@@ -107,6 +127,8 @@
 
 html {
   @apply antialiased;
+  /* Evita parpadeo / salto horizontal cuando el scroll vertical aparece o desaparece al navegar */
+  scrollbar-gutter: stable;
 }
 
 /* Capa ambiental: halos azules difuminados (modo oscuro) */
@@ -144,7 +166,9 @@ html.dark body {
 }
 
 body {
-  @apply bg-[var(--color-surface-cream)] text-zinc-900 font-sans min-h-screen transition-colors;
+  @apply bg-surface-cream text-zinc-900 font-sans min-h-screen transition-colors;
+  /* Evita que el rebote de scroll muestre contenido por encima del header fijo */
+  overscroll-behavior-y: none;
 }
 
 @layer base {
@@ -221,6 +245,31 @@ body {
   --admin-primary-soft: color-mix(in srgb, var(--color-admin-primary) 22%, transparent);
 }
 
+/*
+ * El scroll del admin debe quedar solo en las columnas internas (sidebar + main).
+ * Si html/body pueden hacer scroll, al cambiar de ruta a veces aparece un instante la barra
+ * del viewport a la derecha y luego desaparece.
+ */
+html:has(.admin-shell) {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+html:has(.admin-shell) body {
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+html:has(.admin-shell) #root {
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+}
+
 /* Tablas: contraste frente al fondo gris/crema en tema claro (borde + superficie blanca) */
 .admin-table-panel {
   @apply flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border backdrop-blur-xl;
@@ -257,8 +306,28 @@ body {
   overflow: hidden;
 }
 
+@keyframes route-outlet-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.route-outlet-fade {
+  animation: route-outlet-fade-in 220ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-outlet-fade {
+    animation: none;
+  }
+}
+
 .admin-nav-link {
-  @apply flex cursor-pointer items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-zinc-600 transition-colors dark:text-zinc-400;
+  @apply flex cursor-pointer items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-zinc-600 transition-[color,background-color,box-shadow] duration-200 ease-out motion-reduce:transition-none dark:text-zinc-400;
 }
 
 .admin-nav-link:hover {

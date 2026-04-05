@@ -24,7 +24,6 @@ export const apiPaths = {
   adminDashboard: '/admin/dashboard',
   adminUsers: '/admin/users',
   adminUser: (id: string) => `/admin/users/${id}`,
-  adminUserToggleActive: (id: string) => `/admin/users/${id}/toggle-active`,
   adminStores: '/admin/stores',
   adminStore: (id: string) => `/admin/stores/${id}`,
   adminStoreCommission: (id: string) => `/admin/stores/${id}/commission`,
@@ -46,8 +45,4 @@ export const apiPaths = {
   orderStatus: (id: string) => `/orders/${id}/status`,
   paymentByOrder: (orderId: string) => `/payments/order/${orderId}`,
   filesUpload: '/files/upload',
-  filesUploadMultiple: '/files/upload/multiple',
-  filesDownload: '/files/download',
-  filesMetadata: '/files/metadata',
-  filesDelete: '/files',
 } as const;

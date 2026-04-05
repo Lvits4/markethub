@@ -30,7 +30,7 @@ export function ProductCard({
   const img = getPrimaryImageUrl(product);
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-md bg-white shadow-[var(--shadow-market)] ring-1 ring-zinc-200/60 transition hover:shadow-md dark:bg-night-900 dark:shadow-[var(--shadow-market-dark)] dark:ring-night-800">
+    <article className="group relative flex flex-col overflow-hidden rounded-md bg-white shadow-market ring-1 ring-zinc-200/60 transition hover:shadow-md dark:bg-night-900 dark:shadow-market-dark dark:ring-night-800">
       <Link
         to={routePaths.productDetail(product.id)}
         className="relative aspect-square w-full overflow-hidden bg-zinc-100 dark:bg-night-800"
@@ -61,7 +61,7 @@ export function ProductCard({
           className="absolute right-2 top-2 cursor-pointer rounded-full bg-transparent p-1 text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <FiHeart
-            className={`h-7 w-7 drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)] ${isFavorite ? 'fill-[var(--color-forest)] text-[var(--color-forest)] drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]' : ''}`}
+            className={`h-7 w-7 drop-shadow-[0_1px_3px_rgba(0,0,0,0.85)] ${isFavorite ? 'fill-forest text-forest drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]' : ''}`}
           />
         </button>
       ) : null}
@@ -72,13 +72,12 @@ export function ProductCard({
         >
           {product.name}
         </Link>
-        <p className="text-sm font-medium text-[var(--color-forest)]">
+        <p className="text-sm font-medium text-forest">
           {formatPrice(product.price)}
         </p>
         {onAddToCart ? (
           <Button
             type="button"
-            variant="outline"
             className="mt-2 w-full justify-center py-1.5 text-xs"
             disabled={addToCartDisabled}
             onClick={(e) => {

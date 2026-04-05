@@ -30,11 +30,8 @@ export function SellerMyStoresPanel() {
   const cancelEdit = () => setEditingId(null);
 
   return (
-    <section id="mis-tiendas" aria-labelledby="mis-tiendas-heading">
-      <h2
-        id="mis-tiendas-heading"
-        className="text-2xl font-bold text-zinc-900 dark:text-zinc-50"
-      >
+    <section aria-label="Mis tiendas">
+      <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
         Mis tiendas
       </h2>
       <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
@@ -74,7 +71,7 @@ export function SellerMyStoresPanel() {
           {data.map((s) => (
             <li
               key={s.id}
-              className="rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800"
+              className="rounded-md bg-white p-5 shadow-market ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800"
             >
               {editingId === s.id ? (
                 <div className="space-y-3">
@@ -135,7 +132,7 @@ export function SellerMyStoresPanel() {
                       <p className="text-xs text-zinc-500">{s.slug}</p>
                       <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
                         {s.isApproved ? (
-                          <span className="text-[var(--color-forest)]">
+                          <span className="text-forest">
                             Aprobada
                           </span>
                         ) : (
@@ -147,7 +144,7 @@ export function SellerMyStoresPanel() {
                     </div>
                     <Link
                       to={routePaths.sellerStoreProducts(s.id)}
-                      className="inline-flex items-center justify-center rounded-md border-2 border-[var(--color-forest)] px-5 py-2 text-sm font-medium text-[var(--color-forest)] hover:bg-[var(--color-forest)]/8 dark:border-[color:rgb(69_139_222/0.45)]"
+                      className="inline-flex items-center justify-center rounded-md border-2 border-forest px-5 py-2 text-sm font-medium text-forest hover:bg-forest/8 dark:border-[color:rgb(69_139_222/0.45)]"
                     >
                       Productos
                     </Link>

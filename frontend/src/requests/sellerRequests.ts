@@ -1,7 +1,6 @@
 import { apiPaths } from '../config/apiPaths';
 import type {
   AdminDashboardStats,
-  AdminPlatformReport,
   AdminProductRow,
   AdminSalesReport,
   AdminStoreDetail,
@@ -24,10 +23,4 @@ export function fetchSellerStoreById(token: string, storeId: string) {
 
 export function fetchSellerSalesReport(token: string) {
   return fetchDefault<AdminSalesReport>(apiPaths.sellerReportsSales, { token });
-}
-
-export function fetchSellerOrdersStoreReport(token: string) {
-  return fetchDefault<AdminPlatformReport>(apiPaths.ordersStoreReport, {
-    token,
-  });
 }

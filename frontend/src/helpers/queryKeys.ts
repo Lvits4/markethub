@@ -30,5 +30,4 @@ export const queryKeys = {
   sellerProducts: ['seller', 'products'] as const,
   sellerStore: (id: string) => ['seller', 'stores', id] as const,
   sellerSalesReport: ['seller', 'reports', 'sales'] as const,
-  sellerStoreReport: ['seller', 'orders', 'store-report'] as const,
 };

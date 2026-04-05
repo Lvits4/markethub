@@ -1,4 +1,4 @@
-import { useId, useRef, useState, type ChangeEvent } from 'react';
+import { useRef, useState, type ChangeEvent } from 'react';
 import toast from 'react-hot-toast';
 import { FiImage, FiUpload, FiX } from 'react-icons/fi';
 import { getErrorMessage } from '../../helpers/mapApiError';
@@ -36,7 +36,6 @@ export function LogoUploadField({
   onUploadingChange,
 }: LogoUploadFieldProps) {
   const { token } = useAuth();
-  const inputId = useId();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -100,14 +99,12 @@ export function LogoUploadField({
     busy || !token
       ? 'cursor-not-allowed border-zinc-200 bg-zinc-50/40 opacity-50 dark:border-night-700 dark:bg-night-950/30'
       : dragOver
-        ? 'cursor-pointer border-[#1f6feb] bg-blue-50/80 dark:border-sky-400 dark:bg-sky-500/10'
+        ? 'cursor-pointer border-code-blue bg-blue-50/80 dark:border-sky-400 dark:bg-sky-500/10'
         : 'cursor-pointer border-zinc-300 bg-zinc-50/60 hover:border-zinc-400 hover:bg-zinc-100/80 dark:border-night-600 dark:bg-night-950/40 dark:hover:border-sky-500/35 dark:hover:bg-night-900/60'
   }`;
 
   const listRowClass =
     'flex items-center justify-between gap-2 rounded-md border border-zinc-200 bg-zinc-50/80 px-3 py-2 dark:border-night-600 dark:bg-night-900/60';
-
-  const fileInputId = `${inputId}-logo-file`;
 
   const zoneBody = (
     <>
@@ -126,7 +123,7 @@ export function LogoUploadField({
         ) : (
           <>
             Arrastra una imagen aquí o{' '}
-            <span className="text-[var(--color-forest)] underline decoration-transparent underline-offset-2 transition-colors group-hover:decoration-current">
+            <span className="text-forest underline decoration-transparent underline-offset-2 transition-colors group-hover:decoration-current">
               elige archivo
             </span>
           </>
@@ -138,27 +135,29 @@ export function LogoUploadField({
     </>
   );
 
+  const fileInput = (
+    <input
+      ref={fileRef}
+      type="file"
+      accept="image/*"
+      className="sr-only"
+      aria-label="Logo de la tienda"
+      disabled={busy || !token}
+      onChange={(e) => void handleFile(e)}
+    />
+  );
+
   return (
     <div className="space-y-3">
-      <p id={`${inputId}-label`} className={labelClass}>
-        Logo de la tienda
-      </p>
-      <input
-        id={fileInputId}
-        ref={fileRef}
-        type="file"
-        accept="image/*"
-        className="sr-only"
-        aria-labelledby={`${inputId}-label`}
-        disabled={busy || !token}
-        onChange={(e) => void handleFile(e)}
-      />
+      <p className={labelClass}>Logo de la tienda</p>
 
       {busy || !token ? (
-        <div className={`group ${zoneClass}`}>{zoneBody}</div>
+        <>
+          {fileInput}
+          <div className={`group ${zoneClass}`}>{zoneBody}</div>
+        </>
       ) : (
         <label
-          htmlFor={fileInputId}
           className={`group ${zoneClass}`}
           onDragEnter={(e) => {
             e.preventDefault();
@@ -181,6 +180,7 @@ export function LogoUploadField({
             processDroppedOrPicked(e.dataTransfer.files?.[0]);
           }}
         >
+          {fileInput}
           {zoneBody}
         </label>
       )}

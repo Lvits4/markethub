@@ -15,6 +15,8 @@ import type { Order } from '../../types/order';
 
 const labelClass = 'text-xs font-medium text-zinc-600 dark:text-zinc-300';
 
+const fieldsetResetClass = 'm-0 min-w-0 border-0 p-0';
+
 const ORDER_STATUS_OPTIONS = ORDER_STATUS_VALUES.map((st) => ({
   value: st,
   label: orderStatusLabel[st],
@@ -93,24 +95,25 @@ export function AdminEditOrderForm({
         </div>
 
         <div className="flex flex-col gap-3">
-          <div>
-            <label htmlFor="edit-order-status" className={labelClass}>
+          <fieldset className={fieldsetResetClass}>
+            <legend className={labelClass}>
               Estado del pedido{' '}
               <span className="text-red-600 dark:text-red-400">*</span>
-            </label>
-            <FormSelect
-              id="edit-order-status"
-              value={status}
-              onChange={(v) => {
-                if (isOrderStatusValue(v)) setStatus(v);
-              }}
-              options={ORDER_STATUS_OPTIONS}
-              disabled={busy}
-            />
+            </legend>
+            <div className="mt-1">
+              <FormSelect
+                value={status}
+                onChange={(v) => {
+                  if (isOrderStatusValue(v)) setStatus(v);
+                }}
+                options={ORDER_STATUS_OPTIONS}
+                disabled={busy}
+              />
+            </div>
             <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
               Selecciona el nuevo estado para este pedido.
             </p>
-          </div>
+          </fieldset>
         </div>
       </div>
 
@@ -122,7 +125,7 @@ export function AdminEditOrderForm({
               variant="ghost"
               disabled={busy}
               onClick={onCancel}
-              className="h-11 min-h-11 min-w-0 flex-1 basis-0 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:min-w-[7.5rem]"
+              className="h-11 min-h-11 min-w-0 flex-1 basis-0 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:w-44"
             >
               Cancelar
             </Button>
@@ -132,7 +135,7 @@ export function AdminEditOrderForm({
             variant="cta"
             disabled={busy || unchanged}
             onClick={handleSave}
-            className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:min-w-[11rem]"
+            className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:w-44 sm:flex-none"
           >
             {busy ? 'Guardando…' : 'Guardar cambios'}
           </Button>

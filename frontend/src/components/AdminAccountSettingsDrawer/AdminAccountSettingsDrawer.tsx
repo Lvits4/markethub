@@ -47,10 +47,10 @@ export function AdminAccountSettingsDrawer({
         role="dialog"
         aria-modal="true"
         aria-label="Ajustes de cuenta"
-        className="flex h-full w-full max-w-[640px] cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-[#0b152f]"
+        className="flex h-full w-full max-w-admin-drawer cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-admin-drawer"
         onPointerDown={(e) => e.stopPropagation()}
       >
-        <div className="flex shrink-0 items-center justify-between border-b border-slate-200/80 bg-white px-3 py-2.5 dark:border-sky-500/20 dark:bg-[#0d1938]">
+        <div className="flex shrink-0 items-center justify-between border-b border-slate-200/80 bg-white px-3 py-2.5 dark:border-sky-500/20 dark:bg-admin-drawer-head">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
             Ajustes de cuenta
           </h2>
@@ -64,7 +64,7 @@ export function AdminAccountSettingsDrawer({
             <FiX className="h-4 w-4" aria-hidden />
           </Button>
         </div>
-        <div className="market-scroll min-h-0 flex-1 overflow-y-auto bg-[#f5f8fc] p-3 dark:bg-[#091126]">
+        <div className="market-scroll min-h-0 flex-1 overflow-y-auto bg-admin-canvas p-3 dark:bg-admin-canvas-dark">
           <AccountSettingsBody
             compact
             onLogoutSuccess={onLogoutSuccess}

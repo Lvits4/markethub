@@ -8,9 +8,11 @@ import { useUpdateCategoryMutation } from '../../hooks/useAdminCategoryMutations
 import type { Category } from '../../types/category';
 
 const fieldClass =
-  'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';
+  'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-hidden transition placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';
 
 const labelClass = 'text-xs font-medium text-zinc-600 dark:text-zinc-300';
+
+const fieldsetResetClass = 'm-0 min-w-0 border-0 p-0';
 
 export type AdminEditCategoryFormProps = {
   category: Category;
@@ -94,42 +96,37 @@ export function AdminEditCategoryForm({
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
             Slug: <span className="font-mono">{category.slug}</span>
           </p>
-          <div>
-            <label htmlFor="edit-cat-name" className={labelClass}>
+          <label className="flex flex-col gap-1">
+            <span className={labelClass}>
               Nombre <span className="text-red-600 dark:text-red-400">*</span>
-            </label>
+            </span>
             <input
-              id="edit-cat-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className={fieldClass}
               disabled={busy}
             />
-          </div>
-          <div>
-            <label htmlFor="edit-cat-desc" className={labelClass}>
-              Descripción (opcional)
-            </label>
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className={labelClass}>Descripción (opcional)</span>
             <input
-              id="edit-cat-desc"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className={fieldClass}
               disabled={busy}
             />
-          </div>
-          <div>
-            <label htmlFor="edit-cat-parent" className={labelClass}>
-              Categoría padre (opcional)
-            </label>
-            <FormSelect
-              id="edit-cat-parent"
-              value={parentId}
-              onChange={setParentId}
-              options={parentFormOptions}
-              disabled={busy}
-            />
-          </div>
+          </label>
+          <fieldset className={fieldsetResetClass}>
+            <legend className={labelClass}>Categoría padre (opcional)</legend>
+            <div className="mt-1">
+              <FormSelect
+                value={parentId}
+                onChange={setParentId}
+                options={parentFormOptions}
+                disabled={busy}
+              />
+            </div>
+          </fieldset>
         </div>
       </div>
       <div
@@ -141,7 +138,7 @@ export function AdminEditCategoryForm({
             variant="ghost"
             disabled={busy}
             onClick={onCancel}
-            className="h-11 min-h-11 w-full justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:w-auto sm:min-w-[7.5rem]"
+            className="h-11 min-h-11 w-full justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:w-44 sm:flex-none"
           >
             Cancelar
           </Button>
@@ -151,7 +148,7 @@ export function AdminEditCategoryForm({
           variant="cta"
           disabled={busy}
           onClick={handleSubmit}
-          className="h-11 min-h-11 w-full justify-center px-3 sm:min-w-[11rem] sm:w-auto"
+          className="h-11 min-h-11 w-full justify-center px-3 sm:w-44 sm:flex-none"
         >
           {busy ? 'Guardando…' : 'Guardar cambios'}
         </Button>

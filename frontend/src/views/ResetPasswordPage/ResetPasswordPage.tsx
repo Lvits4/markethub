@@ -46,24 +46,19 @@ export function ResetPasswordPage() {
       </p>
 
       <form onSubmit={(e) => void handleSubmit(e)} className="mt-6 flex flex-col gap-3">
-        <div>
-          <label
-            htmlFor="token"
-            className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
-          >
+        <label className="flex flex-col gap-1">
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
             Token
-          </label>
+          </span>
           <input
-            id="token"
             type="text"
             value={token}
             onChange={(e) => setToken(e.target.value)}
-            className="mt-1 w-full rounded-md border border-zinc-200/90 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none dark:border-night-600 dark:bg-night-950/80 dark:text-zinc-100"
+            className="mt-1 w-full rounded-md border border-zinc-200/90 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-hidden dark:border-night-600 dark:bg-night-950/80 dark:text-zinc-100"
             placeholder="Pega el token aquí"
           />
-        </div>
+        </label>
         <AuthPasswordField
-          id="new-password"
           label="Nueva contraseña"
           value={password}
           onChange={setPassword}

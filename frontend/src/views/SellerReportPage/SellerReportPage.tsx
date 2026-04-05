@@ -3,7 +3,7 @@ import { useSellerReportQuery } from '../../queries/useSellerReportQuery';
 
 function StatBlock({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
+    <div className="rounded-md bg-white p-5 shadow-market ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
       <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
         {label}
       </p>

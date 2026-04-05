@@ -6,7 +6,7 @@ import { getErrorMessage } from '../../helpers/mapApiError';
 import { forgotPasswordRequest } from '../../requests/authRequests';
 
 const inputClass =
-  'mt-1 w-full rounded-md border border-zinc-200/90 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-auth-primary focus:bg-white focus:ring-2 focus:ring-auth-primary/18 dark:border-night-600 dark:bg-night-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:bg-night-950';
+  'mt-1 w-full rounded-md border border-zinc-200/90 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-hidden transition placeholder:text-zinc-400 focus:border-auth-primary focus:bg-white focus:ring-2 focus:ring-auth-primary/18 dark:border-night-600 dark:bg-night-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:bg-night-950';
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -41,28 +41,20 @@ export function ForgotPasswordPage() {
       <h1 className="text-3xl font-bold tracking-tight text-balance text-zinc-900 dark:text-zinc-50">
         Recuperar contraseña
       </h1>
-      <p className="mt-1.5 text-[15px] leading-relaxed text-pretty text-zinc-500 dark:text-zinc-400">
-        Te enviaremos instrucciones si el correo está registrado. En desarrollo el
-        servidor puede devolver un token visible.
-      </p>
 
       <form onSubmit={(e) => void handleSubmit(e)} className="mt-6 flex flex-col gap-2">
-        <div>
-          <label
-            htmlFor="email"
-            className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
-          >
+        <label className="flex flex-col gap-1">
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
             Correo electrónico
-          </label>
+          </span>
           <input
-            id="email"
             type="email"
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className={inputClass}
           />
-        </div>
+        </label>
         <button
           type="submit"
           disabled={pending}
@@ -86,6 +78,13 @@ export function ForgotPasswordPage() {
       ) : null}
 
       <p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+        <Link
+          to={routePaths.resetPassword}
+          className="font-semibold text-auth-primary hover:underline"
+        >
+          Ya tengo token o enlace → nueva contraseña
+        </Link>
+        <span className="mx-2 text-zinc-400">·</span>
         <Link to={routePaths.login} className="font-semibold text-auth-primary hover:underline">
           Volver al inicio de sesión
         </Link>

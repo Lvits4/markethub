@@ -18,9 +18,9 @@ export function Button({
 
   const styles: Record<ButtonVariant, string> = {
     primary:
-      'rounded-md bg-blue-500 px-5 py-3 text-white shadow-sm hover:bg-blue-600 dark:bg-[var(--color-market-dark-surface)] dark:text-[var(--color-market-dark-accent)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.25)] dark:hover:bg-[var(--color-market-dark-surface-hover)]',
+      'rounded-md bg-blue-500 px-5 py-3 text-white shadow-sm hover:bg-blue-600 dark:bg-market-dark-surface dark:text-market-dark-accent dark:shadow-[0_1px_2px_rgba(0,0,0,0.25)] dark:hover:bg-market-dark-surface-hover',
     outline:
-      'rounded-md border-2 border-sky-400 bg-transparent px-5 py-3 text-sky-600 hover:bg-sky-400/10 dark:border-[color:rgb(69_139_222/0.42)] dark:text-[var(--color-market-dark-accent)] dark:hover:bg-[color:rgb(21_42_94/0.55)]',
+      'rounded-md border-2 border-sky-400 bg-transparent px-5 py-3 text-sky-600 hover:bg-sky-400/10 dark:border-[color:rgb(69_139_222/0.42)] dark:text-market-dark-accent dark:hover:bg-[color:rgb(21_42_94/0.55)]',
     ghost:
       'rounded-md px-4 py-2 text-zinc-800 dark:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-night-800',
     icon:

@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Button } from '../Button/Button';
@@ -24,10 +24,6 @@ export function AccountSettingsBody({
   onLogoutSuccess,
 }: AccountSettingsBodyProps) {
   const navigate = useNavigate();
-  const ids = useId();
-  const firstFieldId = `${ids}-first`;
-  const lastFieldId = `${ids}-last`;
-  const avatarFieldId = `${ids}-avatar`;
 
   const { theme, toggleTheme } = useTheme();
   const { user, isAuthenticated, logout, token } = useAuth();
@@ -111,8 +107,8 @@ export function AccountSettingsBody({
 
   const fieldStack = compact ? 'mt-2 space-y-2' : 'mt-4 space-y-3';
   const inputPad = compact
-    ? 'mt-1 w-full rounded-md border border-zinc-200 bg-zinc-50/80 px-3 py-2 text-sm text-zinc-900 outline-none focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100'
-    : 'mt-1 w-full rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-none focus:border-[var(--color-forest)] dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100';
+    ? 'mt-1 w-full rounded-md border border-zinc-200 bg-zinc-50/80 px-3 py-2 text-sm text-zinc-900 outline-hidden focus:border-forest dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100'
+    : 'mt-1 w-full rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-hidden focus:border-forest dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100';
 
   const actionsRow = compact
     ? 'mt-3 flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-2'
@@ -158,44 +154,32 @@ export function AccountSettingsBody({
               </p>
             ) : (
               <div className={fieldStack}>
-                  <div>
-                    <label
-                      htmlFor={firstFieldId}
-                      className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
-                    >
+                  <label className="flex flex-col gap-1">
+                    <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
                       Nombre
-                    </label>
+                    </span>
                     <input
-                      id={firstFieldId}
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       className={inputPad}
                     />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor={lastFieldId}
-                      className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
-                    >
+                  </label>
+                  <label className="flex flex-col gap-1">
+                    <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
                       Apellidos
-                    </label>
+                    </span>
                     <input
-                      id={lastFieldId}
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       className={inputPad}
                     />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor={avatarFieldId}
-                      className="text-xs font-medium text-zinc-600 dark:text-zinc-300"
-                    >
+                  </label>
+                  <fieldset className="m-0 min-w-0 border-0 p-0">
+                    <legend className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
                       Avatar (opcional)
-                    </label>
+                    </legend>
                     <div className={compact ? 'mt-0.5' : 'mt-1'}>
                       <ProductImagesField
-                        id={avatarFieldId}
                         files={avatarFiles}
                         onChange={setAvatarFiles}
                         disabled={updateProfile.isPending || uploadingAvatar}
@@ -211,7 +195,7 @@ export function AccountSettingsBody({
                         hintText="PNG, JPG, WebP… Se aplicará al guardar el perfil."
                       />
                     </div>
-                  </div>
+                  </fieldset>
                 </div>
             )}
 

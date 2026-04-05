@@ -53,14 +53,14 @@ export function RegisterPage() {
 
   return (
     <div className="w-full">
-      <h1 className="text-3xl font-bold tracking-tight text-balance text-zinc-900 dark:text-zinc-50">
+      <h1 className="text-2xl font-bold tracking-tight text-balance text-zinc-900 sm:text-3xl dark:text-zinc-50">
         Crear tu cuenta
       </h1>
-      <p className="mt-1.5 text-[15px] leading-relaxed text-pretty text-zinc-500 dark:text-zinc-400">
+      <p className="mt-1 text-[15px] leading-snug text-pretty text-zinc-500 dark:text-zinc-400">
         Hola. Vamos a crear tu cuenta en MarketHub.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-3 flex flex-col gap-2">
+      <form onSubmit={handleSubmit} className="mt-2.5 flex flex-col gap-1.5">
         <label className="flex flex-col gap-1">
           <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
             Nombre
@@ -139,13 +139,13 @@ export function RegisterPage() {
         <button
           type="submit"
           disabled={registerMutation.isPending}
-          className="mt-3 w-full cursor-pointer rounded-md bg-auth-primary py-3 text-sm font-semibold text-white shadow-md shadow-auth-primary/35 transition hover:bg-auth-primary-hover hover:shadow-lg hover:shadow-auth-primary/30 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50 disabled:active:translate-y-0"
+          className="mt-2 w-full cursor-pointer rounded-md bg-auth-primary py-3 text-sm font-semibold text-white shadow-md shadow-auth-primary/35 transition hover:bg-auth-primary-hover hover:shadow-lg hover:shadow-auth-primary/30 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50 disabled:active:translate-y-0"
         >
           {registerMutation.isPending ? 'Creando cuenta…' : 'Crear mi cuenta'}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="mt-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
         ¿Ya estás con nosotros?{' '}
         <Link
           to={routePaths.login}

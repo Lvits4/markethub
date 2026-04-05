@@ -1,7 +1,6 @@
 import {
   useCallback,
   useEffect,
-  useId,
   useMemo,
   useRef,
   useState,
@@ -28,15 +27,14 @@ type ListPlacementCoords =
     };
 
 export type FormSelectProps = {
-  id: string;
   value: string;
   onChange: (value: string) => void;
   options: FormSelectOption[];
   placeholder?: string;
   error?: boolean;
   disabled?: boolean;
-  /** Para enlazar el botón a un título externo (p. ej. gráfico admin). */
-  'aria-labelledby'?: string;
+  /** Nombre accesible del desplegable (p. ej. cuando no hay legend de fieldset asociado). */
+  'aria-label'?: string;
   variant?: 'field' | 'compact';
   triggerClassName?: string;
   listClassName?: string;
@@ -48,10 +46,10 @@ export type FormSelectProps = {
 };
 
 const fieldTriggerBaseClass =
-  'mt-0.5 flex w-full min-h-[2.75rem] items-center justify-between gap-2 rounded-md border bg-zinc-50 px-3 py-2.5 text-left text-sm outline-none transition dark:bg-night-950';
+  'mt-0.5 flex w-full min-h-[2.75rem] items-center justify-between gap-2 rounded-md border bg-zinc-50 px-3 py-2.5 text-left text-sm outline-hidden transition dark:bg-night-950';
 
 const fieldTriggerNormalClass =
-  'border-zinc-200 text-zinc-900 placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/20 dark:border-night-700 dark:text-zinc-100 dark:focus:border-[#1f6feb] dark:focus:ring-[#1f6feb]/25';
+  'border-zinc-200 text-zinc-900 placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/20 dark:border-night-700 dark:text-zinc-100 dark:focus:border-code-blue dark:focus:ring-code-blue/25';
 
 const fieldTriggerErrorClass =
   'border-red-500 focus:border-red-500 focus:ring-red-500/20 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400/20';
@@ -60,12 +58,12 @@ const fieldTriggerDisabledClass =
   'cursor-not-allowed opacity-60';
 
 const compactTriggerBaseClass =
-  'flex min-h-0 min-w-[7.5rem] items-center justify-between gap-2 rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] px-2.5 py-1.5 text-left text-xs font-medium text-zinc-800 shadow-sm outline-none ring-[var(--admin-primary)]/0 transition hover:border-zinc-300 focus-visible:ring-2 dark:text-zinc-100 dark:hover:border-night-600';
+  'flex min-h-0 min-w-[7.5rem] items-center justify-between gap-2 rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] px-2.5 py-1.5 text-left text-xs font-medium text-zinc-800 shadow-sm outline-hidden ring-admin-primary/0 transition hover:border-zinc-300 focus-visible:ring-2 dark:text-zinc-100 dark:hover:border-night-600';
 
 const compactTriggerDisabledClass = 'cursor-not-allowed opacity-60';
 
 const fieldListPanelClass =
-  'fixed z-[90] flex flex-col overflow-hidden overscroll-contain rounded-md border border-zinc-200/90 bg-white shadow-lg ring-1 ring-black/5 dark:border-sky-500/20 dark:bg-[#121a2e] dark:shadow-[0_16px_40px_-12px_rgb(0_0_0/0.55)] dark:ring-sky-500/10';
+  'fixed z-[90] flex flex-col overflow-hidden overscroll-contain rounded-md border border-zinc-200/90 bg-white shadow-lg ring-1 ring-black/5 dark:border-sky-500/20 dark:bg-admin-dropdown dark:shadow-admin-dropdown dark:ring-sky-500/10';
 
 const fieldListUlClass =
   'market-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain py-1';
@@ -77,17 +75,16 @@ const compactListUlClass =
   'market-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain py-0.5';
 
 const listSearchInputClass =
-  'w-full rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/20 dark:border-night-600 dark:bg-night-900 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-[#1f6feb] dark:focus:ring-[#1f6feb]/25';
+  'w-full rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-2 text-sm text-zinc-900 outline-hidden placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/20 dark:border-night-600 dark:bg-night-900 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-code-blue dark:focus:ring-code-blue/25';
 
 export function FormSelect({
-  id,
   value,
   onChange,
   options,
   placeholder = '—',
   error = false,
   disabled = false,
-  'aria-labelledby': ariaLabelledBy,
+  'aria-label': ariaLabel,
   variant = 'field',
   triggerClassName,
   listClassName,
@@ -95,8 +92,6 @@ export function FormSelect({
   searchable = false,
   searchPlaceholder = 'Buscar…',
 }: FormSelectProps) {
-  const listboxId = useId();
-  const listSearchInputId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -281,7 +276,6 @@ export function FormSelect({
             {searchable ? (
               <div className="shrink-0 border-b border-zinc-200/90 p-2 dark:border-sky-500/20">
                 <input
-                  id={listSearchInputId}
                   type="search"
                   value={listFilter}
                   onChange={(e) => setListFilter(e.target.value)}
@@ -294,7 +288,7 @@ export function FormSelect({
                 />
               </div>
             ) : null}
-            <ul id={listboxId} role="listbox" className={ulScrollClass}>
+            <ul role="listbox" className={ulScrollClass}>
               {filteredOptions.length === 0 ? (
                 <li className="px-3 py-2.5 text-sm text-zinc-500 dark:text-zinc-400">
                   Sin coincidencias
@@ -304,7 +298,7 @@ export function FormSelect({
                   const isSelected = opt.value === value;
                   const optionClass = isCompact
                     ? isSelected
-                      ? 'cursor-pointer px-3 py-1.5 text-left text-xs font-semibold text-[var(--admin-primary)] bg-[var(--admin-primary-soft)] dark:text-[var(--color-market-dark-accent)]'
+                      ? 'cursor-pointer px-3 py-1.5 text-left text-xs font-semibold text-admin-primary bg-[var(--admin-primary-soft)] dark:text-market-dark-accent'
                       : 'cursor-pointer px-3 py-1.5 text-left text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800/80'
                     : isSelected
                       ? 'mx-1 cursor-pointer rounded-md px-3 py-2.5 text-sm font-medium bg-blue-50 text-blue-900 dark:bg-sky-500/15 dark:text-sky-100'
@@ -337,11 +331,9 @@ export function FormSelect({
       <button
         ref={triggerRef}
         type="button"
-        id={id}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-controls={listboxId}
-        aria-labelledby={ariaLabelledBy}
+        aria-label={ariaLabel}
         disabled={disabled}
         onClick={toggle}
         className={triggerClass}

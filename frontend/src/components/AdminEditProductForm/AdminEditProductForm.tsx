@@ -13,11 +13,13 @@ import { uploadFile } from '../../requests/fileRequests';
 import type { Product } from '../../types/product';
 
 const fieldClass =
-  'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';
+  'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-hidden transition placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';
 
 const textareaClass = `${fieldClass} resize-none`;
 
 const labelClass = 'text-xs font-medium text-zinc-600 dark:text-zinc-300';
+
+const fieldsetResetClass = 'm-0 min-w-0 border-0 p-0';
 
 const errorFieldClass =
   'border-red-500 focus:border-red-500 focus:ring-red-500/20 dark:border-red-400 dark:focus:border-red-400 dark:focus:ring-red-400/20';
@@ -179,7 +181,7 @@ export function AdminEditProductForm({
                 role="listitem"
                 className={`h-1 flex-1 rounded-full transition-colors ${
                   i <= step
-                    ? 'bg-[var(--color-forest)] dark:bg-blue-500'
+                    ? 'bg-forest dark:bg-blue-500'
                     : 'bg-zinc-200 dark:bg-night-700'
                 }`}
               />
@@ -193,13 +195,12 @@ export function AdminEditProductForm({
         <div className="flex flex-col gap-3">
           {step === 0 ? (
             <>
-              <div>
-                <label htmlFor="edit-product-name" className={labelClass}>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>
                   Nombre{' '}
                   <span className="text-red-600 dark:text-red-400">*</span>
-                </label>
+                </span>
                 <input
-                  id="edit-product-name"
                   value={name}
                   onChange={(e) => {
                     setName(e.target.value);
@@ -212,44 +213,39 @@ export function AdminEditProductForm({
                     {errors.name}
                   </p>
                 ) : null}
-              </div>
-              <div>
-                <label htmlFor="edit-product-description" className={labelClass}>
-                  Descripción
-                </label>
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className={labelClass}>Descripción</span>
                 <textarea
-                  id="edit-product-description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
                   className={textareaClass}
                 />
-              </div>
-              <div>
-                <label htmlFor="edit-product-category" className={labelClass}>
-                  Categoría
-                </label>
-                <FormSelect
-                  id="edit-product-category"
-                  value={categoryId}
-                  onChange={setCategoryId}
-                  options={categoryOptions}
-                  placeholder="— Sin categoría —"
-                />
-              </div>
+              </label>
+              <fieldset className={fieldsetResetClass}>
+                <legend className={labelClass}>Categoría</legend>
+                <div className="mt-1">
+                  <FormSelect
+                    value={categoryId}
+                    onChange={setCategoryId}
+                    options={categoryOptions}
+                    placeholder="— Sin categoría —"
+                  />
+                </div>
+              </fieldset>
             </>
           ) : null}
 
           {step === 1 ? (
             <>
               <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="edit-product-price" className={labelClass}>
+                <label className="flex flex-col gap-1">
+                  <span className={labelClass}>
                     Precio{' '}
                     <span className="text-red-600 dark:text-red-400">*</span>
-                  </label>
+                  </span>
                   <StepperNumberInput
-                    id="edit-product-price"
                     mode="money"
                     step={0.01}
                     min={0}
@@ -267,14 +263,13 @@ export function AdminEditProductForm({
                       {errors.price}
                     </p>
                   ) : null}
-                </div>
-                <div>
-                  <label htmlFor="edit-product-stock" className={labelClass}>
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className={labelClass}>
                     Stock{' '}
                     <span className="text-red-600 dark:text-red-400">*</span>
-                  </label>
+                  </span>
                   <StepperNumberInput
-                    id="edit-product-stock"
                     mode="int"
                     step={1}
                     min={0}
@@ -292,19 +287,16 @@ export function AdminEditProductForm({
                       {errors.stock}
                     </p>
                   ) : null}
-                </div>
-              </div>
-              <div>
-                <label htmlFor="edit-product-images" className={labelClass}>
-                  Imágenes
                 </label>
+              </div>
+              <fieldset className={fieldsetResetClass}>
+                <legend className={labelClass}>Imágenes</legend>
                 <p className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-500">
                   Las nuevas se suben al pulsar «Actualizar». Puedes quitar las
                   actuales o añadir más.
                 </p>
                 <div className="mt-2">
                   <ProductImagesField
-                    id="edit-product-images"
                     files={newImageFiles}
                     onChange={setNewImageFiles}
                     remoteUrls={remoteImageUrls}
@@ -316,7 +308,7 @@ export function AdminEditProductForm({
                     disabled={disabledNav || !token}
                   />
                 </div>
-              </div>
+              </fieldset>
             </>
           ) : null}
         </div>
@@ -334,7 +326,7 @@ export function AdminEditProductForm({
               variant="ghost"
               disabled={disabledNav}
               onClick={onCancel}
-              className="h-11 min-h-11 min-w-0 flex-1 basis-0 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:min-w-[7.5rem]"
+              className="h-11 min-h-11 min-w-0 flex-1 basis-0 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:w-44"
             >
               Cancelar
             </Button>
@@ -345,7 +337,7 @@ export function AdminEditProductForm({
               variant="ghost"
               disabled={disabledNav}
               onClick={goBack}
-              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:min-w-[7.5rem]"
+              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:w-44"
             >
               <FiChevronLeft className="h-4 w-4 shrink-0" aria-hidden />
               Atrás
@@ -359,7 +351,7 @@ export function AdminEditProductForm({
               variant="cta"
               disabled={disabledNav}
               onClick={goNext}
-              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 px-3 sm:min-w-[11rem]"
+              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 px-3 sm:w-44 sm:flex-none"
             >
               Siguiente
               <FiChevronRight className="h-4 w-4 shrink-0" aria-hidden />
@@ -370,7 +362,7 @@ export function AdminEditProductForm({
               variant="cta"
               disabled={disabledNav}
               onClick={() => void submit()}
-              className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:min-w-[11rem]"
+              className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:w-44 sm:flex-none"
             >
               {isUploadingImages
                 ? 'Subiendo imágenes…'

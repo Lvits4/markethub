@@ -245,7 +245,7 @@ function ProductDetailsPanel({ product }: { product: Product }) {
             {galleryImages.map((img) => (
               <div
                 key={img.id}
-                className="flex min-h-[5rem] items-center justify-center rounded-lg border border-slate-200/80 bg-white p-2 dark:border-sky-500/20 dark:bg-[#0f1a38]"
+                className="flex min-h-[5rem] items-center justify-center rounded-lg border border-slate-200/80 bg-white p-2 dark:border-sky-500/20 dark:bg-admin-elevated"
               >
                 <ProductDetailImage url={img.url} />
               </div>
@@ -297,7 +297,7 @@ function ProductDetailsDrawer({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-80 flex cursor-pointer items-stretch justify-end bg-black/35"
+      className="fixed inset-0 z-[80] flex cursor-pointer items-stretch justify-end bg-black/35"
       role="presentation"
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -307,10 +307,10 @@ function ProductDetailsDrawer({
         role="dialog"
         aria-modal="true"
         aria-label="Detalle de producto"
-        className="flex h-full w-full max-w-[640px] cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-[#0b152f]"
+        className="flex h-full w-full max-w-admin-drawer cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-admin-drawer"
         onPointerDown={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-[#0d1938]">
+        <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-admin-drawer-head">
           <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
             Panel de detalles
           </h2>
@@ -326,7 +326,7 @@ function ProductDetailsDrawer({
             </Button>
           </div>
         </div>
-        <div className="min-h-0 flex-1 overflow-hidden bg-[#f5f8fc] dark:bg-[#091126]">
+        <div className="min-h-0 flex-1 overflow-hidden bg-admin-canvas dark:bg-admin-canvas-dark">
           {isLoading ? (
             <p className="px-4 py-4 text-sm text-slate-500">
               Cargando detalle…
@@ -376,7 +376,7 @@ function SortHeader({
         <span className="inline-flex shrink-0 flex-col items-center gap-0 leading-none">
           <button
             type="button"
-            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'asc' ? 'text-[var(--color-forest)]' : 'text-slate-400 dark:text-slate-500'}`}
+            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'asc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
             aria-label={`Ordenar ${label} ascendente`}
             onClick={() => onSort(sortKey, 'asc')}
           >
@@ -384,7 +384,7 @@ function SortHeader({
           </button>
           <button
             type="button"
-            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'desc' ? 'text-[var(--color-forest)]' : 'text-slate-400 dark:text-slate-500'}`}
+            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'desc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
             aria-label={`Ordenar ${label} descendente`}
             onClick={() => onSort(sortKey, 'desc')}
           >
@@ -518,7 +518,7 @@ export function AdminProductsPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Buscar por producto, slug, tienda o categoría…"
-                className={`box-border h-11 w-full rounded-md border border-zinc-200 bg-white py-0 pl-10 text-sm leading-normal text-zinc-900 shadow-sm ring-zinc-200 placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:outline-none focus:ring-2 focus:ring-[var(--color-forest)]/25 dark:border-night-700 dark:bg-night-950 dark:text-zinc-50 dark:ring-night-800 ${search ? 'pr-11' : 'pr-4'}`}
+                className={`box-border h-11 w-full rounded-md border border-zinc-200 bg-white py-0 pl-10 text-sm leading-normal text-zinc-900 shadow-sm ring-zinc-200 placeholder:text-zinc-400 focus:border-forest focus:outline-hidden focus:ring-2 focus:ring-forest/25 dark:border-night-700 dark:bg-night-950 dark:text-zinc-50 dark:ring-night-800 ${search ? 'pr-11' : 'pr-4'}`}
                 aria-label="Buscar productos"
               />
               {search ? (
@@ -551,7 +551,7 @@ export function AdminProductsPage() {
               >
                 <table className="w-full min-w-[900px] table-fixed border-collapse text-left text-sm">
                   <AdminProductsTableColgroup />
-                  <thead className="bg-slate-100/92 backdrop-blur-md dark:bg-[#0f1a38]/95 dark:backdrop-blur-md">
+                  <thead className="bg-slate-100/92 backdrop-blur-md dark:bg-admin-elevated/95 dark:backdrop-blur-md">
                     <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
                       <SortHeader
                         label="Producto"
@@ -657,7 +657,7 @@ export function AdminProductsPage() {
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="!text-[#2563eb] hover:bg-blue-500/10 dark:!text-sky-400 dark:hover:bg-sky-500/15"
+                                className="!text-blue-600 hover:bg-blue-500/10 dark:!text-sky-400 dark:hover:bg-sky-500/15"
                                 aria-label={`Ver detalle de ${p.name}`}
                                 onClick={() => {
                                   setMode('view');
@@ -698,7 +698,7 @@ export function AdminProductsPage() {
               </div>
             </div>
 
-            <div className="flex shrink-0 flex-col items-center gap-3 border-t border-slate-200/80 bg-slate-50/75 px-4 py-3 backdrop-blur-sm dark:border-sky-500/18 dark:bg-[#0c1630]/88 dark:backdrop-blur-sm">
+            <div className="flex shrink-0 flex-col items-center gap-3 border-t border-slate-200/80 bg-slate-50/75 px-4 py-3 backdrop-blur-sm dark:border-sky-500/18 dark:bg-admin-footer/88 dark:backdrop-blur-sm">
               <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
                 <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                   {filteredSorted.length === 0
@@ -753,7 +753,7 @@ export function AdminProductsPage() {
                       );
                       setPageSize(next);
                     }}
-                    className="page-size-input h-9 w-16 rounded-md border border-slate-300 bg-white px-2 text-center text-sm font-semibold text-slate-900 outline-none transition focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/25 dark:border-sky-500/30 dark:bg-[#0b1735] dark:text-slate-100 dark:focus:border-sky-400 dark:focus:ring-sky-500/25"
+                    className="page-size-input h-9 w-16 rounded-md border border-slate-300 bg-white px-2 text-center text-sm font-semibold text-slate-900 outline-hidden transition focus:border-forest focus:ring-2 focus:ring-forest/25 dark:border-sky-500/30 dark:bg-admin-field dark:text-slate-100 dark:focus:border-sky-400 dark:focus:ring-sky-500/25"
                     aria-label="Cantidad de elementos por página"
                   />
                 </label>

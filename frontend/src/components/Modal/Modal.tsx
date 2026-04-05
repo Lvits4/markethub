@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useRef,
-  type ReactNode,
-} from 'react';
+import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../Button/Button';
 
@@ -36,7 +30,6 @@ export function Modal({
   closeButtonClassName = '',
   contentWrapperClassName = '',
 }: ModalProps) {
-  const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
 
   const handleOverlayPointerDown = useCallback(
@@ -89,7 +82,7 @@ export function Modal({
         ref={panelRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby={titleId}
+        aria-label={title}
         className={`flex max-h-[min(90vh,720px)] w-full cursor-default flex-col overflow-hidden rounded-t-xl bg-white shadow-xl ring-1 ring-zinc-200/80 dark:bg-night-900 dark:ring-night-700 sm:rounded-xl ${wide ? 'max-w-3xl' : 'max-w-lg'} ${className}`}
         onPointerDown={(e) => e.stopPropagation()}
       >
@@ -97,7 +90,6 @@ export function Modal({
           className={`flex shrink-0 items-start justify-between gap-3 border-b border-zinc-100 bg-white px-5 py-4 dark:border-night-800 dark:bg-night-900 ${headerClassName}`}
         >
           <h2
-            id={titleId}
             className={`text-lg font-semibold text-zinc-900 dark:text-zinc-50 ${titleClassName}`}
           >
             {title}

@@ -84,7 +84,7 @@ export function OrdersPage() {
           Aún no tienes pedidos.{' '}
           <Link
             to={routePaths.catalog}
-            className="font-semibold text-[var(--color-forest)]"
+            className="font-semibold text-forest"
           >
             Ir al catálogo
           </Link>
@@ -96,7 +96,7 @@ export function OrdersPage() {
               <div className="flex gap-2 sm:gap-3">
                 <Link
                   to={routePaths.orderDetail(o.id)}
-                  className="min-w-0 flex-1 rounded-md bg-white p-5 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 transition hover:ring-zinc-300 dark:bg-night-900 dark:ring-night-800 dark:hover:ring-night-700"
+                  className="min-w-0 flex-1 rounded-md bg-white p-5 shadow-market ring-1 ring-zinc-200/70 transition hover:ring-zinc-300 dark:bg-night-900 dark:ring-night-800 dark:hover:ring-night-700"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
@@ -142,7 +142,7 @@ export function OrdersPage() {
           <Button
             type="button"
             variant="ghost"
-            className="h-10 min-w-[9rem] justify-center border border-zinc-300 bg-white px-4 text-sm text-zinc-800 hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700"
+            className="h-10 w-44 shrink-0 justify-center border border-zinc-300 bg-white px-4 text-sm text-zinc-800 hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700"
             onClick={closeClearHistoryModal}
             disabled={clearHistory.isPending}
           >
@@ -151,7 +151,7 @@ export function OrdersPage() {
           <Button
             type="button"
             variant="primary"
-            className="h-10 min-w-[9rem] justify-center"
+            className="h-10 w-44 shrink-0 justify-center"
             onClick={onConfirmClearHistory}
             disabled={clearHistory.isPending}
           >

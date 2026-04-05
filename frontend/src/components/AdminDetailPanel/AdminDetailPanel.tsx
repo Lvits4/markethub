@@ -65,7 +65,7 @@ export function AdminDetailStatTile({
   hint?: string;
 }) {
   return (
-    <div className="box-border w-full min-w-0 max-w-[11rem] shrink-0 basis-[9.25rem] grow-0 rounded-md border border-slate-200/80 bg-white px-2 py-1.5 shadow-sm sm:basis-[9.75rem] dark:border-sky-500/20 dark:bg-[#0f1a38]">
+    <div className="box-border w-full min-w-0 max-w-44 shrink-0 basis-37 grow-0 rounded-md border border-slate-200/80 bg-white px-2 py-1.5 shadow-sm sm:basis-39 dark:border-sky-500/20 dark:bg-admin-elevated">
       <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
         {label}
       </p>
@@ -113,7 +113,7 @@ export function AdminDetailImageFrame({
 }) {
   return (
     <div
-      className="flex h-30 w-30 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50/90 p-2 ring-1 ring-slate-200/60 dark:border-sky-500/20 dark:bg-[#0a1228] dark:ring-sky-500/20 sm:h-32 sm:w-32"
+      className="flex h-30 w-30 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200/80 bg-slate-50/90 p-2 ring-1 ring-slate-200/60 dark:border-sky-500/20 dark:bg-admin-media-bg dark:ring-sky-500/20 sm:h-32 sm:w-32"
       aria-label={ariaLabel}
     >
       {children}
@@ -174,7 +174,7 @@ export function AdminDetailCompactFieldBlock({
             aria-hidden
           />
         ) : null}
-        <div className="min-w-0 break-words">{children}</div>
+        <div className="min-w-0 wrap-break-words">{children}</div>
       </div>
     </div>
   );
@@ -196,7 +196,7 @@ export function AdminDetailScrollSection({
   return (
     <section className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
       <div
-        className="inline-flex shrink-0 rounded-lg bg-slate-100 p-0.5 dark:bg-[#0f1a38]"
+        className="inline-flex shrink-0 rounded-lg bg-slate-100 p-0.5 dark:bg-admin-elevated"
         role="tablist"
         aria-label={tablistLabel}
       >
@@ -209,7 +209,7 @@ export function AdminDetailScrollSection({
             onClick={() => onTabChange(t.id)}
             className={`cursor-pointer rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ${
               activeTab === t.id
-                ? 'bg-white text-slate-800 shadow-sm dark:bg-[#162647] dark:text-slate-100'
+                ? 'bg-white text-slate-800 shadow-sm dark:bg-admin-pill-dark dark:text-slate-100'
                 : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
             }`}
           >
@@ -232,7 +232,7 @@ export function AdminDetailTextCard({
   children: ReactNode;
 }) {
   return (
-    <div className="rounded-lg border border-slate-200/80 bg-white p-3 dark:border-sky-500/20 dark:bg-[#0f1a38]">
+    <div className="rounded-lg border border-slate-200/80 bg-white p-3 dark:border-sky-500/20 dark:bg-admin-elevated">
       <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
         {title}
       </p>

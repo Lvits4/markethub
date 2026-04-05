@@ -19,13 +19,6 @@ export function fetchAdminUsers(token: string) {
   return fetchDefault<AdminUserRow[]>(apiPaths.adminUsers, { token });
 }
 
-export function toggleAdminUserActive(token: string, userId: string) {
-  return fetchDefault<AdminUserRow>(apiPaths.adminUserToggleActive(userId), {
-    token,
-    method: 'PATCH',
-  });
-}
-
 export function deleteAdminUser(token: string, userId: string) {
   return fetchDefault<{ message: string }>(apiPaths.adminUser(userId), {
     token,

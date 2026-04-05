@@ -16,7 +16,7 @@ export function SellerDashboardPage() {
         <li>
           <Link
             to={routePaths.sellerOrders}
-            className="block rounded-md bg-white p-6 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 transition hover:ring-zinc-300 dark:bg-night-900 dark:ring-night-800 dark:hover:ring-night-700"
+            className="block rounded-md bg-white p-6 shadow-market ring-1 ring-zinc-200/70 transition hover:ring-zinc-300 dark:bg-night-900 dark:ring-night-800 dark:hover:ring-night-700"
           >
             <p className="font-semibold text-zinc-900 dark:text-zinc-50">
               Pedidos
@@ -27,7 +27,7 @@ export function SellerDashboardPage() {
         <li>
           <Link
             to={routePaths.sellerReport}
-            className="block rounded-md bg-white p-6 shadow-[var(--shadow-market)] ring-1 ring-zinc-200/70 transition hover:ring-zinc-300 dark:bg-night-900 dark:ring-night-800 dark:hover:ring-night-700"
+            className="block rounded-md bg-white p-6 shadow-market ring-1 ring-zinc-200/70 transition hover:ring-zinc-300 dark:bg-night-900 dark:ring-night-800 dark:hover:ring-night-700"
           >
             <p className="font-semibold text-zinc-900 dark:text-zinc-50">
               Informe de ventas

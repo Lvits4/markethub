@@ -1,14 +1,16 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { SellerCreateStoreModalProvider } from '../../context/SellerCreateStoreModalProvider/SellerCreateStoreModalProvider';
 import { routePaths } from '../../config/routes';
 
 const navClass =
-  'rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-night-800 dark:hover:text-zinc-100';
+  'rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition-[color,background-color,box-shadow] duration-200 ease-out motion-reduce:transition-none hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-night-800 dark:hover:text-zinc-100';
 
 const activeClass =
-  'bg-[var(--color-forest)]/10 text-[var(--color-forest)] dark:bg-[color:rgb(16_34_81/0.65)] dark:text-[var(--color-market-dark-accent)]';
+  'bg-forest/10 text-forest dark:bg-[color:rgb(16_34_81/0.65)] dark:text-market-dark-accent';
 
 export function SellerLayout() {
+  const { pathname } = useLocation();
+
   return (
     <SellerCreateStoreModalProvider>
     <div className="min-h-screen bg-zinc-50/80 pb-24 dark:bg-night-950/80">
@@ -52,7 +54,9 @@ export function SellerLayout() {
         </div>
       </div>
       <div className="mx-auto max-w-6xl px-4 py-8">
-        <Outlet />
+        <div key={pathname} className="route-outlet-fade">
+          <Outlet />
+        </div>
       </div>
     </div>
     </SellerCreateStoreModalProvider>

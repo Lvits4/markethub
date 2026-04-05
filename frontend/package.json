@@ -7,6 +7,7 @@
     "dev": "npx vite",
     "build": "npx tsc -b && npx vite build",
     "lint": "npx eslint .",
+    "knip": "knip",
     "preview": "npx vite preview"
   },
   "dependencies": {
@@ -30,6 +31,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "knip": "^5.38.0",
     "tailwindcss": "^4.0.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.57.0",

@@ -21,7 +21,6 @@ export function useDeleteOrderMutation() {
       void queryClient.invalidateQueries({ queryKey: queryKeys.adminPlatformReport });
       void queryClient.invalidateQueries({ queryKey: queryKeys.sellerDashboard });
       void queryClient.invalidateQueries({ queryKey: queryKeys.sellerSalesReport });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.sellerStoreReport });
       void queryClient.removeQueries({ queryKey: queryKeys.order(orderId) });
       void queryClient.removeQueries({ queryKey: queryKeys.paymentByOrder(orderId) });
     },

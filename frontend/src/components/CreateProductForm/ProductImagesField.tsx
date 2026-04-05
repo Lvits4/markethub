@@ -9,8 +9,6 @@ function truncateUrl(url: string) {
 }
 
 export type ProductImagesFieldProps = {
-  /** Mismo `id` que `htmlFor` del `<label>` del formulario. */
-  id: string;
   files: File[];
   onChange: (files: File[]) => void;
   disabled?: boolean;
@@ -37,7 +35,6 @@ function filterImageFiles(list: FileList | File[]): File[] {
 }
 
 export function ProductImagesField({
-  id,
   files,
   onChange,
   disabled = false,
@@ -77,7 +74,7 @@ export function ProductImagesField({
     disabled
       ? 'cursor-not-allowed border-zinc-200 bg-zinc-50/40 opacity-50 dark:border-night-700 dark:bg-night-950/30'
       : dragOver
-        ? 'cursor-pointer border-[#1f6feb] bg-blue-50/80 dark:border-sky-400 dark:bg-sky-500/10'
+        ? 'cursor-pointer border-code-blue bg-blue-50/80 dark:border-sky-400 dark:bg-sky-500/10'
         : 'cursor-pointer border-zinc-300 bg-zinc-50/60 hover:border-zinc-400 hover:bg-zinc-100/80 dark:border-night-600 dark:bg-night-950/40 dark:hover:border-sky-500/35 dark:hover:bg-night-900/60'
   }`;
 
@@ -106,7 +103,7 @@ export function ProductImagesField({
         }`}
       >
         Arrastra imágenes aquí o{' '}
-        <span className="text-[var(--color-forest)] underline decoration-transparent underline-offset-2 transition-colors group-hover:decoration-current">
+        <span className="text-forest underline decoration-transparent underline-offset-2 transition-colors group-hover:decoration-current">
           elige archivos
         </span>
       </span>
@@ -123,27 +120,31 @@ export function ProductImagesField({
   const listRowClass =
     'flex items-center justify-between gap-2 rounded-md border border-zinc-200 bg-zinc-50/80 px-3 py-2 dark:border-night-600 dark:bg-night-900/60';
 
+  const fileInput = (
+    <input
+      type="file"
+      accept="image/*"
+      multiple={multiple}
+      disabled={disabled}
+      className="sr-only"
+      aria-label="Seleccionar imágenes"
+      onChange={(e) => {
+        const fl = e.target.files;
+        if (fl?.length) addFiles(fl);
+        e.target.value = '';
+      }}
+    />
+  );
+
   return (
     <div className={compact ? 'space-y-2' : 'space-y-3'}>
-      <input
-        id={id}
-        type="file"
-        accept="image/*"
-        multiple={multiple}
-        disabled={disabled}
-        className="sr-only"
-        onChange={(e) => {
-          const fl = e.target.files;
-          if (fl?.length) addFiles(fl);
-          e.target.value = '';
-        }}
-      />
-
       {disabled ? (
-        <div className={`group ${zoneClass}`}>{body}</div>
+        <>
+          {fileInput}
+          <div className={`group ${zoneClass}`}>{body}</div>
+        </>
       ) : (
         <label
-          htmlFor={id}
           className={`group ${zoneClass}`}
           onDragEnter={(e) => {
             e.preventDefault();
@@ -166,6 +167,7 @@ export function ProductImagesField({
             addFiles(e.dataTransfer.files);
           }}
         >
+          {fileInput}
           {body}
         </label>
       )}

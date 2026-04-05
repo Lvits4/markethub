@@ -33,15 +33,6 @@ export class PaymentsService {
     return this.paymentsRepository.findOne({ where: { orderId } });
   }
 
-  async refund(orderId: string): Promise<Payment | null> {
-    const payment = await this.findByOrderId(orderId);
-    if (payment && payment.status === PaymentStatus.COMPLETED) {
-      payment.status = PaymentStatus.REFUNDED;
-      return this.paymentsRepository.save(payment);
-    }
-    return payment;
-  }
-
   /** Elimina el registro de pago ligado al pedido (p. ej. antes de borrar el pedido). */
   async deleteByOrderId(orderId: string): Promise<void> {
     await this.paymentsRepository.delete({ orderId });

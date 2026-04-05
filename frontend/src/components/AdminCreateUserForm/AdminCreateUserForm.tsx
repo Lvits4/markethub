@@ -6,9 +6,11 @@ import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAdminCreateUser } from '../../hooks/useAdminCreateUser';
 
 const fieldClass =
-  'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-[var(--color-forest)] focus:ring-2 focus:ring-[var(--color-forest)]/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';
+  'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-hidden transition placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';
 
 const labelClass = 'text-xs font-medium text-zinc-600 dark:text-zinc-300';
+
+const fieldsetResetClass = 'm-0 min-w-0 border-0 p-0';
 
 const ROLES = [
   { value: 'CUSTOMER', label: 'Cliente' },
@@ -86,12 +88,11 @@ export function AdminCreateUserForm({
     >
       <div className="market-scroll min-h-0 max-h-[min(60vh,520px)] flex-1 overflow-y-auto overscroll-contain px-5 py-4 sm:max-h-[min(65vh,580px)]">
         <div className="flex flex-col gap-3">
-          <div>
-            <label htmlFor="create-user-email" className={labelClass}>
+          <label className="flex flex-col gap-1">
+            <span className={labelClass}>
               Correo <span className="text-red-600 dark:text-red-400">*</span>
-            </label>
+            </span>
             <input
-              id="create-user-email"
               type="email"
               autoComplete="email"
               value={email}
@@ -99,13 +100,12 @@ export function AdminCreateUserForm({
               className={fieldClass}
               disabled={busy}
             />
-          </div>
-          <div>
-            <label htmlFor="create-user-password" className={labelClass}>
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className={labelClass}>
               Contraseña <span className="text-red-600 dark:text-red-400">*</span>
-            </label>
+            </span>
             <input
-              id="create-user-password"
               type="password"
               autoComplete="new-password"
               value={password}
@@ -113,50 +113,49 @@ export function AdminCreateUserForm({
               className={fieldClass}
               disabled={busy}
             />
-            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+            <span className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
               Mínimo 6 caracteres.
-            </p>
-          </div>
+            </span>
+          </label>
           <div className="grid gap-3 sm:grid-cols-2">
-            <div>
-              <label htmlFor="create-user-first" className={labelClass}>
+            <label className="flex flex-col gap-1">
+              <span className={labelClass}>
                 Nombre <span className="text-red-600 dark:text-red-400">*</span>
-              </label>
+              </span>
               <input
-                id="create-user-first"
                 autoComplete="given-name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 className={fieldClass}
                 disabled={busy}
               />
-            </div>
-            <div>
-              <label htmlFor="create-user-last" className={labelClass}>
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className={labelClass}>
                 Apellidos <span className="text-red-600 dark:text-red-400">*</span>
-              </label>
+              </span>
               <input
-                id="create-user-last"
                 autoComplete="family-name"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 className={fieldClass}
                 disabled={busy}
               />
-            </div>
-          </div>
-          <div>
-            <label htmlFor="create-user-role" className={labelClass}>
-              Rol <span className="text-red-600 dark:text-red-400">*</span>
             </label>
-            <FormSelect
-              id="create-user-role"
-              value={role}
-              onChange={setRole}
-              options={ROLE_OPTIONS}
-              disabled={busy}
-            />
           </div>
+          <fieldset className={fieldsetResetClass}>
+            <legend className={labelClass}>
+              Rol <span className="text-red-600 dark:text-red-400">*</span>
+            </legend>
+            <div className="mt-1">
+              <FormSelect
+                value={role}
+                onChange={setRole}
+                options={ROLE_OPTIONS}
+                disabled={busy}
+              />
+            </div>
+          </fieldset>
           <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-700 dark:text-zinc-200">
             <input
               type="checkbox"
@@ -178,7 +177,7 @@ export function AdminCreateUserForm({
             variant="ghost"
             disabled={busy}
             onClick={onCancel}
-            className="h-11 min-h-11 w-full justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:w-auto sm:min-w-[7.5rem]"
+            className="h-11 min-h-11 w-full justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:w-44 sm:flex-none"
           >
             Cancelar
           </Button>
@@ -188,7 +187,7 @@ export function AdminCreateUserForm({
           variant="cta"
           disabled={busy}
           onClick={handleSubmit}
-          className="h-11 min-h-11 w-full justify-center px-3 sm:min-w-[11rem] sm:w-auto"
+          className="h-11 min-h-11 w-full justify-center px-3 sm:w-44 sm:flex-none"
         >
           {busy ? 'Creando…' : 'Crear usuario'}
         </Button>
