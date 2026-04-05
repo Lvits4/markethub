@@ -1,21 +1,17 @@
 # MarketHub
-
-Marketplace web para explorar tiendas, catálogo, carrito, favoritos y pedidos, con paneles para **vendedores** y **administración**. Monorepo con API en **NestJS** y cliente en **React (Vite)**.
+Marketplace web para explorar tiendas, catálogo, carrito, favoritos y pedidos, con paneles para **vendedores** y **administración**. 
 
 ## Stack
-
 | Parte      | Tecnologías principales |
 | ---------- | ----------------------- |
-| **Backend** | NestJS 11, TypeORM, PostgreSQL, JWT (Passport), Swagger, almacenamiento configurable (`s3-client-dtb`, modo local en desarrollo) |
-| **Frontend** | React 19, TypeScript, Vite 8, Tailwind CSS v4, TanStack Query, React Router (HashRouter), Zod |
+| **Backend** | NestJS 11, TypeORM, PostgreSQL, JWT (Passport), Swagger, almacenamiento configurable (`s3-client-dtb`) |
+| **Frontend** | React 19, TypeScript, Vite 8, Tailwind CSS v4, TanStack Query, React Router (HashRouter) |
 
 ## Requisitos previos
-
 - **Node.js 20+** y npm
 - **Docker** y Docker Compose (recomendado para PostgreSQL), o una instancia de **PostgreSQL** accesible
 
 ## Estructura del repositorio
-
 ```
 markethub/
 ├── backend/     # API NestJS (prefijo global `/api`)
@@ -53,7 +49,7 @@ npm run start:dev
 - API: **http://localhost:3000**
 - Swagger: **http://localhost:3000/api/docs**
 
-En **desarrollo**, TypeORM puede sincronizar el esquema (`synchronize: true` cuando `NODE_ENV=development`). Los ficheros subidos en modo `STORAGE_MODE=offline` se guardan bajo `STORAGE_ROOT_PATH` (por defecto `./uploads`).
+Los ficheros subidos en modo `STORAGE_MODE=offline` se guardan bajo `STORAGE_ROOT_PATH` (por defecto `./uploads`).
 
 ### 3. Frontend
 
@@ -65,10 +61,6 @@ cp .env.example .env
 npm install
 npm run dev
 ```
-
-- App: **http://localhost:5173** (Vite; el enrutador usa hash, p. ej. `/#/browse`)
-
-`VITE_API_BASE_URL` debe apuntar al API (por defecto `http://localhost:3000/api`). En desarrollo, Vite también proxifica `/api` hacia el puerto 3000.
 
 ### 4. Backend y frontend a la vez
 
