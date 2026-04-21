@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { type ReactNode, useMemo, useState } from 'react';
 import {
   Bar,
   BarChart,
@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { HiUsers, HiUserGroup, HiBuildingStorefront, HiCube } from 'react-icons/hi2';
 import { FormSelect } from '../../components/CreateProductForm/FormSelect';
 import { formatPrice } from '../../helpers/formatPrice';
 import { useAuth } from '../../hooks/useAuth';
@@ -22,36 +23,40 @@ const CHART_PERIOD_FORM_OPTIONS = [
   { value: '12', label: '12 meses' },
 ] as const;
 
-/** Acento discreto por tarjeta (misma base que el resto del admin). */
-const KPI_ACCENT_LEFT = [
-  'border-l-blue-500 dark:border-l-blue-400',
-  'border-l-indigo-500 dark:border-l-indigo-400',
-  'border-l-sky-500 dark:border-l-sky-400',
-  'border-l-cyan-500 dark:border-l-cyan-400',
-  'border-l-violet-500 dark:border-l-violet-400',
-  'border-l-zinc-400 dark:border-l-zinc-500',
+const KPI_STYLES = [
+  { accent: 'border-l-blue-500 dark:border-l-blue-400', icon: 'text-blue-500 dark:text-blue-400' },
+  { accent: 'border-l-indigo-500 dark:border-l-indigo-400', icon: 'text-indigo-500 dark:text-indigo-400' },
+  { accent: 'border-l-sky-500 dark:border-l-sky-400', icon: 'text-sky-500 dark:text-sky-400' },
+  { accent: 'border-l-cyan-500 dark:border-l-cyan-400', icon: 'text-cyan-500 dark:text-cyan-400' },
 ] as const;
 
 function KpiCard({
   label,
   value,
+  icon,
   variant,
 }: {
   label: string;
   value: string | number;
-  variant: 0 | 1 | 2 | 3 | 4 | 5;
+  icon: ReactNode;
+  variant: 0 | 1 | 2 | 3;
 }) {
-  const accent = KPI_ACCENT_LEFT[variant];
+  const style = KPI_STYLES[variant];
   return (
     <div
-      className={`flex h-full min-h-[5.75rem] min-w-0 w-full flex-col justify-center rounded-md border border-[var(--admin-border)] border-l-4 bg-[var(--admin-card)] px-4 py-3.5 shadow-sm dark:shadow-none sm:min-h-[6.25rem] sm:px-4 sm:py-4 ${accent}`}
+      className={`flex h-full min-h-[5.75rem] min-w-0 w-full items-center gap-3 rounded-md border border-[var(--admin-border)] border-l-4 bg-[var(--admin-card)] px-4 py-3.5 shadow-sm dark:shadow-none sm:min-h-[6.25rem] sm:px-4 sm:py-4 ${style.accent}`}
     >
-      <p className="line-clamp-2 text-xs font-medium leading-snug text-zinc-600 dark:text-zinc-400 sm:text-[13px]">
-        {label}
-      </p>
-      <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-50 sm:mt-2 sm:text-3xl">
-        {value}
-      </p>
+      <div className={`shrink-0 ${style.icon}`}>
+        {icon}
+      </div>
+      <div className="min-w-0 flex flex-col justify-center">
+        <p className="line-clamp-2 text-xs font-medium leading-snug text-zinc-600 dark:text-zinc-400 sm:text-[13px]">
+          {label}
+        </p>
+        <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-50 sm:mt-2 sm:text-3xl">
+          {value}
+        </p>
+      </div>
     </div>
   );
 }
@@ -131,79 +136,79 @@ export function AdminDashboardPage() {
         </div>
       </header>
 
-      <div className="grid shrink-0 grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-3 xl:grid-cols-6">
-        {isSeller ? (
-          <>
-            <div className="min-w-0">
-              <KpiCard
-                variant={0}
-                label="Ingresos"
-                value={formatPrice(data.revenue.totalSales)}
-              />
-            </div>
-            <div className="min-w-0">
-              <KpiCard
-                variant={1}
-                label="Productos activos"
-                value={data.products.active}
-              />
-            </div>
-            <div className="min-w-0">
-              <KpiCard
-                variant={2}
-                label="Mis tiendas"
-                value={data.stores.total}
-              />
-            </div>
-            <div className="min-w-0">
-              <KpiCard
-                variant={3}
-                label="Aprobadas"
-                value={data.stores.approved}
-              />
-            </div>
-            <div className="min-w-0">
-              <KpiCard variant={4} label="Órdenes" value={data.orders.total} />
-            </div>
-            <div className="min-w-0">
-              <KpiCard
-                variant={5}
-                label="Completadas"
-                value={data.orders.completed}
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="min-w-0">
-              <KpiCard variant={0} label="Vendedores" value={data.users.sellers} />
-            </div>
-            <div className="min-w-0">
-              <KpiCard variant={1} label="Clientes" value={data.users.customers} />
-            </div>
-            <div className="min-w-0">
-              <KpiCard
-                variant={2}
-                label="Tiendas aprobadas"
-                value={data.stores.approved}
-              />
-            </div>
-            <div className="min-w-0">
-              <KpiCard
-                variant={3}
-                label="Tiendas rechazadas"
-                value={data.stores.rejected}
-              />
-            </div>
-            <div className="min-w-0">
-              <KpiCard variant={4} label="Órdenes" value={data.orders.total} />
-            </div>
-            <div className="min-w-0">
-              <KpiCard variant={5} label="Productos" value={data.products.total} />
-            </div>
-          </>
-        )}
-      </div>
+  <div className="grid shrink-0 grid-cols-2 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4 xl:grid-cols-4">
+    {isSeller ? (
+      <>
+        <div className="min-w-0">
+          <KpiCard
+            variant={0}
+            label="Ingresos"
+            value={formatPrice(data.revenue.totalSales)}
+            icon={<HiBuildingStorefront className="h-6 w-6 sm:h-7 sm:w-7" />}
+          />
+        </div>
+        <div className="min-w-0">
+          <KpiCard
+            variant={1}
+            label="Productos activos"
+            value={data.products.active}
+            icon={<HiCube className="h-6 w-6 sm:h-7 sm:w-7" />}
+          />
+        </div>
+        <div className="min-w-0">
+          <KpiCard
+            variant={2}
+            label="Mis tiendas"
+            value={data.stores.total}
+            icon={<HiBuildingStorefront className="h-6 w-6 sm:h-7 sm:w-7" />}
+          />
+        </div>
+        <div className="min-w-0">
+          <KpiCard
+            variant={3}
+            label="Órdenes"
+            value={data.orders.total}
+            icon={<HiUserGroup className="h-6 w-6 sm:h-7 sm:w-7" />}
+          />
+        </div>
+      </>
+    ) : (
+      <>
+        <div className="min-w-0">
+          <KpiCard
+            variant={0}
+            label="Total usuarios"
+            value={data.users.total}
+            icon={<HiUsers className="h-6 w-6 sm:h-7 sm:w-7" />}
+          />
+        </div>
+        <div className="min-w-0">
+          <KpiCard
+            variant={1}
+            label="Total clientes"
+            value={data.users.sellers}
+            icon={<HiUserGroup className="h-6 w-6 sm:h-7 sm:w-7" />}
+          />
+        </div>
+        <div className="min-w-0">
+          <KpiCard
+            variant={2}
+            label="Total tiendas"
+            value={data.stores.approved}
+            icon={<HiBuildingStorefront className="h-6 w-6 sm:h-7 sm:w-7" />}
+          />
+        </div>
+        <div className="min-w-0">
+          <KpiCard
+            variant={3}
+            label="Total productos"
+            value={data.products.total}
+            icon={<HiCube className="h-6 w-6 sm:h-7 sm:w-7" />}
+          />
+        </div>
+      </>
+    )}
+  </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-none lg:flex-row lg:items-stretch">
         <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">

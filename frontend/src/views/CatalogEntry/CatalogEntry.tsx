@@ -6,8 +6,16 @@ import { CatalogPage } from '../CatalogPage/CatalogPage';
 export function CatalogEntry() {
   const { user, isAuthenticated } = useAuth();
 
-  if (isAuthenticated && user?.role === 'ADMIN') {
+  if (!isAuthenticated) {
+    return <Navigate to={routePaths.login} replace />;
+  }
+
+  if (user?.role === 'ADMIN') {
     return <Navigate to={routePaths.admin} replace />;
+  }
+
+  if (user?.role === 'SELLER') {
+    return <Navigate to={routePaths.seller} replace />;
   }
 
   return <CatalogPage />;
