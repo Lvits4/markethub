@@ -60,13 +60,15 @@ type SortKey = 'name' | 'vendor' | 'contactEmail' | 'date';
 type SortDir = 'asc' | 'desc';
 
 const DEFAULT_PAGE_SIZE = 10;
-const NUM_COLS = 6;
-const COL_WIDTH = `${100 / NUM_COLS}%`;
+const NUM_DATA_COLS = 6;
+const ROW_NUM_WIDTH = '3.5%';
+const COL_WIDTH = `${(100 - 3.5) / NUM_DATA_COLS}%`;
 
 function ModerationTableColgroup() {
   return (
     <colgroup>
-      {Array.from({ length: NUM_COLS }, (__, i) => (
+      <col style={{ width: ROW_NUM_WIDTH }} />
+      {Array.from({ length: NUM_DATA_COLS }, (__, i) => (
         <col key={i} style={{ width: COL_WIDTH }} />
       ))}
     </colgroup>
@@ -534,8 +536,11 @@ export function AdminModerationPage() {
                 <table className="w-full min-w-[900px] table-fixed border-collapse text-left text-sm">
                   <ModerationTableColgroup />
                   <thead className="bg-slate-100/92 backdrop-blur-md dark:bg-admin-elevated/95 dark:backdrop-blur-md">
-                    <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                      <SortHeader
+            <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+              <th className="w-10 px-2 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                #
+              </th>
+              <SortHeader
                         label="Tienda"
                         sortKey="name"
                         activeKey={sortKey}
@@ -583,8 +588,8 @@ export function AdminModerationPage() {
                   <tbody>
                     {pageRows.length === 0 ? (
                       <tr>
-                        <td
-                          colSpan={NUM_COLS}
+              <td
+                    colSpan={NUM_DATA_COLS + 1}
                           className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-400"
                         >
                           {stores.length === 0
@@ -593,12 +598,15 @@ export function AdminModerationPage() {
                         </td>
                       </tr>
                     ) : (
-                      pageRows.map((s) => (
-                        <tr
-                          key={s.id}
-                          className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
-                        >
-                          <td className="px-4 py-2 align-middle">
+              pageRows.map((s, idx) => (
+            <tr
+              key={s.id}
+              className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
+            >
+              <td className="w-10 px-2 py-2 text-center align-middle tabular-nums text-slate-400 dark:text-slate-500">
+                {(page - 1) * pageSize + idx + 1}
+              </td>
+              <td className="px-4 py-2 align-middle">
                             <p className="font-medium leading-tight text-slate-900 dark:text-slate-100">
                               {s.name}
                             </p>

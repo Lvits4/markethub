@@ -61,6 +61,7 @@ export function SellerStoreProductsPage() {
           <table className="w-full min-w-[640px] text-left text-sm">
             <thead>
               <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-night-800">
+                <th className="w-8 px-2 py-3 text-center text-zinc-400 dark:text-slate-500">#</th>
                 <th className="px-4 py-3">Producto</th>
                 <th className="px-4 py-3">Precio</th>
                 <th className="px-4 py-3">Stock</th>
@@ -69,12 +70,15 @@ export function SellerStoreProductsPage() {
               </tr>
             </thead>
             <tbody>
-              {data.data.map((p) => (
-                <tr
-                  key={p.id}
-                  className="border-b border-zinc-50 last:border-0 dark:border-night-800/80"
-                >
-                  <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-50">
+              {data.data.map((p, i) => (
+              <tr
+                key={p.id}
+                className="border-b border-zinc-50 last:border-0 dark:border-night-800/80"
+              >
+                <td className="w-8 px-2 py-3 text-center tabular-nums text-zinc-400 dark:text-slate-500">
+                  {i + 1}
+                </td>
+                <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-50">
                     {p.name}
                   </td>
                   <td className="px-4 py-3 tabular-nums">

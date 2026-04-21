@@ -93,23 +93,25 @@ function AdminStoresTableColgroup({ isSeller }: { isSeller: boolean }) {
   if (isSeller) {
     return (
       <colgroup>
-        <col style={{ width: '20%' }} />
-        <col style={{ width: '22%' }} />
-        <col style={{ width: '14%' }} />
-        <col style={{ width: '24%' }} />
+        <col style={{ width: '3.5%' }} />
+        <col style={{ width: '19%' }} />
+        <col style={{ width: '21%' }} />
+        <col style={{ width: '13.5%' }} />
+        <col style={{ width: '23%' }} />
         <col style={{ width: '20%' }} />
       </colgroup>
     );
   }
   return (
     <colgroup>
-      <col style={{ width: '14%' }} />
-      <col style={{ width: '16%' }} />
-      <col style={{ width: '17%' }} />
-      <col style={{ width: '11%' }} />
-      <col style={{ width: '20%' }} />
-      <col style={{ width: '7%' }} />
-      <col style={{ width: '15%' }} />
+      <col style={{ width: '3.5%' }} />
+      <col style={{ width: '13.5%' }} />
+      <col style={{ width: '15.5%' }} />
+      <col style={{ width: '16.5%' }} />
+      <col style={{ width: '10.5%' }} />
+      <col style={{ width: '19.5%' }} />
+      <col style={{ width: '6.5%' }} />
+      <col style={{ width: '14.5%' }} />
     </colgroup>
   );
 }
@@ -458,7 +460,7 @@ function SortHeader({
 export function AdminStoresPage() {
   const { user } = useAuth();
   const isSeller = user?.role === 'SELLER';
-  const colCount = isSeller ? 5 : 7;
+  const colCount = isSeller ? 6 : 8;
   const queryClient = useQueryClient();
   const { openCreateStoreModal } = useSellerCreateStoreModal();
   const adminStoresQ = useAdminStoresQuery();
@@ -632,13 +634,16 @@ export function AdminStoresPage() {
                   <AdminStoresTableColgroup isSeller={isSeller} />
                   <thead className="bg-slate-100/92 backdrop-blur-md dark:bg-admin-elevated/95 dark:backdrop-blur-md">
                     <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                      <SortHeader
-                        label="Tienda"
-                        sortKey="name"
-                        activeKey={sortKey}
-                        dir={sortDir}
-                        onSort={handleSort}
-                      />
+        <th className="w-10 px-2 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+              #
+            </th>
+            <SortHeader
+              label="Tienda"
+              sortKey="name"
+              activeKey={sortKey}
+              dir={sortDir}
+              onSort={handleSort}
+            />
                       {!isSeller ? (
                         <SortHeader
                           label="Vendedor"
@@ -701,12 +706,15 @@ export function AdminStoresPage() {
                         </td>
                       </tr>
                     ) : (
-                      pageRows.map((s) => (
-                        <tr
-                          key={s.id}
-                          className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
-                        >
-                          <td className="px-4 py-2 align-middle">
+        pageRows.map((s, idx) => (
+          <tr
+            key={s.id}
+            className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
+          >
+            <td className="w-10 px-2 py-2 text-center align-middle tabular-nums text-slate-400 dark:text-slate-500">
+              {(page - 1) * pageSize + idx + 1}
+            </td>
+            <td className="px-4 py-2 align-middle">
                             <p className="font-medium leading-tight text-slate-900 dark:text-slate-100">
                               {s.name}
                             </p>

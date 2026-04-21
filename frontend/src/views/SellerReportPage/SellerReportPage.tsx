@@ -52,19 +52,23 @@ export function SellerReportPage() {
             <div className="mt-8 market-table-wrap">
               <table className="w-full min-w-[480px] text-left text-sm">
                 <thead>
-                  <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-night-800">
-                    <th className="px-4 py-3">Producto</th>
+                      <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-night-800">
+                        <th className="w-8 px-2 py-3 text-center text-zinc-400 dark:text-slate-500">#</th>
+                        <th className="px-4 py-3">Producto</th>
                     <th className="px-4 py-3">Unidades</th>
                     <th className="px-4 py-3">Ingresos</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.productSales.map((row, i) => (
-                    <tr
-                      key={`${row.name}-${i}`}
-                      className="border-b border-zinc-50 last:border-0 dark:border-night-800/80"
-                    >
-                      <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-50">
+                      {data.productSales.map((row, i) => (
+                      <tr
+                        key={`${row.name}-${i}`}
+                        className="border-b border-zinc-50 last:border-0 dark:border-night-800/80"
+                      >
+                        <td className="w-8 px-2 py-3 text-center tabular-nums text-zinc-400 dark:text-slate-500">
+                          {i + 1}
+                        </td>
+                        <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-50">
                         {row.name}
                       </td>
                       <td className="px-4 py-3 tabular-nums">{row.quantity}</td>
