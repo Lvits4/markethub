@@ -425,12 +425,7 @@ export function AdminUsersPage() {
         />
         Usuarios
       </h2>
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">
-        Crea, edita o elimina cuentas. Activa o desactiva usuarios desde{' '}
-        <strong>Editar</strong> (casilla «Cuenta activa»). No puedes borrarte ni
-        desactivarte a ti mismo. La papelera elimina de forma permanente tiendas,
-        productos y pedidos vinculados a ese usuario.
-      </p>
+
 
       {isLoading ? (
         <p className="text-center text-sm text-zinc-500">Cargando…</p>
@@ -490,7 +485,7 @@ export function AdminUsersPage() {
                   #
                 </th>
                 <SortHeader
-                        label="Usuario"
+                        label="Nombre"
                         sortKey="name"
                         activeKey={sortKey}
                         dir={sortDir}

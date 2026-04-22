@@ -214,13 +214,13 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
           }
           fields={
             <AdminDetailFieldsGrid>
-              <AdminDetailCompactField label="Vendedor" icon={FiUser}>
+              <AdminDetailCompactField label="Cliente" icon={FiUser}>
                 {ownerName || '—'}
               </AdminDetailCompactField>
-              <AdminDetailCompactField label="Correo vendedor" icon={FiMail}>
+              <AdminDetailCompactField label="Correo" icon={FiMail}>
                 {store.user?.email ?? '—'}
               </AdminDetailCompactField>
-              <AdminDetailCompactField label="Correo tienda" icon={FiMail}>
+              <AdminDetailCompactField label="Correo" icon={FiMail}>
                 {store.contactEmail ?? '—'}
               </AdminDetailCompactField>
               <AdminDetailCompactField label="Teléfono" icon={FiPhone}>
@@ -541,21 +541,21 @@ export function AdminModerationPage() {
                 #
               </th>
               <SortHeader
-                        label="Tienda"
-                        sortKey="name"
+label="Nombre"
+              sortKey="name"
                         activeKey={sortKey}
                         dir={sortDir}
                         onSort={handleSort}
                       />
                       <SortHeader
-                        label="Vendedor"
-                        sortKey="vendor"
+label="Cliente"
+              sortKey="vendor"
                         activeKey={sortKey}
                         dir={sortDir}
                         onSort={handleSort}
                       />
                       <SortHeader
-                        label="Correo tienda"
+                        label="Correo"
                         sortKey="contactEmail"
                         activeKey={sortKey}
                         dir={sortDir}

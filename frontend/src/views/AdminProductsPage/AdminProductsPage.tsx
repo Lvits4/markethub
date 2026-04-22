@@ -560,8 +560,8 @@ export function AdminProductsPage() {
                 #
               </th>
               <SortHeader
-                        label="Producto"
-                        sortKey="name"
+label="Nombre"
+              sortKey="name"
                         activeKey={sortKey}
                         dir={sortDir}
                         onSort={handleSort}

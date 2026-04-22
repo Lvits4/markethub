@@ -14,7 +14,7 @@ const fieldsetResetClass = 'm-0 min-w-0 border-0 p-0';
 
 const ROLES = [
   { value: 'CUSTOMER', label: 'Cliente' },
-  { value: 'SELLER', label: 'Vendedor' },
+  { value: 'SELLER', label: 'Cliente' },
   { value: 'ADMIN', label: 'Administrador' },
 ] as const;
 
