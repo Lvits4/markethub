@@ -10,8 +10,6 @@ import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
 import {
   FiChevronDown,
-  FiChevronLeft,
-  FiChevronRight,
   FiChevronUp,
   FiEdit2,
   FiEye,
@@ -39,6 +37,7 @@ import {
 } from '../../components/AdminDetailPanel/AdminDetailPanel';
 import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
+import { TablePagination } from '../../components/TablePagination/TablePagination';
 import { TableEmptyCell } from '../../components/TableEmptyCell/TableEmptyCell';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminEditStoreForm } from '../../components/AdminEditStoreForm/AdminEditStoreForm';
@@ -817,62 +816,15 @@ label="Cliente"
               </div>
             </div>
 
-            <div className="flex shrink-0 flex-col items-center gap-3 border-t border-slate-200/80 bg-slate-50/75 px-4 py-3 backdrop-blur-sm dark:border-sky-500/18 dark:bg-admin-footer/88 dark:backdrop-blur-sm">
-              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
-                <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                  {filteredSorted.length === 0
-                    ? '0 tiendas'
-                    : `${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, filteredSorted.length)} de ${filteredSorted.length}`}
-                </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Página{' '}
-                  <span className="font-semibold tabular-nums text-slate-700 dark:text-slate-200">
-                    {page}
-                  </span>{' '}
-                  de{' '}
-                  <span className="tabular-nums">{totalPages}</span>
-                </p>
-                <div className="flex items-center gap-1">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-8 min-w-8 px-2"
-                    disabled={page <= 1}
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    aria-label="Página anterior"
-                  >
-                    <FiChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-8 min-w-8 px-2"
-                    disabled={page >= totalPages}
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    aria-label="Página siguiente"
-                  >
-                    <FiChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-                <label className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <span>Por página</span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={999}
-                    value={pageSize}
-                    onChange={(e) => {
-                      const raw = Number(e.target.value);
-                      if (!Number.isFinite(raw)) return;
-                      const next = Math.min(999, Math.max(1, Math.trunc(raw)));
-                      setPageSize(next);
-                    }}
-                    className="page-size-input h-9 w-16 rounded-md border border-slate-300 bg-white px-2 text-center text-sm font-semibold text-slate-900 outline-hidden transition focus:border-forest focus:ring-2 focus:ring-forest/25 dark:border-sky-500/30 dark:bg-admin-field dark:text-slate-100 dark:focus:border-sky-400 dark:focus:ring-sky-500/25"
-                    aria-label="Cantidad de elementos por página"
-                  />
-                </label>
-              </div>
-            </div>
+          <TablePagination
+            totalItems={filteredSorted.length}
+            page={page}
+            pageSize={pageSize}
+            totalPages={totalPages}
+            label="tiendas"
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+          />
           </div>
 
           <Modal
