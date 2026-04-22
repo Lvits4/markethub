@@ -15,8 +15,7 @@ import { SellerCreateStoreModalProvider } from '../context/SellerCreateStoreModa
 import { AdminCategoriesPage } from '../views/AdminCategoriesPage/AdminCategoriesPage';
 import { AdminDashboardPage } from '../views/AdminDashboardPage/AdminDashboardPage';
 import { AdminModerationPage } from '../views/AdminModerationPage/AdminModerationPage';
-import { AdminOrdersPage } from '../views/AdminOrdersPage/AdminOrdersPage';
-import { AdminProductsPage } from '../views/AdminProductsPage/AdminProductsPage';
+
 import { AdminStoresPage } from '../views/AdminStoresPage/AdminStoresPage';
 import { AdminUsersPage } from '../views/AdminUsersPage/AdminUsersPage';
 import { SellerLayout } from '../layouts/SellerLayout/SellerLayout';
@@ -110,8 +109,7 @@ export default function App() {
                   }
                 />
                 <Route path="stores" element={<AdminStoresPage />} />
-                <Route path="products" element={<AdminProductsPage />} />
-                <Route path="orders" element={<AdminOrdersPage />} />
+
                 <Route
                   path="categories"
                   element={

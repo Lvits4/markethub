@@ -8,11 +8,9 @@ import {
   FiGrid,
   FiLogOut,
   FiMoon,
-  FiPackage,
   FiSettings,
   FiShield,
   FiShoppingBag,
-  FiShoppingCart,
   FiSun,
   FiTag,
   FiUsers,
@@ -194,24 +192,12 @@ export function AdminLayout() {
               collapsedBadgeCount={pendingCount}
             />
           ) : null}
-          <SidebarNavItem
-            to={routePaths.adminOrders}
-            icon={FiShoppingCart}
-            label="Pedidos"
-            collapsed={collapsed}
-          />
-          <SidebarNavItem
-            to={routePaths.adminStores}
-            icon={FiShoppingBag}
-            label="Tiendas"
-            collapsed={collapsed}
-          />
-          <SidebarNavItem
-            to={routePaths.adminProducts}
-            icon={FiPackage}
-            label="Productos"
-            collapsed={collapsed}
-          />
+<SidebarNavItem
+          to={routePaths.adminStores}
+          icon={FiShoppingBag}
+          label="Tiendas"
+          collapsed={collapsed}
+        />
           {isAdmin ? (
             <SidebarNavItem
               to={routePaths.adminUsers}
