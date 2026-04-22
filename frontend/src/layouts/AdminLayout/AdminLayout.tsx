@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import {
   FiChevronLeft,
   FiChevronRight,
+  FiDollarSign,
   FiExternalLink,
   FiGrid,
   FiLogOut,
@@ -192,13 +193,21 @@ export function AdminLayout() {
               collapsedBadgeCount={pendingCount}
             />
           ) : null}
-<SidebarNavItem
+        <SidebarNavItem
           to={routePaths.adminStores}
           icon={FiShoppingBag}
           label="Tiendas"
           collapsed={collapsed}
         />
-          {isAdmin ? (
+        {isAdmin ? (
+          <SidebarNavItem
+            to={routePaths.adminEarnings}
+            icon={FiDollarSign}
+            label="Ganancias"
+            collapsed={collapsed}
+          />
+        ) : null}
+        {isAdmin ? (
             <SidebarNavItem
               to={routePaths.adminUsers}
               icon={FiUsers}

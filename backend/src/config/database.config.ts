@@ -6,4 +6,5 @@ export default registerAs('database', () => ({
   username: process.env.DB_USERNAME || 'markethub',
   password: process.env.DB_PASSWORD || 'markethub_secret',
   database: process.env.DB_NAME || 'markethub',
+  
 }));

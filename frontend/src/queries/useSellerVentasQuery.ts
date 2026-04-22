@@ -1,16 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '../helpers/queryKeys';
-import { fetchSellerDashboard } from '../requests/sellerRequests';
+import { fetchSellerVentas } from '../requests/sellerRequests';
 import { useAuth } from '../hooks/useAuth';
 
-export function useSellerDashboardQuery(lowStockThreshold?: number) {
+export function useSellerVentasQuery() {
   const { token, isAuthenticated, user } = useAuth();
   const enabled =
     isAuthenticated && Boolean(token) && user?.role === 'SELLER';
 
   return useQuery({
-    queryKey: queryKeys.sellerDashboard(lowStockThreshold),
-    queryFn: () => fetchSellerDashboard(token!, lowStockThreshold),
+    queryKey: queryKeys.sellerVentas,
+    queryFn: () => fetchSellerVentas(token!),
     enabled,
   });
 }

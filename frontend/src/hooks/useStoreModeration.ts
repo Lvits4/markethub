@@ -15,7 +15,7 @@ export function useStoreApprove() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.storesRejected });
       queryClient.invalidateQueries({ queryKey: queryKeys.adminStores });
-      queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard() });
     },
   });
 }
@@ -32,7 +32,7 @@ export function useStoreReject() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.storesRejected });
       queryClient.invalidateQueries({ queryKey: queryKeys.adminStores });
-      queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard });
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard() });
     },
   });
 }

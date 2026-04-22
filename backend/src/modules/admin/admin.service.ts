@@ -37,7 +37,7 @@ export class AdminService {
     private readonly storesService: StoresService,
   ) {}
 
-  async getDashboardStats() {
+  async getDashboardStats(days = 7) {
     const [
       totalUsers,
       totalCustomers,
@@ -74,6 +74,53 @@ export class AdminService {
       .where('payment.status = :status', { status: PaymentStatus.COMPLETED })
       .getRawOne();
 
+    const totalSales = parseFloat(totalSalesResult?.total || '0') || 0;
+
+    const storeSalesResults = await this.ordersRepository
+      .createQueryBuilder('order')
+      .innerJoin('order.store', 'store')
+      .select('order.store_id', 'storeId')
+      .addSelect('store.commission', 'commission')
+      .addSelect('SUM(order.total_amount)', 'storeTotal')
+      .where('order.status != :cancelled', { cancelled: OrderStatus.CANCELLED })
+      .groupBy('order.store_id')
+      .addGroupBy('store.commission')
+      .getRawMany<{ storeId: string; commission: string; storeTotal: string }>();
+
+    let adminEarnings = 0;
+    for (const row of storeSalesResults) {
+      const storeTotal = parseFloat(row.storeTotal) || 0;
+      const commission = parseFloat(row.commission) || 5;
+      adminEarnings += storeTotal * (commission / 100);
+    }
+
+    const dailySales = await this.ordersRepository
+      .createQueryBuilder('order')
+      .select("TO_CHAR(order.created_at, 'YYYY-MM-DD')", 'day')
+      .addSelect('SUM(order.total_amount)', 'totalRevenue')
+      .addSelect('COUNT(*)', 'totalOrders')
+      .where('order.status != :cancelled', { cancelled: OrderStatus.CANCELLED })
+      .andWhere('order.created_at >= CURRENT_DATE - (:days::int || \' days\')::interval', { days })
+      .groupBy("TO_CHAR(order.created_at, 'YYYY-MM-DD')")
+      .orderBy("TO_CHAR(order.created_at, 'YYYY-MM-DD')", 'ASC')
+      .getRawMany();
+
+    const recentSales = await this.ordersRepository
+      .createQueryBuilder('order')
+      .leftJoin('order.store', 'store')
+      .leftJoin('order.user', 'buyer')
+      .select('order.id', 'orderId')
+      .addSelect('order.total_amount', 'totalAmount')
+      .addSelect('order.status', 'status')
+      .addSelect('order.created_at', 'createdAt')
+      .addSelect('store.name', 'storeName')
+      .addSelect("buyer.first_name || ' ' || buyer.last_name", 'buyerName')
+      .addSelect('buyer.email', 'buyerEmail')
+      .where('order.status != :cancelled', { cancelled: OrderStatus.CANCELLED })
+      .orderBy('order.created_at', 'DESC')
+      .limit(10)
+      .getRawMany();
+
     return {
       users: { total: totalUsers, customers: totalCustomers, sellers: totalSellers },
       stores: {
@@ -84,7 +131,12 @@ export class AdminService {
       },
       products: { total: totalProducts, active: activeProducts },
       orders: { total: totalOrders, completed: completedOrders },
-      revenue: { totalSales: parseFloat(totalSalesResult?.total || '0') },
+      revenue: {
+        totalSales,
+        adminEarnings,
+      },
+      dailySales,
+      recentSales,
     };
   }
 
@@ -340,5 +392,43 @@ export class AdminService {
       .getRawMany();
 
     return { monthlySales, topStores };
+  }
+
+  async getEarningsReport() {
+    const stores = await this.storesRepository.find({
+      where: { isApproved: true },
+      select: ['id', 'name', 'commission'],
+    });
+
+    const results = await Promise.all(
+      stores.map(async (store) => {
+        const commission = Number(store.commission);
+
+        const salesResult = await this.ordersRepository
+          .createQueryBuilder('order')
+          .select('SUM(order.total_amount)', 'totalRevenue')
+          .addSelect('COUNT(*)', 'totalOrders')
+          .where('order.store_id = :storeId', { storeId: store.id })
+          .andWhere('order.status != :cancelled', { cancelled: OrderStatus.CANCELLED })
+          .getRawOne<{ totalRevenue: string | null; totalOrders: string }>();
+
+        const totalRevenue = parseFloat(String(salesResult?.totalRevenue ?? '0')) || 0;
+        const totalOrders = parseInt(String(salesResult?.totalOrders ?? '0'), 10) || 0;
+        const adminEarnings = totalRevenue * (commission / 100);
+        const sellerEarnings = totalRevenue - adminEarnings;
+
+        return {
+          storeId: store.id,
+          storeName: store.name,
+          commission,
+          totalRevenue,
+          sellerEarnings,
+          adminEarnings,
+          totalOrders,
+        };
+      }),
+    );
+
+    return results.sort((a, b) => b.adminEarnings - a.adminEarnings);
   }
 }

@@ -17,7 +17,7 @@ export function useAdminCreateUser() {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard() });
     },
   });
 }

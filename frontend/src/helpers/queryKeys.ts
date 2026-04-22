@@ -17,17 +17,21 @@ export const queryKeys = {
   order: (id: string) => ['orders', id] as const,
   ordersStore: ['orders', 'store'] as const,
   paymentByOrder: (orderId: string) => ['payments', 'order', orderId] as const,
-  adminDashboard: ['admin', 'dashboard'] as const,
+  adminDashboard: (days?: number) =>
+    ['admin', 'dashboard', { days: days ?? 7 }] as const,
   adminUsers: ['admin', 'users'] as const,
   adminStores: ['admin', 'stores'] as const,
   adminStore: (id: string) => ['admin', 'stores', id] as const,
   adminProducts: ['admin', 'products'] as const,
   adminOrders: ['admin', 'orders'] as const,
   adminSalesReport: ['admin', 'reports', 'sales'] as const,
+  adminEarningsReport: ['admin', 'reports', 'earnings'] as const,
   adminPlatformReport: ['admin', 'orders', 'store-report'] as const,
   storesRejected: ['stores', 'rejected'] as const,
-  sellerDashboard: ['seller', 'dashboard'] as const,
+  sellerDashboard: (lowStockThreshold?: number) =>
+    ['seller', 'dashboard', { lowStockThreshold: lowStockThreshold ?? 5 }] as const,
   sellerProducts: ['seller', 'products'] as const,
   sellerStore: (id: string) => ['seller', 'stores', id] as const,
   sellerSalesReport: ['seller', 'reports', 'sales'] as const,
+  sellerVentas: ['seller', 'ventas'] as const,
 };

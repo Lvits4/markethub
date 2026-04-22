@@ -20,7 +20,7 @@ export function useAdminPatchCommission() {
     },
     onSuccess: (_data, { storeId }) => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.adminStores });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard() });
       void queryClient.invalidateQueries({
         queryKey: queryKeys.adminStore(storeId),
       });

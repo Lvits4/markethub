@@ -43,6 +43,14 @@ export function SellerLayout() {
               Pedidos
             </NavLink>
             <NavLink
+              to={routePaths.sellerVentas}
+              className={({ isActive }) =>
+                `${navClass} ${isActive ? activeClass : ''}`
+              }
+            >
+              Ventas
+            </NavLink>
+            <NavLink
               to={routePaths.sellerReport}
               className={({ isActive }) =>
                 `${navClass} ${isActive ? activeClass : ''}`

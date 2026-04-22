@@ -14,7 +14,7 @@ export function useAdminDeleteUser() {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.adminUsers });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard() });
       void queryClient.invalidateQueries({ queryKey: queryKeys.adminStores });
       void queryClient.invalidateQueries({ queryKey: queryKeys.adminProducts });
       void queryClient.invalidateQueries({ queryKey: queryKeys.adminOrders });

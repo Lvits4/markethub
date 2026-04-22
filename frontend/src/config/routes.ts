@@ -20,6 +20,7 @@ export const routePaths = {
   sellerProductNew: '/seller/products/new',
   sellerProductEdit: (id: string) => `/seller/products/${id}/edit`,
   sellerOrders: '/seller/orders',
+  sellerVentas: '/seller/ventas',
   sellerReport: '/seller/report',
   admin: '/admin',
   adminUsers: '/admin/users',
@@ -28,4 +29,5 @@ export const routePaths = {
   adminProducts: '/admin/products',
   adminOrders: '/admin/orders',
   adminCategories: '/admin/categories',
+  adminEarnings: '/admin/earnings',
 } as const;

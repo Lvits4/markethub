@@ -16,10 +16,10 @@ export function useDeleteOrderMutation() {
       void queryClient.invalidateQueries({ queryKey: queryKeys.ordersMy });
       void queryClient.invalidateQueries({ queryKey: queryKeys.ordersStore });
       void queryClient.invalidateQueries({ queryKey: queryKeys.adminOrders });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.adminSalesReport });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.adminPlatformReport });
-      void queryClient.invalidateQueries({ queryKey: queryKeys.sellerDashboard });
+void queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard() });
+    void queryClient.invalidateQueries({ queryKey: queryKeys.adminSalesReport });
+    void queryClient.invalidateQueries({ queryKey: queryKeys.adminPlatformReport });
+    void queryClient.invalidateQueries({ queryKey: queryKeys.sellerDashboard() });
       void queryClient.invalidateQueries({ queryKey: queryKeys.sellerSalesReport });
       void queryClient.removeQueries({ queryKey: queryKeys.order(orderId) });
       void queryClient.removeQueries({ queryKey: queryKeys.paymentByOrder(orderId) });

@@ -7,8 +7,9 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { CurrentUser, Roles } from '../../common/decorators';
 import { Role } from '../../common/enums';
@@ -28,8 +29,10 @@ export class AdminController {
 
   @Get('dashboard')
   @ApiOperation({ summary: 'Dashboard con estadísticas globales' })
-  getDashboard() {
-    return this.adminService.getDashboardStats();
+  @ApiQuery({ name: 'days', required: false, type: Number, description: 'Rango de días para ventas diarias (default 7)' })
+  getDashboard(@Query('days') days?: string) {
+    const d = days ? parseInt(days, 10) : 7;
+    return this.adminService.getDashboardStats(isNaN(d) ? 7 : d);
   }
 
   @Get('users')
@@ -119,5 +122,11 @@ export class AdminController {
   @ApiOperation({ summary: 'Reporte de ventas mensuales y top tiendas' })
   getSalesReport() {
     return this.adminService.getSalesReport();
+  }
+
+  @Get('reports/earnings')
+  @ApiOperation({ summary: 'Reporte de ganancias por tienda (comisiones del admin)' })
+  getEarningsReport() {
+    return this.adminService.getEarningsReport();
   }
 }

@@ -27,7 +27,7 @@ export function useCreateProductMutation(storeId: string | undefined) {
       }
       void qc.invalidateQueries({ queryKey: queryKeys.adminProducts });
       void qc.invalidateQueries({ queryKey: queryKeys.sellerProducts });
-      void qc.invalidateQueries({ queryKey: queryKeys.sellerDashboard });
+      void qc.invalidateQueries({ queryKey: queryKeys.sellerDashboard() });
       void qc.invalidateQueries({ queryKey: ['products'] });
     },
   });
@@ -47,7 +47,7 @@ export function useUpdateProductMutation(storeId: string | undefined) {
       }
       void qc.invalidateQueries({ queryKey: queryKeys.adminProducts });
       void qc.invalidateQueries({ queryKey: queryKeys.sellerProducts });
-      void qc.invalidateQueries({ queryKey: queryKeys.sellerDashboard });
+      void qc.invalidateQueries({ queryKey: queryKeys.sellerDashboard() });
       void qc.invalidateQueries({ queryKey: ['products'] });
     },
   });
@@ -67,7 +67,7 @@ export function useDeleteProductMutation(storeId: string | undefined) {
       }
       void qc.invalidateQueries({ queryKey: queryKeys.adminProducts });
       void qc.invalidateQueries({ queryKey: queryKeys.sellerProducts });
-      void qc.invalidateQueries({ queryKey: queryKeys.sellerDashboard });
+      void qc.invalidateQueries({ queryKey: queryKeys.sellerDashboard() });
       void qc.invalidateQueries({ queryKey: ['products'] });
     },
   });

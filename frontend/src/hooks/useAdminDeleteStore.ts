@@ -14,10 +14,10 @@ export function useAdminDeleteStore() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.adminStores });
-      queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard });
-      queryClient.invalidateQueries({ queryKey: queryKeys.storesRejected });
-      queryClient.invalidateQueries({ queryKey: queryKeys.myStores });
-      queryClient.invalidateQueries({ queryKey: queryKeys.sellerDashboard });
+queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard() });
+    queryClient.invalidateQueries({ queryKey: queryKeys.storesRejected });
+    queryClient.invalidateQueries({ queryKey: queryKeys.myStores });
+    queryClient.invalidateQueries({ queryKey: queryKeys.sellerDashboard() });
       queryClient.invalidateQueries({ queryKey: queryKeys.sellerProducts });
     },
   });

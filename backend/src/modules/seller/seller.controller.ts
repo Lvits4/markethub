@@ -1,5 +1,5 @@
-import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { SellerService } from './seller.service';
 import { CurrentUser, Roles } from '../../common/decorators';
 import { Role } from '../../common/enums';
@@ -14,8 +14,13 @@ export class SellerController {
 
   @Get('dashboard')
   @ApiOperation({ summary: 'Estadísticas del panel para las tiendas del vendedor' })
-  getDashboard(@CurrentUser() user: User) {
-    return this.sellerService.getDashboardStats(user);
+  @ApiQuery({ name: 'lowStockThreshold', required: false, type: Number, description: 'Umbral de stock bajo (default 5)' })
+  getDashboard(
+    @CurrentUser() user: User,
+    @Query('lowStockThreshold') lowStockThreshold?: string,
+  ) {
+    const threshold = lowStockThreshold ? parseInt(lowStockThreshold, 10) : 5;
+    return this.sellerService.getDashboardStats(user, isNaN(threshold) ? 5 : threshold);
   }
 
   @Get('products')
@@ -39,5 +44,11 @@ export class SellerController {
   @ApiOperation({ summary: 'Informe de ventas mensual y por tienda (solo tiendas propias)' })
   getSalesReport(@CurrentUser() user: User) {
     return this.sellerService.getSalesReport(user);
+  }
+
+  @Get('ventas')
+  @ApiOperation({ summary: 'Tabla de ventas por tienda del vendedor con comisiones y ganancias' })
+  getVentas(@CurrentUser() user: User) {
+    return this.sellerService.getVentas(user);
   }
 }

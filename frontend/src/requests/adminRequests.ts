@@ -1,6 +1,7 @@
 import { apiPaths } from '../config/apiPaths';
 import type {
   AdminDashboardStats,
+  AdminEarningsRow,
   AdminOrderRow,
   AdminPlatformReport,
   AdminProductRow,
@@ -11,8 +12,11 @@ import type {
 } from '../types/admin';
 import { fetchDefault } from './fetchDefault';
 
-export function fetchAdminDashboard(token: string) {
-  return fetchDefault<AdminDashboardStats>(apiPaths.adminDashboard, { token });
+export function fetchAdminDashboard(token: string, days?: number) {
+  const path = days
+    ? `${apiPaths.adminDashboard}?days=${days}`
+    : apiPaths.adminDashboard;
+  return fetchDefault<AdminDashboardStats>(path, { token });
 }
 
 export function fetchAdminUsers(token: string) {
@@ -127,4 +131,8 @@ export function fetchOrdersStoreReport(token: string) {
   return fetchDefault<AdminPlatformReport>(apiPaths.ordersStoreReport, {
     token,
   });
+}
+
+export function fetchAdminEarningsReport(token: string) {
+  return fetchDefault<AdminEarningsRow[]>(apiPaths.adminReportsEarnings, { token });
 }

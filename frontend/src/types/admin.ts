@@ -1,3 +1,19 @@
+export type AdminDailySaleRow = {
+  day: string;
+  totalRevenue: string;
+  totalOrders: string;
+};
+
+export type AdminRecentSaleRow = {
+  orderId: string;
+  totalAmount: string;
+  status: string;
+  createdAt: string;
+  storeName: string | null;
+  buyerName: string | null;
+  buyerEmail: string | null;
+};
+
 export type AdminDashboardStats = {
   users: { total: number; customers: number; sellers: number };
   stores: {
@@ -8,7 +24,61 @@ export type AdminDashboardStats = {
   };
   products: { total: number; active: number };
   orders: { total: number; completed: number };
-  revenue: { totalSales: number };
+  revenue: { totalSales: number; adminEarnings: number };
+  dailySales: AdminDailySaleRow[];
+  recentSales: AdminRecentSaleRow[];
+};
+
+export type AdminEarningsRow = {
+  storeId: string;
+  storeName: string;
+  commission: number;
+  totalRevenue: number;
+  sellerEarnings: number;
+  adminEarnings: number;
+  totalOrders: number;
+};
+
+export type SellerDailyOrderRow = {
+  day: string;
+  orderCount: string;
+};
+
+export type SellerMonthlySaleRow = {
+  month: string;
+  totalOrders: string;
+  totalRevenue: string;
+};
+
+export type SellerTopStoreEarningsRow = {
+  storeId: string;
+  storeName: string;
+  commission: number;
+  totalRevenue: number;
+  sellerEarnings: number;
+  adminEarnings: number;
+};
+
+export type SellerDashboardStats = {
+  salesCount: number;
+  sellerEarnings: number;
+  commissionOwed: number;
+  totalProducts: number;
+  lowStockCount: number;
+  dailyOrders: SellerDailyOrderRow[];
+  monthlySales: SellerMonthlySaleRow[];
+  topStoresByEarnings: SellerTopStoreEarningsRow[];
+};
+
+export type SellerVentasRow = {
+  storeId: string;
+  storeName: string;
+  totalRevenue: number;
+  commission: number;
+  sellerEarnings: number;
+  adminEarnings: number;
+  totalOrders: number;
+  activeProducts: number;
 };
 
 export type AdminUserRow = {

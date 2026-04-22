@@ -16,7 +16,7 @@ export function useCreateOrderMutation() {
       void qc.invalidateQueries({ queryKey: queryKeys.cart });
       void qc.invalidateQueries({ queryKey: queryKeys.cartSummary });
       void qc.invalidateQueries({ queryKey: queryKeys.ordersMy });
-      void qc.invalidateQueries({ queryKey: queryKeys.adminDashboard });
+      void qc.invalidateQueries({ queryKey: queryKeys.adminDashboard() });
       void qc.invalidateQueries({ queryKey: queryKeys.ordersStore });
     },
   });

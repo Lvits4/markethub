@@ -14,6 +14,7 @@ import { AdminLayout } from '../layouts/AdminLayout/AdminLayout';
 import { SellerCreateStoreModalProvider } from '../context/SellerCreateStoreModalProvider/SellerCreateStoreModalProvider';
 import { AdminCategoriesPage } from '../views/AdminCategoriesPage/AdminCategoriesPage';
 import { AdminDashboardPage } from '../views/AdminDashboardPage/AdminDashboardPage';
+import { AdminEarningsPage } from '../views/AdminEarningsPage/AdminEarningsPage';
 import { AdminModerationPage } from '../views/AdminModerationPage/AdminModerationPage';
 
 import { AdminStoresPage } from '../views/AdminStoresPage/AdminStoresPage';
@@ -24,6 +25,7 @@ import { SellerOrdersPage } from '../views/SellerOrdersPage/SellerOrdersPage';
 import { SellerProductFormPage } from '../views/SellerProductFormPage/SellerProductFormPage';
 import { SellerReportPage } from '../views/SellerReportPage/SellerReportPage';
 import { SellerStoreProductsPage } from '../views/SellerStoreProductsPage/SellerStoreProductsPage';
+import { SellerVentasPage } from '../views/SellerVentasPage/SellerVentasPage';
 import { CatalogPage } from '../views/CatalogPage/CatalogPage';
 import { CatalogEntry } from '../views/CatalogEntry/CatalogEntry';
 import { CartPage } from '../views/CartPage/CartPage';
@@ -108,9 +110,17 @@ export default function App() {
                     </AdminOnlyRoute>
                   }
                 />
-                <Route path="stores" element={<AdminStoresPage />} />
+              <Route path="stores" element={<AdminStoresPage />} />
+              <Route
+                path="earnings"
+                element={
+                  <AdminOnlyRoute>
+                    <AdminEarningsPage />
+                  </AdminOnlyRoute>
+                }
+              />
 
-                <Route
+              <Route
                   path="categories"
                   element={
                     <AdminOnlyRoute>
@@ -129,9 +139,10 @@ export default function App() {
                   </ProtectedRoute>
                 }
               >
-                <Route index element={<SellerDashboardPage />} />
-                <Route path="orders" element={<SellerOrdersPage />} />
-                <Route path="report" element={<SellerReportPage />} />
+              <Route index element={<SellerDashboardPage />} />
+              <Route path="orders" element={<SellerOrdersPage />} />
+              <Route path="ventas" element={<SellerVentasPage />} />
+              <Route path="report" element={<SellerReportPage />} />
                 <Route
                   path="stores/:storeId/products"
                   element={<SellerStoreProductsPage />}
