@@ -288,11 +288,6 @@ export function AdminCategoriesPage() {
         <FiTag className="h-7 w-7 shrink-0 text-zinc-900 dark:text-zinc-50" aria-hidden />
         Categorías
       </h2>
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">
-        Organiza el catálogo en categorías y subcategorías. Eliminar una
-        categoría la borra del sistema; las subcategorías pasan a raíz y los
-        productos vinculados quedan sin categoría hasta que los edites.
-      </p>
 
       {isLoading ? (
         <p className="text-center text-sm text-zinc-500">Cargando…</p>
@@ -312,7 +307,7 @@ export function AdminCategoriesPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar por nombre, slug, descripción, padre o ID…"
+                placeholder="Buscar por nombre o descripción…"
                 className={`box-border h-11 w-full rounded-md border border-zinc-200 bg-white py-0 pl-10 text-sm leading-normal text-zinc-900 shadow-sm ring-zinc-200 placeholder:text-zinc-400 focus:border-forest focus:outline-hidden focus:ring-2 focus:ring-forest/25 dark:border-night-700 dark:bg-night-950 dark:text-zinc-50 dark:ring-night-800 ${search ? 'pr-11' : 'pr-4'}`}
                 aria-label="Buscar categorías"
               />
