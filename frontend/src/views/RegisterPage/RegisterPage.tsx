@@ -38,14 +38,18 @@ export function RegisterPage() {
     }
     setFieldErrors({});
     registerMutation.mutate(parsed.data, {
-      onSuccess: (data) => {
-        toast.success('Cuenta creada');
-        if (data.user.role === 'ADMIN') {
-          navigate(routePaths.admin, { replace: true });
-          return;
-        }
-        navigate(routePaths.catalog, { replace: true });
-      },
+    onSuccess: (data) => {
+      toast.success('Cuenta creada');
+      if (data.user.role === 'ADMIN') {
+        navigate(routePaths.admin, { replace: true });
+        return;
+      }
+      if (data.user.role === 'SELLER') {
+        navigate(routePaths.seller, { replace: true });
+        return;
+      }
+      navigate(routePaths.catalog, { replace: true });
+    },
       onError: (err) =>
         toast.error(getErrorMessage(err, 'No se pudo registrar')),
     });

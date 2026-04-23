@@ -270,15 +270,15 @@ export function AdminUsersPage() {
                   <FiX className="h-3.5 w-3.5" aria-hidden />
                 </button>
               ) : null}
-            </div>
-            <Button
-              type="button"
-              variant="cta"
-              className="h-11 min-h-11 shrink-0 px-6 py-0"
-              onClick={() => setCreateOpen(true)}
-            >
-              Crear usuario
-            </Button>
+        </div>
+        <Button
+          type="button"
+          variant="cta"
+          className="h-11 min-h-11 shrink-0 px-6 py-0"
+          onClick={() => setCreateOpen(true)}
+        >
+          Crear usuario
+        </Button>
           </div>
 
           <div className="admin-table-panel">
@@ -424,9 +424,8 @@ export function AdminUsersPage() {
               totalItems={filteredSorted.length}
               page={page}
               pageSize={pageSize}
-              totalPages={totalPages}
-              label="usuarios"
-              onPageChange={setPage}
+      totalPages={totalPages}
+        onPageChange={setPage}
               onPageSizeChange={setPageSize}
             />
           </div>

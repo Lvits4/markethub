@@ -18,6 +18,8 @@ import {
   FiX,
 } from 'react-icons/fi';
 import { Button } from '../../components/Button/Button';
+import { FilterPopover } from '../../components/FilterPopover/FilterPopover';
+import type { FilterField } from '../../components/FilterPopover/FilterPopover';
 import { TablePagination } from '../../components/TablePagination/TablePagination';
 import {
   renderTableCellString,
@@ -38,6 +40,30 @@ const DEFAULT_PAGE_SIZE = 10;
 const NUM_DATA_COLS = 4;
 const ROW_NUM_WIDTH = '3.5%';
 const COL_WIDTH = `${(100 - 3.5) / NUM_DATA_COLS}%`;
+
+const CATEGORY_STATUS_OPTIONS: { value: string; label: string }[] = [
+  { value: '', label: 'Todos' },
+  { value: 'active', label: 'Activa' },
+  { value: 'inactive', label: 'Inactiva' },
+];
+
+const CATEGORY_FILTER_DEFAULTS = { status: '', parentId: '' };
+
+function matchesCategoryFilter(
+  c: Category,
+  filters: { status: string; parentId: string },
+): boolean {
+  if (filters.status === 'active' && !c.isActive) return false;
+  if (filters.status === 'inactive' && c.isActive) return false;
+  if (filters.parentId === '__none__' && c.parentId !== null) return false;
+  if (
+    filters.parentId &&
+    filters.parentId !== '__none__' &&
+    c.parentId !== filters.parentId
+  )
+    return false;
+  return true;
+}
 
 function CategoriesTableColgroup() {
   return (
@@ -193,6 +219,7 @@ export function AdminCategoriesPage() {
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [categoryFilters, setCategoryFilters] = useState(CATEGORY_FILTER_DEFAULTS);
   const [createOpen, setCreateOpen] = useState(false);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
   const [viewCategory, setViewCategory] = useState<Category | null>(null);
@@ -227,13 +254,32 @@ export function AdminCategoriesPage() {
     [list],
   );
 
+  const parentFilterOptions = useMemo(
+    () => [
+      { value: '', label: 'Todas' },
+      { value: '__none__', label: 'Sin categoría padre' },
+      ...sortedBase.map((c) => ({ value: c.id, label: c.name })),
+    ],
+    [sortedBase],
+  );
+
+  const categoryFilterFields: FilterField[] = useMemo(
+    () => [
+      { key: 'status', label: 'Estado', options: CATEGORY_STATUS_OPTIONS },
+      { key: 'parentId', label: 'Categoría padre', options: parentFilterOptions },
+    ],
+    [parentFilterOptions],
+  );
+
   const filteredSorted = useMemo(() => {
     const q = search.trim();
-    const filtered = list.filter((c) => matchesSearch(c, list, q));
+    const filtered = list
+      .filter((c) => matchesSearch(c, list, q))
+      .filter((c) => matchesCategoryFilter(c, categoryFilters));
     return [...filtered].sort((a, b) =>
       compareCategories(a, b, list, sortKey, sortDir),
     );
-  }, [list, search, sortKey, sortDir]);
+  }, [list, search, sortKey, sortDir, categoryFilters]);
 
   const totalPages = Math.max(
     1,
@@ -246,7 +292,7 @@ export function AdminCategoriesPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, pageSize]);
+  }, [search, pageSize, categoryFilters]);
 
   const pageRows = useMemo(() => {
     const start = (page - 1) * pageSize;
@@ -313,8 +359,15 @@ export function AdminCategoriesPage() {
                   <FiX className="h-3.5 w-3.5" aria-hidden />
                 </button>
               ) : null}
-            </div>
-            <Button
+        </div>
+        <FilterPopover
+          fields={categoryFilterFields}
+          values={categoryFilters}
+          defaultValues={CATEGORY_FILTER_DEFAULTS}
+          onApply={(v) => setCategoryFilters(v as typeof CATEGORY_FILTER_DEFAULTS)}
+          onClear={() => setCategoryFilters(CATEGORY_FILTER_DEFAULTS)}
+        />
+        <Button
               type="button"
               variant="cta"
               className="h-11 min-h-11 shrink-0 px-6 py-0"

@@ -38,7 +38,6 @@ import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusB
 import { Button } from '../../components/Button/Button';
 import { TablePagination } from '../../components/TablePagination/TablePagination';
 import {
-  renderTableCellString,
   TableEmptyCell,
 } from '../../components/TableEmptyCell/TableEmptyCell';
 import { formatPrice } from '../../helpers/formatPrice';
@@ -55,11 +54,11 @@ function numOrZero(v: string | number) {
   return Number.isFinite(n) ? n : 0;
 }
 
-type SortKey = 'name' | 'vendor' | 'contactEmail' | 'date';
+type SortKey = 'name' | 'vendor' | 'contactEmail';
 type SortDir = 'asc' | 'desc';
 
 const DEFAULT_PAGE_SIZE = 10;
-const NUM_DATA_COLS = 6;
+const NUM_DATA_COLS = 5;
 const ROW_NUM_WIDTH = '3.5%';
 const COL_WIDTH = `${(100 - 3.5) / NUM_DATA_COLS}%`;
 
@@ -97,9 +96,6 @@ function compareStores(
     case 'contactEmail':
       cmp = (a.contactEmail ?? '').localeCompare(b.contactEmail ?? '', 'es');
       break;
-    case 'date':
-      cmp = (a.createdAt ?? '').localeCompare(b.createdAt ?? '');
-      break;
     default:
       cmp = 0;
   }
@@ -119,17 +115,6 @@ function matchesSearch(s: AdminStoreRow, q: string): boolean {
     s.user?.lastName,
   ];
   return chunks.some((c) => (c ?? '').toLowerCase().includes(n));
-}
-
-function formatDate(iso?: string) {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '—';
-  return d.toLocaleDateString('es', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
 }
 
 function StoreDetailLogo({ logo }: { logo: string | null }) {
@@ -398,7 +383,7 @@ export function AdminModerationPage() {
   const reject = useStoreReject();
 
   const [search, setSearch] = useState('');
-  const [sortKey, setSortKey] = useState<SortKey>('date');
+  const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
@@ -558,22 +543,15 @@ label="Cliente"
                         sortKey="contactEmail"
                         activeKey={sortKey}
                         dir={sortDir}
-                        onSort={handleSort}
-                      />
-                      <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                        Teléfono
-                      </th>
-                      <SortHeader
-                        label="Creación"
-                        sortKey="date"
-                        activeKey={sortKey}
-                        dir={sortDir}
-                        onSort={handleSort}
-                      />
-                      <th className="px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                        Acción
-                      </th>
-                    </tr>
+          onSort={handleSort}
+        />
+        <th className="px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+          Teléfono
+        </th>
+        <th className="px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+          Acción
+        </th>
+      </tr>
                   </thead>
                 </table>
               </div>
@@ -631,12 +609,9 @@ label="Cliente"
                             {s.contactEmail ?? <TableEmptyCell />}
                           </td>
                           <td className="px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
-                            {s.contactPhone ?? <TableEmptyCell />}
-                          </td>
-                          <td className="px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
-                            {renderTableCellString(formatDate(s.createdAt))}
-                          </td>
-                          <td className="px-4 py-2 align-middle text-center">
+        {s.contactPhone ?? <TableEmptyCell />}
+      </td>
+      <td className="px-4 py-2 align-middle text-center">
                             <div className="flex flex-nowrap items-center justify-center gap-1.5">
                               <Button
                                 type="button"

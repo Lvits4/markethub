@@ -87,30 +87,16 @@ type SortKey =
 type SortDir = 'asc' | 'desc';
 
 const DEFAULT_PAGE_SIZE = 10;
+const ROW_NUM_WIDTH = '3.5%';
 
-function AdminStoresTableColgroup({ isSeller }: { isSeller: boolean }) {
-  if (isSeller) {
-    return (
-      <colgroup>
-        <col style={{ width: '3.5%' }} />
-        <col style={{ width: '19%' }} />
-        <col style={{ width: '21%' }} />
-        <col style={{ width: '13.5%' }} />
-        <col style={{ width: '23%' }} />
-        <col style={{ width: '20%' }} />
-      </colgroup>
-    );
-  }
+function AdminStoresTableColgroup({ numDataCols }: { numDataCols: number }) {
+  const colWidth = `${(100 - 3.5) / numDataCols}%`;
   return (
     <colgroup>
-      <col style={{ width: '3.5%' }} />
-      <col style={{ width: '13.5%' }} />
-      <col style={{ width: '15.5%' }} />
-      <col style={{ width: '16.5%' }} />
-      <col style={{ width: '10.5%' }} />
-      <col style={{ width: '19.5%' }} />
-      <col style={{ width: '6.5%' }} />
-      <col style={{ width: '14.5%' }} />
+      <col style={{ width: ROW_NUM_WIDTH }} />
+      {Array.from({ length: numDataCols }, (__, i) => (
+        <col key={i} style={{ width: colWidth }} />
+      ))}
     </colgroup>
   );
 }
@@ -459,7 +445,8 @@ function SortHeader({
 export function AdminStoresPage() {
   const { user } = useAuth();
   const isSeller = user?.role === 'SELLER';
-  const colCount = isSeller ? 6 : 8;
+  const numDataCols = isSeller ? 5 : 7;
+  const colCount = numDataCols + 1;
   const queryClient = useQueryClient();
   const { openCreateStoreModal } = useSellerCreateStoreModal();
   const adminStoresQ = useAdminStoresQuery();
@@ -630,7 +617,7 @@ isSeller
                 className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-sky-500/20"
               >
                 <table className="table-fixed w-full min-w-[900px] border-collapse text-left text-sm">
-                  <AdminStoresTableColgroup isSeller={isSeller} />
+                  <AdminStoresTableColgroup numDataCols={numDataCols} />
                   <thead className="bg-slate-100/92 backdrop-blur-md dark:bg-admin-elevated/95 dark:backdrop-blur-md">
                     <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
         <th className="w-10 px-2 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
@@ -691,7 +678,7 @@ label="Cliente"
                 className="market-scroll min-h-0 flex-1 overflow-y-auto overflow-x-auto"
               >
                 <table className="table-fixed w-full min-w-[900px] border-collapse text-left text-sm">
-                  <AdminStoresTableColgroup isSeller={isSeller} />
+                  <AdminStoresTableColgroup numDataCols={numDataCols} />
                   <tbody>
                     {pageRows.length === 0 ? (
                       <tr>

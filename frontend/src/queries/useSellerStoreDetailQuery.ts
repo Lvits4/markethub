@@ -9,7 +9,7 @@ export function useSellerStoreDetailQuery(storeId: string | null) {
     Boolean(storeId) &&
     isAuthenticated &&
     Boolean(token) &&
-    user?.role === 'SELLER';
+    (user?.role === 'SELLER' || user?.role === 'ADMIN');
 
   return useQuery({
     queryKey: queryKeys.sellerStore(storeId ?? ''),

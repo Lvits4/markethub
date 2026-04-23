@@ -26,6 +26,7 @@ import { SellerProductFormPage } from '../views/SellerProductFormPage/SellerProd
 import { SellerReportPage } from '../views/SellerReportPage/SellerReportPage';
 import { SellerStoreProductsPage } from '../views/SellerStoreProductsPage/SellerStoreProductsPage';
 import { SellerVentasPage } from '../views/SellerVentasPage/SellerVentasPage';
+import { SellerStoresPage } from '../views/SellerStoresPage/SellerStoresPage';
 import { CatalogPage } from '../views/CatalogPage/CatalogPage';
 import { CatalogEntry } from '../views/CatalogEntry/CatalogEntry';
 import { CartPage } from '../views/CartPage/CartPage';
@@ -139,8 +140,9 @@ export default function App() {
                   </ProtectedRoute>
                 }
               >
-              <Route index element={<SellerDashboardPage />} />
-              <Route path="orders" element={<SellerOrdersPage />} />
+      <Route index element={<SellerDashboardPage />} />
+      <Route path="stores" element={<SellerStoresPage />} />
+      <Route path="orders" element={<SellerOrdersPage />} />
               <Route path="ventas" element={<SellerVentasPage />} />
               <Route path="report" element={<SellerReportPage />} />
                 <Route

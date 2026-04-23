@@ -10,6 +10,6 @@ export function useStoreOrdersSellerQuery() {
     queryKey: queryKeys.ordersStore,
     queryFn: () => fetchStoreOrders(token!),
     enabled:
-      isAuthenticated && Boolean(token) && user?.role === 'SELLER',
+      isAuthenticated && Boolean(token) && (user?.role === 'SELLER' || user?.role === 'ADMIN'),
   });
 }

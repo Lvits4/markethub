@@ -6,7 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 export function useSellerProductsQuery() {
   const { token, isAuthenticated, user } = useAuth();
   const enabled =
-    isAuthenticated && Boolean(token) && user?.role === 'SELLER';
+    isAuthenticated && Boolean(token) && (user?.role === 'SELLER' || user?.role === 'ADMIN');
 
   return useQuery({
     queryKey: queryKeys.sellerProducts,

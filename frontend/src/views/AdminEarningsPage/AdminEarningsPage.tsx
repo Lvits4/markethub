@@ -8,8 +8,8 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import {
-  FiChevronLeft,
-  FiChevronRight,
+  FiChevronDown,
+  FiChevronUp,
   FiDollarSign,
   FiSearch,
   FiX,
@@ -22,24 +22,23 @@ import { useAdminEarningsReportQuery } from '../../queries/useAdminEarningsRepor
 import { patchAdminStoreCommission } from '../../requests/adminRequests';
 import type { AdminEarningsRow } from '../../types/admin';
 
-type SortKey = 'store' | 'commission' | 'revenue' | 'sellerEarnings' | 'adminEarnings' | 'orders';
+type SortKey = 'store' | 'commission' | 'revenue' | 'sellerEarnings' | 'adminEarnings';
 type SortDir = 'asc' | 'desc';
 
 const DEFAULT_PAGE_SIZE = 10;
-const NUM_DATA_COLS = 6;
+const NUM_DATA_COLS = 5;
+const ROW_NUM_WIDTH = '3.5%';
+const COL_WIDTH = `${(100 - 3.5) / NUM_DATA_COLS}%`;
 
 function EarningsTableColgroup() {
-  return (
-    <colgroup>
-      <col style={{ width: '3.5%' }} />
-      <col style={{ width: '22%' }} />
-      <col style={{ width: '12%' }} />
-      <col style={{ width: '18%' }} />
-      <col style={{ width: '18%' }} />
-      <col style={{ width: '18%' }} />
-      <col style={{ width: '8.5%' }} />
-    </colgroup>
-  );
+return (
+<colgroup>
+<col style={{ width: ROW_NUM_WIDTH }} />
+{Array.from({ length: NUM_DATA_COLS }, (__, i) => (
+<col key={i} style={{ width: COL_WIDTH }} />
+))}
+</colgroup>
+);
 }
 
 function SortHeader({
@@ -48,25 +47,17 @@ function SortHeader({
   activeKey,
   dir,
   onSort,
-  align = 'left',
 }: {
   label: string;
   sortKey: SortKey;
   activeKey: SortKey;
   dir: SortDir;
   onSort: (key: SortKey, direction: SortDir) => void;
-  align?: 'left' | 'right';
 }) {
   const active = activeKey === sortKey;
-  const AscIcon = FiChevronLeft;
-  const DescIcon = FiChevronRight;
   return (
-    <th
-      className={`px-4 py-3.5 ${align === 'right' ? 'text-right' : 'text-left'}`}
-    >
-      <div
-        className={`inline-flex items-center gap-2 ${align === 'right' ? 'flex-row-reverse' : ''}`}
-      >
+    <th className="px-4 py-3.5 text-left">
+      <div className="inline-flex items-center gap-2">
         <span className="leading-tight">{label}</span>
         <span className="inline-flex shrink-0 flex-col items-center gap-0 leading-none">
           <button
@@ -75,7 +66,7 @@ function SortHeader({
             aria-label={`Ordenar ${label} ascendente`}
             onClick={() => onSort(sortKey, 'asc')}
           >
-            <AscIcon className="h-3 w-3 rotate-90" aria-hidden />
+            <FiChevronUp className="h-3 w-3" aria-hidden />
           </button>
           <button
             type="button"
@@ -83,7 +74,7 @@ function SortHeader({
             aria-label={`Ordenar ${label} descendente`}
             onClick={() => onSort(sortKey, 'desc')}
           >
-            <DescIcon className="h-3 w-3 rotate-90" aria-hidden />
+            <FiChevronDown className="h-3 w-3" aria-hidden />
           </button>
         </span>
       </div>
@@ -98,8 +89,7 @@ function matchesSearch(row: AdminEarningsRow, q: string) {
     row.storeName.toLowerCase().includes(lq) ||
     String(row.commission).includes(lq) ||
     formatPrice(row.totalRevenue).toLowerCase().includes(lq) ||
-    formatPrice(row.adminEarnings).toLowerCase().includes(lq) ||
-    String(row.totalOrders).includes(lq)
+    formatPrice(row.adminEarnings).toLowerCase().includes(lq)
   );
 }
 
@@ -116,8 +106,6 @@ function compareRows(a: AdminEarningsRow, b: AdminEarningsRow, key: SortKey, dir
       return mul * (a.sellerEarnings - b.sellerEarnings);
     case 'adminEarnings':
       return mul * (a.adminEarnings - b.adminEarnings);
-    case 'orders':
-      return mul * (a.totalOrders - b.totalOrders);
     default:
       return 0;
   }
@@ -356,47 +344,35 @@ export function AdminEarningsPage() {
                       dir={sortDir}
                       onSort={handleSort}
                     />
-                    <SortHeader
-                      label="Comisión %"
-                      sortKey="commission"
-                      activeKey={sortKey}
-                      dir={sortDir}
-                      onSort={handleSort}
-                      align="right"
-                    />
-                    <SortHeader
-                      label="Ventas totales"
-                      sortKey="revenue"
-                      activeKey={sortKey}
-                      dir={sortDir}
-                      onSort={handleSort}
-                      align="right"
-                    />
-                    <SortHeader
-                      label="Ganancia vendedor"
-                      sortKey="sellerEarnings"
-                      activeKey={sortKey}
-                      dir={sortDir}
-                      onSort={handleSort}
-                      align="right"
-                    />
-                    <SortHeader
-                      label="Ganancia admin"
-                      sortKey="adminEarnings"
-                      activeKey={sortKey}
-                      dir={sortDir}
-                      onSort={handleSort}
-                      align="right"
-                    />
-                    <SortHeader
-                      label="Pedidos"
-                      sortKey="orders"
-                      activeKey={sortKey}
-                      dir={sortDir}
-                      onSort={handleSort}
-                      align="right"
-                    />
-                  </tr>
+            <SortHeader
+              label="Comisión %"
+              sortKey="commission"
+              activeKey={sortKey}
+              dir={sortDir}
+              onSort={handleSort}
+            />
+            <SortHeader
+              label="Ventas totales"
+              sortKey="revenue"
+              activeKey={sortKey}
+              dir={sortDir}
+              onSort={handleSort}
+            />
+            <SortHeader
+              label="Ganancia vendedor"
+              sortKey="sellerEarnings"
+              activeKey={sortKey}
+              dir={sortDir}
+              onSort={handleSort}
+            />
+            <SortHeader
+              label="Ganancia admin"
+              sortKey="adminEarnings"
+              activeKey={sortKey}
+              dir={sortDir}
+              onSort={handleSort}
+            />
+          </tr>
                 </thead>
               </table>
             </div>
@@ -433,27 +409,24 @@ export function AdminEarningsPage() {
                             {row.storeName}
                           </p>
                         </td>
-                        <td className="px-4 py-2 text-right align-middle">
-                          <div className="inline-block">
-                            <CommissionCell
-                              storeId={row.storeId}
-                              commission={row.commission}
-                            />
-                          </div>
-                        </td>
-                        <td className="px-4 py-2 text-right align-middle tabular-nums text-slate-700 dark:text-slate-300">
-                          {formatPrice(row.totalRevenue)}
-                        </td>
-                        <td className="px-4 py-2 text-right align-middle tabular-nums text-slate-700 dark:text-slate-300">
-                          {formatPrice(row.sellerEarnings)}
-                        </td>
-                        <td className="px-4 py-2 text-right align-middle tabular-nums font-medium text-green-600 dark:text-green-400">
-                          {formatPrice(row.adminEarnings)}
-                        </td>
-                        <td className="px-4 py-2 text-right align-middle tabular-nums text-slate-700 dark:text-slate-300">
-                          {row.totalOrders}
-                        </td>
-                      </tr>
+        <td className="px-4 py-2 align-middle">
+          <div className="inline-block">
+            <CommissionCell
+              storeId={row.storeId}
+              commission={row.commission}
+            />
+          </div>
+        </td>
+        <td className="px-4 py-2 align-middle tabular-nums text-slate-700 dark:text-slate-300">
+          {formatPrice(row.totalRevenue)}
+        </td>
+        <td className="px-4 py-2 align-middle tabular-nums text-slate-700 dark:text-slate-300">
+          {formatPrice(row.sellerEarnings)}
+        </td>
+        <td className="px-4 py-2 align-middle tabular-nums font-medium text-green-600 dark:text-green-400">
+          {formatPrice(row.adminEarnings)}
+        </td>
+                </tr>
                     ))
                   )}
                 </tbody>

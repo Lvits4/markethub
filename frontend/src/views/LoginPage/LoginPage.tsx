@@ -44,10 +44,10 @@ export function LoginPage() {
           navigate(routePaths.admin, { replace: true });
           return;
         }
-        if (data.user.role === 'SELLER') {
-          navigate(routePaths.admin, { replace: true });
-          return;
-        }
+      if (data.user.role === 'SELLER') {
+        navigate(routePaths.seller, { replace: true });
+        return;
+      }
         navigate(from, { replace: true });
       },
       onError: (err) =>

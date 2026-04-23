@@ -25,17 +25,25 @@ export function SellerLayout() {
             </p>
           </div>
           <nav className="flex flex-wrap gap-1" aria-label="Vendedor">
-            <NavLink
-              to={routePaths.seller}
-              end
-              className={({ isActive }) =>
-                `${navClass} ${isActive ? activeClass : ''}`
-              }
-            >
-              Inicio
-            </NavLink>
-            <NavLink
-              to={routePaths.sellerOrders}
+        <NavLink
+          to={routePaths.seller}
+          end
+          className={({ isActive }) =>
+            `${navClass} ${isActive ? activeClass : ''}`
+          }
+        >
+          Inicio
+        </NavLink>
+        <NavLink
+          to={routePaths.sellerStores}
+          className={({ isActive }) =>
+            `${navClass} ${isActive ? activeClass : ''}`
+          }
+        >
+          Tiendas
+        </NavLink>
+        <NavLink
+          to={routePaths.sellerOrders}
               className={({ isActive }) =>
                 `${navClass} ${isActive ? activeClass : ''}`
               }
