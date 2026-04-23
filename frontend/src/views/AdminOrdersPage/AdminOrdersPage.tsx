@@ -781,9 +781,8 @@ export function AdminOrdersPage() {
             totalItems={filteredSorted.length}
             page={page}
             pageSize={pageSize}
-            totalPages={totalPages}
-            label="pedidos"
-            onPageChange={setPage}
+      totalPages={totalPages}
+        onPageChange={setPage}
             onPageSizeChange={setPageSize}
           />
           </div>

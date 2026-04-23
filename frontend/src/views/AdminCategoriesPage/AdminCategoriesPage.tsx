@@ -31,11 +31,11 @@ import { useDeleteCategoryMutation } from '../../hooks/useAdminCategoryMutations
 import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery';
 import type { Category } from '../../types/category';
 
-type SortKey = 'name' | 'slug' | 'parent' | 'description';
+type SortKey = 'name' | 'parent' | 'description';
 type SortDir = 'asc' | 'desc';
 
 const DEFAULT_PAGE_SIZE = 10;
-const NUM_DATA_COLS = 5;
+const NUM_DATA_COLS = 4;
 const ROW_NUM_WIDTH = '3.5%';
 const COL_WIDTH = `${(100 - 3.5) / NUM_DATA_COLS}%`;
 
@@ -61,7 +61,6 @@ function matchesSearch(c: Category, list: Category[], q: string): boolean {
   const n = q.toLowerCase();
   const chunks = [
     c.name,
-    c.slug,
     c.description,
     c.id,
     parentLabel(list, c.parentId),
@@ -80,9 +79,6 @@ function compareCategories(
   switch (key) {
     case 'name':
       cmp = a.name.localeCompare(b.name, 'es', { sensitivity: 'base' });
-      break;
-    case 'slug':
-      cmp = a.slug.localeCompare(b.slug, 'es', { sensitivity: 'base' });
       break;
     case 'parent':
       cmp = parentLabel(list, a.parentId).localeCompare(
@@ -125,11 +121,8 @@ function CategoryDetailContent({ category, list }: { category: Category; list: C
       <div className="space-y-3 text-center">
         <div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            {category.name}
-          </h3>
-          <p className="font-mono text-xs text-slate-500 dark:text-slate-400">
-            {category.slug}
-          </p>
+          {category.name}
+        </h3>
         </div>
       </div>
       <div className="mx-auto grid max-w-2xl gap-2 sm:grid-cols-2">
@@ -345,21 +338,14 @@ export function AdminCategoriesPage() {
                 <th className="w-10 px-2 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
                   #
                 </th>
-                <SortHeader
-                  label="Nombre"
-                        sortKey="name"
-                        activeKey={sortKey}
-                        dir={sortDir}
-                        onSort={handleSort}
-                      />
-                      <SortHeader
-                        label="Slug"
-                        sortKey="slug"
-                        activeKey={sortKey}
-                        dir={sortDir}
-                        onSort={handleSort}
-                      />
-                      <SortHeader
+          <SortHeader
+            label="Nombre"
+            sortKey="name"
+            activeKey={sortKey}
+            dir={sortDir}
+            onSort={handleSort}
+          />
+          <SortHeader
                         label="Padre"
                         sortKey="parent"
                         activeKey={sortKey}
@@ -413,10 +399,7 @@ export function AdminCategoriesPage() {
                               {c.name}
                             </p>
                           </td>
-                          <td className="min-w-0 truncate px-4 py-2 align-middle font-mono text-xs text-slate-600 dark:text-slate-400">
-                            {c.slug}
-                          </td>
-                          <td className="min-w-0 truncate px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
+          <td className="min-w-0 truncate px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
                             {renderTableCellString(parentLabel(list, c.parentId))}
                           </td>
                           <td className="min-w-0 truncate px-4 py-2 align-middle text-slate-600 dark:text-slate-400">
@@ -472,8 +455,7 @@ export function AdminCategoriesPage() {
             page={page}
             pageSize={pageSize}
             totalPages={totalPages}
-            label="categorías"
-            onPageChange={setPage}
+        onPageChange={setPage}
             onPageSizeChange={setPageSize}
           />
           </div>

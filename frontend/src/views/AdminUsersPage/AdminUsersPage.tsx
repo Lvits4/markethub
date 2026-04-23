@@ -5,41 +5,20 @@ import {
   useRef,
   useState,
 } from 'react';
-import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
 import {
   FiChevronDown,
   FiChevronUp,
-  FiCalendar,
   FiEdit2,
-  FiEye,
-  FiMail,
   FiSearch,
-  FiShield,
   FiTrash2,
-  FiUser,
   FiUsers,
   FiX,
 } from 'react-icons/fi';
-import {
-  AdminDetailCompactField,
-  AdminDetailFieldsGrid,
-  AdminDetailHeroSplit,
-  AdminDetailImageFrame,
-  AdminDetailPanelRoot,
-  AdminDetailPanelTop,
-  AdminDetailStatTile,
-  AdminDetailStatsGrid,
-  AdminDetailTextCard,
-  AdminDetailTitleRow,
-} from '../../components/AdminDetailPanel/AdminDetailPanel';
 import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
 import { TablePagination } from '../../components/TablePagination/TablePagination';
-import {
-  renderTableCellString,
-  TableEmptyCell,
-} from '../../components/TableEmptyCell/TableEmptyCell';
+import { TableEmptyCell } from '../../components/TableEmptyCell/TableEmptyCell';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminCreateUserForm } from '../../components/AdminCreateUserForm/AdminCreateUserForm';
 import { AdminEditUserForm } from '../../components/AdminEditUserForm/AdminEditUserForm';
@@ -49,12 +28,12 @@ import { useAuth } from '../../hooks/useAuth';
 import { useAdminUsersQuery } from '../../queries/useAdminUsersQuery';
 import type { AdminUserRow } from '../../types/admin';
 
-type SortKey = 'name' | 'email' | 'role' | 'date' | 'active';
+type SortKey = 'name' | 'email' | 'role' | 'active';
 type SortDir = 'asc' | 'desc';
 
 const DEFAULT_PAGE_SIZE = 10;
 const ROW_NUM_WIDTH = '3.5%';
-const NUM_DATA_COLS = 6;
+const NUM_DATA_COLS = 5;
 
 function UsersTableColgroup() {
   return (
@@ -92,9 +71,6 @@ function compareUsers(
     case 'role':
       cmp = a.role.localeCompare(b.role, 'es', { sensitivity: 'base' });
       break;
-    case 'date':
-      cmp = (a.createdAt ?? '').localeCompare(b.createdAt ?? '');
-      break;
     case 'active':
       cmp = (a.isActive ? 1 : 0) - (b.isActive ? 1 : 0);
       break;
@@ -115,162 +91,6 @@ function matchesSearch(u: AdminUserRow, q: string): boolean {
     u.id,
   ];
   return chunks.some((c) => (c ?? '').toLowerCase().includes(n));
-}
-
-function formatDate(iso?: string) {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '—';
-  return d.toLocaleDateString('es', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-}
-
-function UserDetailsPanel({ user }: { user: AdminUserRow }) {
-  const displayName = fullName(user) || user.email;
-
-  return (
-    <AdminDetailPanelRoot>
-      <AdminDetailPanelTop>
-        <AdminDetailTitleRow
-          title={displayName}
-          subtitle={user.email}
-          badges={
-            <>
-              <AdminStatusBadge
-                tone="blue"
-                className="!px-2 !py-0.5 !text-[10px]"
-              >
-                {user.role}
-              </AdminStatusBadge>
-              <AdminStatusBadge tone={user.isActive ? 'success' : 'danger'}>
-                {user.isActive ? 'Activo' : 'Inactivo'}
-              </AdminStatusBadge>
-            </>
-          }
-        />
-
-        <AdminDetailStatsGrid>
-          <AdminDetailStatTile label="Rol" value={user.role} hint="permiso" />
-          <AdminDetailStatTile
-            label="Estado"
-            value={user.isActive ? 'Activo' : 'Inactivo'}
-            hint="cuenta"
-          />
-        </AdminDetailStatsGrid>
-
-        <AdminDetailHeroSplit
-          image={
-            <AdminDetailImageFrame ariaLabel="Avatar del usuario">
-              <FiUser
-                className="h-12 w-12 text-slate-400 dark:text-slate-500"
-                aria-hidden
-              />
-            </AdminDetailImageFrame>
-          }
-          fields={
-            <AdminDetailFieldsGrid>
-              <AdminDetailCompactField label="Nombre" icon={FiUser}>
-                {fullName(user) || '—'}
-              </AdminDetailCompactField>
-              <AdminDetailCompactField label="Correo" icon={FiMail}>
-                {user.email}
-              </AdminDetailCompactField>
-              <AdminDetailCompactField label="Rol" icon={FiShield}>
-                {user.role}
-              </AdminDetailCompactField>
-              <AdminDetailCompactField label="Alta" icon={FiCalendar}>
-                {formatDate(user.createdAt)}
-              </AdminDetailCompactField>
-            </AdminDetailFieldsGrid>
-          }
-        />
-      </AdminDetailPanelTop>
-
-      <section className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden border-t border-slate-200/80 pt-3 dark:border-sky-500/20">
-        <div className="market-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pr-0.5">
-          <div className="space-y-3 pb-1">
-            <AdminDetailTextCard title="Acciones en la tabla">
-              Para cambiar el estado activo o inactivo, el rol o los datos de la
-              cuenta, o para eliminar de forma definitiva un usuario, utiliza los
-              botones de la fila correspondiente en la tabla principal.
-            </AdminDetailTextCard>
-          </div>
-        </div>
-      </section>
-    </AdminDetailPanelRoot>
-  );
-}
-
-function UserDetailsDrawer({
-  open,
-  onClose,
-  user,
-}: {
-  open: boolean;
-  onClose: () => void;
-  user: AdminUserRow | null;
-}) {
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
-
-  if (!open || !user) return null;
-
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[80] flex cursor-pointer items-stretch justify-end bg-black/35"
-      role="presentation"
-      onPointerDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <aside
-        role="dialog"
-        aria-modal="true"
-        aria-label="Detalle de usuario"
-        className="flex h-full w-full max-w-admin-drawer cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-admin-drawer"
-        onPointerDown={(e) => e.stopPropagation()}
-      >
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-admin-drawer-head">
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-            Panel de detalles
-          </h2>
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <Button
-              type="button"
-              variant="icon"
-              className="h-8 w-8 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-sky-500/20"
-              aria-label="Cerrar panel"
-              onClick={onClose}
-            >
-              <FiX className="h-4 w-4" aria-hidden />
-            </Button>
-          </div>
-        </div>
-        <div className="min-h-0 flex-1 overflow-hidden bg-admin-canvas dark:bg-admin-canvas-dark">
-          <UserDetailsPanel user={user} />
-        </div>
-      </aside>
-    </div>,
-    document.body,
-  );
 }
 
 function SortHeader({
@@ -326,11 +146,10 @@ export function AdminUsersPage() {
   const deleteUser = useAdminDeleteUser();
 
   const [search, setSearch] = useState('');
-  const [sortKey, setSortKey] = useState<SortKey>('date');
-  const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [sortKey, setSortKey] = useState<SortKey>('name');
+  const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const [viewUserId, setViewUserId] = useState<string | null>(null);
   const [userToDelete, setUserToDelete] = useState<AdminUserRow | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [editUserId, setEditUserId] = useState<string | null>(null);
@@ -389,11 +208,6 @@ export function AdminUsersPage() {
     setSortDir(direction);
   }, []);
 
-  const drawerUser = useMemo(
-    () => (viewUserId ? users.find((u) => u.id === viewUserId) ?? null : null),
-    [users, viewUserId],
-  );
-
   const editUser = useMemo(
     () => (editUserId ? users.find((u) => u.id === editUserId) ?? null : null),
     [users, editUserId],
@@ -404,12 +218,10 @@ export function AdminUsersPage() {
 
   const handleConfirmDelete = () => {
     if (!userToDelete) return;
-    const deletedId = userToDelete.id;
-    deleteUser.mutate(deletedId, {
+    deleteUser.mutate(userToDelete.id, {
       onSuccess: () => {
         toast.success('Usuario eliminado');
         setUserToDelete(null);
-        if (viewUserId === deletedId) setViewUserId(null);
       },
       onError: (e) => toast.error(getErrorMessage(e)),
     });
@@ -476,14 +288,14 @@ export function AdminUsersPage() {
                 onScroll={onTableHeaderScroll}
                 className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-sky-500/20"
               >
-                <table className="w-full min-w-[1040px] table-fixed border-collapse text-left text-sm">
+                <table className="w-full min-w-[860px] table-fixed border-collapse text-left text-sm">
                   <UsersTableColgroup />
                   <thead className="bg-slate-100/92 backdrop-blur-md dark:bg-admin-elevated/95 dark:backdrop-blur-md">
-              <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                <th className="w-10 px-2 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-                  #
-                </th>
-                <SortHeader
+                    <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+                      <th className="w-10 px-2 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                        #
+                      </th>
+                      <SortHeader
                         label="Nombre"
                         sortKey="name"
                         activeKey={sortKey}
@@ -511,13 +323,6 @@ export function AdminUsersPage() {
                         dir={sortDir}
                         onSort={handleSort}
                       />
-                      <SortHeader
-                        label="Alta"
-                        sortKey="date"
-                        activeKey={sortKey}
-                        dir={sortDir}
-                        onSort={handleSort}
-                      />
                       <th className="px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
                         Acción
                       </th>
@@ -530,7 +335,7 @@ export function AdminUsersPage() {
                 onScroll={onTableBodyScroll}
                 className="market-scroll min-h-0 flex-1 overflow-y-auto overflow-x-auto"
               >
-                <table className="w-full min-w-[1040px] table-fixed border-collapse text-left text-sm">
+                <table className="w-full min-w-[860px] table-fixed border-collapse text-left text-sm">
                   <UsersTableColgroup />
                   <tbody>
                     {pageRows.length === 0 ? (
@@ -545,15 +350,15 @@ export function AdminUsersPage() {
                         </td>
                       </tr>
                     ) : (
-                  pageRows.map((u, idx) => (
-                  <tr
-                    key={u.id}
-                    className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
-                  >
-                    <td className="w-10 px-2 py-2 text-center align-middle tabular-nums text-slate-400 dark:text-slate-500">
-                      {(page - 1) * pageSize + idx + 1}
-                    </td>
-                    <td className="px-4 py-2 align-middle">
+                      pageRows.map((u, idx) => (
+                        <tr
+                          key={u.id}
+                          className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
+                        >
+                          <td className="w-10 px-2 py-2 text-center align-middle tabular-nums text-slate-400 dark:text-slate-500">
+                            {(page - 1) * pageSize + idx + 1}
+                          </td>
+                          <td className="px-4 py-2 align-middle">
                             <p className="font-medium leading-tight text-slate-900 dark:text-slate-100">
                               {fullName(u) || <TableEmptyCell />}
                             </p>
@@ -574,20 +379,8 @@ export function AdminUsersPage() {
                               {u.isActive ? 'Activo' : 'Inactivo'}
                             </AdminStatusBadge>
                           </td>
-                          <td className="px-4 py-2 align-middle text-slate-700 dark:text-slate-300">
-                            {renderTableCellString(formatDate(u.createdAt))}
-                          </td>
                           <td className="px-4 py-2 align-middle text-center">
                             <div className="flex flex-nowrap items-center justify-center gap-1.5">
-                              <Button
-                                type="button"
-                                variant="icon"
-                                className="!text-blue-600 hover:bg-blue-500/10 dark:!text-sky-400 dark:hover:bg-sky-500/15"
-                                aria-label={`Ver detalle de ${u.email}`}
-                                onClick={() => setViewUserId(u.id)}
-                              >
-                                <FiEye className="h-4 w-4" aria-hidden />
-                              </Button>
                               <Button
                                 type="button"
                                 variant="icon"
@@ -627,22 +420,16 @@ export function AdminUsersPage() {
               </div>
             </div>
 
-          <TablePagination
-            totalItems={filteredSorted.length}
-            page={page}
-            pageSize={pageSize}
-            totalPages={totalPages}
-            label="usuarios"
-            onPageChange={setPage}
-            onPageSizeChange={setPageSize}
-          />
+            <TablePagination
+              totalItems={filteredSorted.length}
+              page={page}
+              pageSize={pageSize}
+              totalPages={totalPages}
+              label="usuarios"
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+            />
           </div>
-
-          <UserDetailsDrawer
-            open={viewUserId != null && drawerUser != null}
-            onClose={() => setViewUserId(null)}
-            user={drawerUser}
-          />
 
           <Modal
             open={createOpen}

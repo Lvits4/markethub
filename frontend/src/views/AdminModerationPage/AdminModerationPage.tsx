@@ -681,9 +681,8 @@ label="Cliente"
             totalItems={filteredSorted.length}
             page={page}
             pageSize={pageSize}
-            totalPages={totalPages}
-            label="tiendas pendientes"
-            onPageChange={setPage}
+      totalPages={totalPages}
+        onPageChange={setPage}
             onPageSizeChange={setPageSize}
           />
           </div>

@@ -88,7 +88,6 @@ export type AdminUserRow = {
   lastName: string;
   role: string;
   isActive: boolean;
-  createdAt: string;
 };
 
 export type AdminStoreOwner = {

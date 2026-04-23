@@ -6,23 +6,17 @@ export type TablePaginationProps = {
   page: number;
   pageSize: number;
   totalPages: number;
-  label: string;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
 };
 
 export function TablePagination({
-  totalItems,
   page,
   pageSize,
   totalPages,
-  label,
   onPageChange,
   onPageSizeChange,
 }: TablePaginationProps) {
-  const from = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
-  const to = Math.min(page * pageSize, totalItems);
-
   const handlePageSizeChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const raw = Number(e.target.value);
@@ -35,18 +29,6 @@ export function TablePagination({
 
   return (
     <div className="table-pagination-root">
-      <div className="table-pagination-cell table-pagination-cell--info">
-        <span className="table-pagination-range">
-          {totalItems === 0
-            ? `0 ${label}`
-            : `${from}\u2013${to} de ${totalItems}`}
-        </span>
-        <span className="table-pagination-page">
-          Página{' '}
-          <span className="table-pagination-page-current">{page}</span> de{' '}
-          <span className="table-pagination-page-total">{totalPages}</span>
-        </span>
-      </div>
       <div className="table-pagination-cell table-pagination-cell--controls">
         <span className="table-pagination-rows-label">Filas por página</span>
         <input
@@ -59,6 +41,9 @@ export function TablePagination({
           aria-label="Cantidad de filas por página"
         />
       </div>
+      <span className="table-pagination-pages">
+        {page}<span className="table-pagination-pages-sep">–</span>{totalPages}
+      </span>
       <div className="table-pagination-cell table-pagination-cell--nav">
         <button
           type="button"

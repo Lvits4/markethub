@@ -466,7 +466,6 @@ export function AdminEarningsPage() {
         page={page}
         pageSize={pageSize}
         totalPages={totalPages}
-        label="tiendas"
         onPageChange={setPage}
         onPageSizeChange={setPageSize}
       />

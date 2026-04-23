@@ -19,8 +19,7 @@ export class CategoriesService {
   ) {}
 
   async create(dto: CreateCategoryDto): Promise<Category> {
-    const slug = this.generateSlug(dto.name);
-    const existing = await this.categoriesRepository.findOne({ where: { slug } });
+    const existing = await this.categoriesRepository.findOne({ where: { name: dto.name } });
     if (existing) {
       throw new ConflictException('Ya existe una categoría con ese nombre');
     }
@@ -32,7 +31,7 @@ export class CategoriesService {
       }
     }
 
-    const category = this.categoriesRepository.create({ ...dto, slug });
+    const category = this.categoriesRepository.create({ ...dto });
     return this.categoriesRepository.save(category);
   }
 
@@ -67,12 +66,10 @@ export class CategoriesService {
     const category = await this.findById(id);
 
     if (dto.name) {
-      const slug = this.generateSlug(dto.name);
-      const existing = await this.categoriesRepository.findOne({ where: { slug } });
+      const existing = await this.categoriesRepository.findOne({ where: { name: dto.name } });
       if (existing && existing.id !== id) {
         throw new ConflictException('Ya existe una categoría con ese nombre');
       }
-      (dto as any).slug = slug;
     }
 
     Object.assign(category, dto);
@@ -92,14 +89,5 @@ export class CategoriesService {
       .where('category_id = :id', { id })
       .execute();
     await this.categoriesRepository.delete({ id });
-  }
-
-  private generateSlug(name: string): string {
-    return name
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
   }
 }

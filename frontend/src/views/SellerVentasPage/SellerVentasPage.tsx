@@ -368,9 +368,8 @@ export function SellerVentasPage() {
             totalItems={filteredSorted.length}
             page={page}
             pageSize={pageSize}
-            totalPages={totalPages}
-            label="tiendas"
-            onPageChange={setPage}
+      totalPages={totalPages}
+        onPageChange={setPage}
             onPageSizeChange={setPageSize}
           />
         </div>

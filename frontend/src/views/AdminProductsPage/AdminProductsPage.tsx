@@ -710,9 +710,8 @@ label="Nombre"
             totalItems={filteredSorted.length}
             page={page}
             pageSize={pageSize}
-            totalPages={totalPages}
-            label="productos"
-            onPageChange={setPage}
+      totalPages={totalPages}
+        onPageChange={setPage}
             onPageSizeChange={setPageSize}
           />
           </div>

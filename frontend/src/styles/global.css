@@ -257,49 +257,34 @@ body {
   white-space: nowrap;
 }
 
-.table-pagination-cell--info {
-  gap: 16px;
-}
-
 .table-pagination-cell--controls {
-  gap: 8px;
+  gap: 6px;
 }
 
 .table-pagination-cell--nav {
-  margin-left: 8px;
-  gap: 4px;
+  gap: 2px;
 }
 
-.table-pagination-range {
+.table-pagination-pages {
+  font-size: 0.8125rem;
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
   color: rgb(51 65 85);
+  padding: 0 12px;
+  white-space: nowrap;
 }
 
-.dark .table-pagination-range {
+.dark .table-pagination-pages {
   color: rgb(226 232 240);
 }
 
-.table-pagination-page {
-  font-size: 0.75rem;
-  color: rgb(100 116 139);
-}
-
-.dark .table-pagination-page {
+.table-pagination-pages-sep {
+  margin: 0 4px;
   color: rgb(148 163 184);
 }
 
-.table-pagination-page-current {
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: rgb(51 65 85);
-}
-
-.dark .table-pagination-page-current {
-  color: rgb(226 232 240);
-}
-
-.table-pagination-page-total {
-  font-variant-numeric: tabular-nums;
+.dark .table-pagination-pages-sep {
+  color: rgb(100 116 139);
 }
 
 .table-pagination-rows-label {
@@ -314,16 +299,17 @@ body {
 .table-pagination-rows-input {
   -moz-appearance: textfield;
   appearance: textfield;
-  width: 56px;
-  height: 32px;
-  border-radius: 4px;
-  border: 1px solid rgb(203 213 225);
-  background-color: #ffffff;
-  padding: 0 8px;
+  width: 40px;
+  height: 24px;
+  border-radius: 3px;
+  border: 1px solid rgb(226 232 240);
+  background-color: transparent;
+  padding: 0 4px;
   text-align: center;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: rgb(15 23 42);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: rgb(100 116 139);
   outline: none;
   transition: border-color 150ms, box-shadow 150ms;
 }
@@ -337,31 +323,32 @@ body {
 .table-pagination-rows-input:focus {
   border-color: var(--color-forest);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-forest) 25%, transparent);
+  color: rgb(51 65 85);
 }
 
 .dark .table-pagination-rows-input {
-  border-color: rgb(56 189 248 / 0.3);
-  background-color: var(--color-admin-field);
-  color: rgb(226 232 240);
+  border-color: rgb(56 189 248 / 0.15);
+  color: rgb(148 163 184);
 }
 
 .dark .table-pagination-rows-input:focus {
   border-color: rgb(56 189 248);
   box-shadow: 0 0 0 2px rgb(56 189 248 / 0.25);
+  color: rgb(226 232 240);
 }
 
 .table-pagination-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   border-radius: 4px;
-  border: 1px solid rgb(203 213 225);
+  border: none;
   background-color: transparent;
   color: rgb(15 23 42);
   cursor: pointer;
-  transition: background-color 150ms, border-color 150ms;
+  transition: background-color 150ms;
 }
 
 .table-pagination-btn:hover:not(:disabled) {
@@ -370,11 +357,10 @@ body {
 
 .table-pagination-btn:disabled {
   cursor: not-allowed;
-  opacity: 0.38;
+  opacity: 0.3;
 }
 
 .dark .table-pagination-btn {
-  border-color: rgb(56 189 248 / 0.3);
   color: rgb(226 232 240);
 }
 
@@ -383,8 +369,8 @@ body {
 }
 
 .table-pagination-btn-icon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
 }
 
 /* Shell del panel de administración */

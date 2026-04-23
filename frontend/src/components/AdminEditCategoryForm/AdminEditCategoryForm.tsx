@@ -90,12 +90,9 @@ export function AdminEditCategoryForm({
     >
       <div className="market-scroll min-h-0 max-h-[min(60vh,520px)] flex-1 overflow-y-auto overscroll-contain px-5 py-4 sm:max-h-[min(65vh,580px)]">
         <div className="flex flex-col gap-3">
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            ID: <span className="font-mono">{category.id}</span>
-          </p>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Slug: <span className="font-mono">{category.slug}</span>
-          </p>
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          ID: <span className="font-mono">{category.id}</span>
+        </p>
           <label className="flex flex-col gap-1">
             <span className={labelClass}>
               Nombre <span className="text-red-600 dark:text-red-400">*</span>

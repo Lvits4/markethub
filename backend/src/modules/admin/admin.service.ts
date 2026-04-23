@@ -142,7 +142,7 @@ export class AdminService {
 
   async getAllUsers() {
     return this.usersRepository.find({
-      select: ['id', 'email', 'firstName', 'lastName', 'role', 'isActive', 'createdAt'],
+      select: ['id', 'email', 'firstName', 'lastName', 'role', 'isActive'],
       order: { createdAt: 'DESC' },
     });
   }
@@ -155,7 +155,6 @@ export class AdminService {
       lastName: user.lastName,
       role: user.role,
       isActive: user.isActive,
-      createdAt: user.createdAt,
     };
   }
 
