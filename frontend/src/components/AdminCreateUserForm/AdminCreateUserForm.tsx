@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { FormSelect } from '../CreateProductForm/FormSelect';
 import { Button } from '../Button/Button';
 import { getErrorMessage } from '../../helpers/mapApiError';
@@ -14,7 +15,7 @@ const fieldsetResetClass = 'm-0 min-w-0 border-0 p-0';
 
 const ROLES = [
   { value: 'CUSTOMER', label: 'Cliente' },
-  { value: 'SELLER', label: 'Cliente' },
+  { value: 'SELLER', label: 'Vendedor' },
   { value: 'ADMIN', label: 'Administrador' },
 ] as const;
 
@@ -42,6 +43,7 @@ export function AdminCreateUserForm({
   const [lastName, setLastName] = useState('');
   const [role, setRole] = useState<string>('CUSTOMER');
   const [isActive, setIsActive] = useState(true);
+  const [pwdVisible, setPwdVisible] = useState(false);
 
   const busy = createMut.isPending;
 
@@ -101,22 +103,36 @@ export function AdminCreateUserForm({
               disabled={busy}
             />
           </label>
-          <label className="flex flex-col gap-1">
-            <span className={labelClass}>
-              Contraseña <span className="text-red-600 dark:text-red-400">*</span>
-            </span>
-            <input
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={fieldClass}
-              disabled={busy}
-            />
-            <span className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-              Mínimo 6 caracteres.
-            </span>
-          </label>
+            <label className="flex flex-col gap-1">
+              <span className={labelClass}>
+                Contraseña <span className="text-red-600 dark:text-red-400">*</span>
+              </span>
+              <div className="relative">
+                <input
+                  type={pwdVisible ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={fieldClass + ' pr-11'}
+                  disabled={busy}
+                />
+                <button
+                  type="button"
+                  onClick={() => setPwdVisible((v) => !v)}
+                  className="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-night-800 dark:hover:text-zinc-200"
+                  aria-label={pwdVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                >
+                  {pwdVisible ? (
+                    <FiEyeOff className="h-4 w-4" aria-hidden />
+                  ) : (
+                    <FiEye className="h-4 w-4" aria-hidden />
+                  )}
+                </button>
+              </div>
+              <span className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                Mínimo 6 caracteres.
+              </span>
+            </label>
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="flex flex-col gap-1">
               <span className={labelClass}>

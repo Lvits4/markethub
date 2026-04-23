@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { FormSelect } from '../CreateProductForm/FormSelect';
 import { Button } from '../Button/Button';
 import { getErrorMessage } from '../../helpers/mapApiError';
@@ -15,7 +16,7 @@ const fieldsetResetClass = 'm-0 min-w-0 border-0 p-0';
 
 const ROLES = [
   { value: 'CUSTOMER', label: 'Cliente' },
-  { value: 'SELLER', label: 'Cliente' },
+  { value: 'SELLER', label: 'Vendedor' },
   { value: 'ADMIN', label: 'Administrador' },
 ] as const;
 
@@ -45,6 +46,7 @@ export function AdminEditUserForm({
   const [role, setRole] = useState(user.role);
   const [isActive, setIsActive] = useState(user.isActive);
   const [password, setPassword] = useState('');
+  const [pwdVisible, setPwdVisible] = useState(false);
 
   useEffect(() => {
     setEmail(user.email);
@@ -53,6 +55,7 @@ export function AdminEditUserForm({
     setRole(user.role);
     setIsActive(user.isActive);
     setPassword('');
+    setPwdVisible(false);
   }, [user]);
 
   const busy = updateMut.isPending;
@@ -162,18 +165,32 @@ export function AdminEditUserForm({
               />
             </div>
           </fieldset>
-          <label className="flex flex-col gap-1">
-            <span className={labelClass}>Nueva contraseña</span>
-            <input
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Dejar vacío para no cambiar"
-              className={fieldClass}
-              disabled={busy}
-            />
-          </label>
+            <label className="flex flex-col gap-1">
+              <span className={labelClass}>Nueva contraseña</span>
+              <div className="relative">
+                <input
+                  type={pwdVisible ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Dejar vacío para no cambiar"
+                  className={fieldClass + ' pr-11'}
+                  disabled={busy}
+                />
+                <button
+                  type="button"
+                  onClick={() => setPwdVisible((v) => !v)}
+                  className="absolute right-1.5 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-night-800 dark:hover:text-zinc-200"
+                  aria-label={pwdVisible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                >
+                  {pwdVisible ? (
+                    <FiEyeOff className="h-4 w-4" aria-hidden />
+                  ) : (
+                    <FiEye className="h-4 w-4" aria-hidden />
+                  )}
+                </button>
+              </div>
+            </label>
           <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-700 dark:text-zinc-200">
             <input
               type="checkbox"
