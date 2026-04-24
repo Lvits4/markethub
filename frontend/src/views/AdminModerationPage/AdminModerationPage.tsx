@@ -28,11 +28,8 @@ import {
   AdminDetailPanelRoot,
   AdminDetailPanelTop,
   AdminDetailScrollSection,
-  AdminDetailStatTile,
-  AdminDetailStatsGrid,
   AdminDetailTextCard,
   AdminDetailTitleRow,
-  getAdminStorePanelStats,
 } from '../../components/AdminDetailPanel/AdminDetailPanel';
 import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
@@ -40,7 +37,6 @@ import { TablePagination } from '../../components/TablePagination/TablePaginatio
 import {
   TableEmptyCell,
 } from '../../components/TableEmptyCell/TableEmptyCell';
-import { formatPrice } from '../../helpers/formatPrice';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAuth } from '../../hooks/useAuth';
 import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc';
@@ -149,7 +145,6 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
   const ownerName = store.user
     ? `${store.user.firstName} ${store.user.lastName}`.trim()
     : '';
-  const st = getAdminStorePanelStats(store);
   const descText = store.description?.trim() || 'Sin descripción';
   const shipText = store.shippingPolicy?.trim() || 'No definida';
   const retText = store.returnPolicy?.trim() || 'No definida';
@@ -171,24 +166,6 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
             </>
           }
         />
-
-        <AdminDetailStatsGrid>
-          <AdminDetailStatTile
-            label="Productos"
-            value={st.productsTotal}
-            hint={`${st.productsActive} activos`}
-          />
-          <AdminDetailStatTile
-            label="Pedidos"
-            value={st.ordersTotal}
-            hint={`${st.ordersDelivered} entregados`}
-          />
-          <AdminDetailStatTile
-            label="Ventas (bruto)"
-            value={formatPrice(st.revenue)}
-            hint="excl. cancelados"
-          />
-        </AdminDetailStatsGrid>
 
         <AdminDetailHeroSplit
           image={
