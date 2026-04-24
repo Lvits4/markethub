@@ -4,14 +4,12 @@ import {
   useMemo,
   useRef,
   useState,
-  type ReactNode,
 } from 'react';
 import toast from 'react-hot-toast';
 import {
   FiChevronDown,
   FiChevronUp,
   FiEdit2,
-  FiEye,
   FiSearch,
   FiTag,
   FiTrash2,
@@ -122,47 +120,6 @@ function compareCategories(
   return dir === 'asc' ? cmp : -cmp;
 }
 
-function DetailField({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="space-y-1">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-        {label}
-      </p>
-      <div className="rounded-md border border-slate-200/80 bg-white px-2.5 py-1.5 text-xs text-slate-700 dark:border-sky-500/20 dark:bg-admin-elevated dark:text-slate-200">
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function CategoryDetailContent({ category, list }: { category: Category; list: Category[] }) {
-  return (
-    <div className="space-y-4 px-5 py-4">
-      <div className="space-y-3 text-center">
-        <div>
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-          {category.name}
-        </h3>
-        </div>
-      </div>
-      <div className="mx-auto grid max-w-2xl gap-2 sm:grid-cols-2">
-        <DetailField label="Padre">
-          {parentLabel(list, category.parentId)}
-        </DetailField>
-        <DetailField label="Descripción">
-          {category.description?.trim() ? category.description : '—'}
-        </DetailField>
-      </div>
-    </div>
-  );
-}
-
 function SortHeader({
   label,
   sortKey,
@@ -222,7 +179,6 @@ export function AdminCategoriesPage() {
   const [categoryFilters, setCategoryFilters] = useState(CATEGORY_FILTER_DEFAULTS);
   const [createOpen, setCreateOpen] = useState(false);
   const [editCategory, setEditCategory] = useState<Category | null>(null);
-  const [viewCategory, setViewCategory] = useState<Category | null>(null);
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(
     null,
   );
@@ -313,7 +269,6 @@ export function AdminCategoriesPage() {
       onSuccess: () => {
         toast.success('Categoría eliminada');
         setCategoryToDelete(null);
-        setViewCategory((v) => (v?.id === id ? null : v));
         setEditCategory((e) => (e?.id === id ? null : e));
       },
       onError: (e) => toast.error(getErrorMessage(e)),
@@ -464,25 +419,16 @@ export function AdminCategoriesPage() {
                           </td>
                           <td className="px-4 py-2 align-middle text-center">
                             <div className="flex flex-nowrap items-center justify-center gap-1.5">
-                              <Button
-                                type="button"
-                                variant="icon"
-                                className="!text-blue-600 hover:bg-blue-500/10 dark:!text-sky-400 dark:hover:bg-sky-500/15"
-                                aria-label={`Ver detalle de ${c.name}`}
-                                onClick={() => setViewCategory(c)}
-                              >
-                                <FiEye className="h-4 w-4" aria-hidden />
-                              </Button>
-                              <Button
-                                type="button"
-                                variant="icon"
-                                className="!text-yellow-600 hover:bg-yellow-500/15 dark:!text-sky-300 dark:hover:bg-sky-500/15"
-                                aria-label={`Editar ${c.name}`}
-                                disabled={busy}
-                                onClick={() => setEditCategory(c)}
-                              >
-                                <FiEdit2 className="h-4 w-4" aria-hidden />
-                              </Button>
+              <Button
+                  type="button"
+                  variant="icon"
+                  className="!text-yellow-600 hover:bg-yellow-500/15 dark:!text-sky-300 dark:hover:bg-sky-500/15"
+                  aria-label={`Editar ${c.name}`}
+                  disabled={busy}
+                  onClick={() => setEditCategory(c)}
+                >
+                  <FiEdit2 className="h-4 w-4" aria-hidden />
+                </Button>
                               <Button
                                 type="button"
                                 variant="icon"
@@ -527,20 +473,8 @@ export function AdminCategoriesPage() {
             </div>
           </Modal>
 
-          <Modal
-            open={viewCategory != null}
-            onClose={() => setViewCategory(null)}
-            title={viewCategory ? `Detalle: ${viewCategory.name}` : 'Detalle'}
-          >
-            <div className="min-h-0 flex-1 overflow-hidden">
-              {viewCategory ? (
-                <CategoryDetailContent category={viewCategory} list={list} />
-              ) : null}
-            </div>
-          </Modal>
-
-          <Modal
-            open={editCategory != null}
+  <Modal
+      open={editCategory != null}
             onClose={() => setEditCategory(null)}
             title={
               editCategory ? `Editar: ${editCategory.name}` : 'Editar categoría'
