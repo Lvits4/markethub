@@ -544,7 +544,7 @@ export function AdminUsersPage() {
               <Button
                 type="button"
                 variant="primary"
-                className="h-10 w-40 justify-center border-0 bg-rose-700/90 px-4 text-sm text-white hover:bg-rose-800 dark:bg-rose-700/90 dark:hover:bg-rose-800"
+                className="h-10 w-40 justify-center border-0 bg-rose-700/90 px-4 text-sm text-white hover:bg-rose-800 dark:bg-rose-700/90 dark:text-white dark:hover:bg-rose-800"
                 onClick={handleConfirmDelete}
                 disabled={deleteUser.isPending}
               >

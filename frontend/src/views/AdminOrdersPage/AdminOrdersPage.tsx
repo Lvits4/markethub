@@ -5,7 +5,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
 import {
   FiChevronDown,
@@ -34,6 +33,7 @@ import {
   AdminDetailStatsGrid,
   AdminDetailTitleRow,
 } from '../../components/AdminDetailPanel/AdminDetailPanel';
+import { AdminDrawerWrapper } from '../../components/AdminDrawerWrapper/AdminDrawerWrapper';
 import {
   AdminStatusBadge,
   orderStatusTone,
@@ -321,91 +321,56 @@ function OrderDetailsDrawer({
   onDeleteOrder?: (orderId: string) => void;
   deletePending?: boolean;
 }) {
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
-
-  if (!open) return null;
-
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[80] flex cursor-pointer items-stretch justify-end bg-black/35"
-      role="presentation"
-      onPointerDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <aside
-        role="dialog"
-        aria-modal="true"
-        aria-label="Detalle de pedido"
-        className="flex h-full w-full max-w-admin-drawer cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-admin-drawer"
-        onPointerDown={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-admin-drawer-head">
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-            Panel de detalles
-          </h2>
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="icon"
-              className="h-8 w-8 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-sky-500/20"
-              aria-label="Cerrar panel"
-              onClick={onClose}
-            >
-              <FiX className="h-4 w-4" aria-hidden />
-            </Button>
-          </div>
+  return (
+    <AdminDrawerWrapper open={open} onClose={onClose} ariaLabel="Detalle de pedido">
+      <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-admin-drawer-head">
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+          Panel de detalles
+        </h2>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="icon"
+            className="h-8 w-8 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-sky-500/20"
+            aria-label="Cerrar panel"
+            onClick={onClose}
+          >
+            <FiX className="h-4 w-4" aria-hidden />
+          </Button>
         </div>
-        <div className="min-h-0 flex-1 overflow-hidden bg-admin-canvas dark:bg-admin-canvas-dark">
-          {isLoading ? (
-            <p className="px-4 py-4 text-sm text-slate-500">
-              Cargando detalle…
-            </p>
-          ) : isError ? (
-            <p className="px-4 py-4 text-sm text-red-600">
-              No se pudo cargar el detalle del pedido.
-            </p>
-          ) : order ? (
-            <OrderDetailsPanel order={order} />
-          ) : (
-            <p className="px-4 py-4 text-sm text-slate-500">
-              No hay datos del pedido.
-            </p>
-          )}
+      </div>
+      <div className="min-h-0 flex-1 overflow-hidden bg-admin-canvas dark:bg-admin-canvas-dark">
+        {isLoading ? (
+          <p className="px-4 py-4 text-sm text-slate-500">
+            Cargando detalle…
+          </p>
+        ) : isError ? (
+          <p className="px-4 py-4 text-sm text-red-600">
+            No se pudo cargar el detalle del pedido.
+          </p>
+        ) : order ? (
+          <OrderDetailsPanel order={order} />
+        ) : (
+          <p className="px-4 py-4 text-sm text-slate-500">
+            No hay datos del pedido.
+          </p>
+        )}
+      </div>
+      {order && onDeleteOrder ? (
+        <div className="shrink-0 border-t border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-admin-drawer-head">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full justify-center border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/30 sm:w-auto"
+            disabled={deletePending}
+            onClick={() => onDeleteOrder(order.id)}
+          >
+            <FiTrash2 className="mr-2 h-4 w-4" aria-hidden />
+            {deletePending ? 'Eliminando…' : 'Eliminar pedido'}
+          </Button>
         </div>
-        {order && onDeleteOrder ? (
-          <div className="shrink-0 border-t border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-admin-drawer-head">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full justify-center border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/30 sm:w-auto"
-              disabled={deletePending}
-              onClick={() => onDeleteOrder(order.id)}
-            >
-              <FiTrash2 className="mr-2 h-4 w-4" aria-hidden />
-              {deletePending ? 'Eliminando…' : 'Eliminar pedido'}
-            </Button>
-          </div>
-        ) : null}
-      </aside>
-    </div>,
-    document.body,
+      ) : null}
+    </AdminDrawerWrapper>
   );
 }
 
@@ -863,7 +828,7 @@ export function AdminOrdersPage() {
               <Button
                 type="button"
                 variant="primary"
-                className="h-10 w-40 justify-center border-0 bg-rose-700/90 px-4 text-sm text-white hover:bg-rose-800 dark:bg-rose-700/90 dark:hover:bg-rose-800"
+                className="h-10 w-40 justify-center border-0 bg-rose-700/90 px-4 text-sm text-white hover:bg-rose-800 dark:bg-rose-700/90 dark:text-white dark:hover:bg-rose-800"
                 onClick={handleConfirmDeleteOrder}
                 disabled={deleteOrderMut.isPending}
               >

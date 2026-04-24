@@ -5,7 +5,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { createPortal } from 'react-dom';
 import toast from 'react-hot-toast';
 import {
   FiCheck,
@@ -31,6 +30,7 @@ import {
   AdminDetailTextCard,
   AdminDetailTitleRow,
 } from '../../components/AdminDetailPanel/AdminDetailPanel';
+import { AdminDrawerWrapper } from '../../components/AdminDrawerWrapper/AdminDrawerWrapper';
 import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
 import { TablePagination } from '../../components/TablePagination/TablePagination';
@@ -233,77 +233,42 @@ function ModerationDrawer({
   isError: boolean;
   store?: AdminStoreDetail;
 }) {
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
-
-  if (!open) return null;
-
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[80] flex cursor-pointer items-stretch justify-end bg-black/35"
-      role="presentation"
-      onPointerDown={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <aside
-        role="dialog"
-        aria-modal="true"
-        aria-label="Detalle de tienda pendiente"
-        className="flex h-full w-full max-w-admin-drawer cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl dark:border-sky-500/20 dark:bg-admin-drawer"
-        onPointerDown={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-admin-drawer-head">
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-            Panel de detalles
-          </h2>
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="icon"
-              className="h-8 w-8 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-sky-500/20"
-              aria-label="Cerrar panel"
-              onClick={onClose}
-            >
-              <FiX className="h-4 w-4" aria-hidden />
-            </Button>
-          </div>
+  return (
+    <AdminDrawerWrapper open={open} onClose={onClose} ariaLabel="Detalle de tienda pendiente">
+      <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-admin-drawer-head">
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
+          Panel de detalles
+        </h2>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="icon"
+            className="h-8 w-8 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-sky-500/20"
+            aria-label="Cerrar panel"
+            onClick={onClose}
+          >
+            <FiX className="h-4 w-4" aria-hidden />
+          </Button>
         </div>
-        <div className="min-h-0 flex-1 overflow-hidden bg-admin-canvas dark:bg-admin-canvas-dark">
-          {isLoading ? (
-            <p className="px-4 py-4 text-sm text-slate-500">
-              Cargando detalle…
-            </p>
-          ) : isError ? (
-            <p className="px-4 py-4 text-sm text-red-600">
-              No se pudo cargar el detalle de la tienda.
-            </p>
-          ) : store ? (
-            <StoreDetailsPanel store={store} />
-          ) : (
-            <p className="px-4 py-4 text-sm text-slate-500">
-              No hay datos de la tienda.
-            </p>
-          )}
-        </div>
-      </aside>
-    </div>,
-    document.body,
+      </div>
+      <div className="min-h-0 flex-1 overflow-hidden bg-admin-canvas dark:bg-admin-canvas-dark">
+        {isLoading ? (
+          <p className="px-4 py-4 text-sm text-slate-500">
+            Cargando detalle…
+          </p>
+        ) : isError ? (
+          <p className="px-4 py-4 text-sm text-red-600">
+            No se pudo cargar el detalle de la tienda.
+          </p>
+        ) : store ? (
+          <StoreDetailsPanel store={store} />
+        ) : (
+          <p className="px-4 py-4 text-sm text-slate-500">
+            No hay datos de la tienda.
+          </p>
+        )}
+      </div>
+    </AdminDrawerWrapper>
   );
 }
 
