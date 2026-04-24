@@ -10,7 +10,6 @@ import toast from 'react-hot-toast';
 import {
   FiChevronDown,
   FiChevronUp,
-  FiDollarSign,
   FiSearch,
   FiX,
 } from 'react-icons/fi';
@@ -355,15 +354,6 @@ export function AdminEarningsPage() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <h2 className="flex shrink-0 items-center gap-2.5 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-        <FiDollarSign
-          className="h-7 w-7 shrink-0 text-zinc-900 dark:text-zinc-50"
-          aria-hidden
-        />
-        Ganancias
-      </h2>
-
-      <div className="flex min-h-0 flex-1 flex-col gap-4">
         <div className="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative min-w-0 flex-1">
             <FiSearch
@@ -518,7 +508,6 @@ export function AdminEarningsPage() {
         onPageSizeChange={setPageSize}
       />
         </div>
-      </div>
     </div>
   );
 }

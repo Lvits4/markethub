@@ -11,7 +11,6 @@ import {
   FiChevronUp,
   FiEdit2,
   FiSearch,
-  FiTag,
   FiTrash2,
   FiX,
 } from 'react-icons/fi';
@@ -277,11 +276,6 @@ export function AdminCategoriesPage() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <h2 className="flex shrink-0 items-center gap-2.5 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-        <FiTag className="h-7 w-7 shrink-0 text-zinc-900 dark:text-zinc-50" aria-hidden />
-        Categorías
-      </h2>
-
       {isLoading ? (
         <p className="text-center text-sm text-zinc-500">Cargando…</p>
       ) : isError ? (

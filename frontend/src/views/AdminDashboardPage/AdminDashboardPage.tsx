@@ -133,16 +133,13 @@ export function AdminDashboardPage() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <header className="flex shrink-0 flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-        <div className="min-w-0">
-          <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-2xl">
-            Panel
-          </h1>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 sm:text-sm">
-            Resumen de MarketHub
-          </p>
-        </div>
-      </header>
+    <header className="flex shrink-0 flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+      <div className="min-w-0">
+        <p className="text-xs text-zinc-500 dark:text-zinc-400 sm:text-sm">
+          Resumen de MarketHub
+        </p>
+      </div>
+    </header>
 
       <div className="grid shrink-0 grid-cols-2 gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-4 xl:grid-cols-4">
         <div className="min-w-0">

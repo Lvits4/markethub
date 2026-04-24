@@ -1,4 +1,4 @@
-import { useState, type ComponentType, type ReactNode } from 'react';
+import { useState, type ComponentType } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
@@ -25,8 +25,6 @@ type NavItemProps = {
   icon: ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
   label: string;
   collapsed: boolean;
-  badge?: ReactNode;
-  collapsedBadgeCount?: number;
 };
 
 const sidebarLabelGrid =
@@ -38,16 +36,7 @@ function SidebarNavItem({
   icon: Icon,
   label,
   collapsed,
-  badge,
-  collapsedBadgeCount,
 }: NavItemProps) {
-  const collapsedBadge =
-    collapsed && collapsedBadgeCount != null && collapsedBadgeCount > 0 ? (
-      <span className="absolute right-0 top-0 inline-flex h-4 min-w-4 translate-x-0.5 -translate-y-0.5 items-center justify-center rounded-full bg-admin-primary px-0.5 text-[9px] font-bold leading-none tabular-nums text-white">
-        {collapsedBadgeCount > 9 ? '9+' : collapsedBadgeCount}
-      </span>
-    ) : null;
-
   return (
     <NavLink
       to={to}
@@ -63,19 +52,17 @@ function SidebarNavItem({
           .join(' ')
       }
     >
-      <span className="relative inline-flex shrink-0">
-        <Icon className="h-[18px] w-[18px]" aria-hidden />
-        {collapsedBadge}
-      </span>
+          <span className="relative inline-flex shrink-0">
+            <Icon className="h-[18px] w-[18px]" aria-hidden />
+          </span>
       <div
         className={`${sidebarLabelGrid} ${collapsed ? 'grid-cols-[0fr]' : 'grid-cols-[1fr]'}`}
         aria-hidden={collapsed}
       >
         <div className="min-w-0 overflow-hidden">
-          <span className="flex min-w-0 items-center gap-2">
-            <span className="min-w-0 flex-1 truncate">{label}</span>
-            {badge}
-          </span>
+            <span className="flex min-w-0 items-center gap-2">
+              <span className="min-w-0 flex-1 truncate">{label}</span>
+            </span>
         </div>
       </div>
     </NavLink>
@@ -98,13 +85,6 @@ export function AdminLayout() {
     toast.success('Sesión cerrada');
     navigate(routePaths.login, { replace: true });
   };
-
-  const moderationBadge =
-    pendingCount > 0 ? (
-      <span className="inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-admin-primary px-1 text-[10px] font-bold leading-none tabular-nums text-white">
-        {pendingCount > 99 ? '99+' : pendingCount}
-      </span>
-    ) : null;
 
   return (
     <>
@@ -167,14 +147,12 @@ export function AdminLayout() {
               collapsed={collapsed}
             />
             {isAdmin ? (
-              <SidebarNavItem
-                to={routePaths.adminModeration}
-                icon={FiShield}
-                label="Moderación"
-                collapsed={collapsed}
-                badge={moderationBadge}
-                collapsedBadgeCount={pendingCount}
-              />
+        <SidebarNavItem
+          to={routePaths.adminModeration}
+          icon={FiShield}
+          label="Moderación"
+          collapsed={collapsed}
+        />
             ) : null}
             <SidebarNavItem
               to={routePaths.adminStores}
