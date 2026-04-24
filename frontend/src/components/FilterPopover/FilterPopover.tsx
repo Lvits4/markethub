@@ -146,14 +146,14 @@ export function FilterPopover({
             ))}
 
             <div className="mt-1 flex gap-2 border-t border-zinc-200/80 pt-4 dark:border-night-700">
-              <Button
-                type="button"
-                variant="ghost"
-                className="flex-1 justify-center py-2.5 text-sm"
-                onClick={handleClear}
-              >
-                Limpiar
-              </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          className="flex-1 justify-center rounded-md border border-zinc-300 bg-zinc-100 py-2.5 text-sm text-zinc-700 hover:bg-zinc-200 dark:border-night-600 dark:bg-night-800 dark:text-zinc-200 dark:hover:bg-night-700"
+          onClick={handleClear}
+        >
+          Limpiar
+        </Button>
               <Button
                 type="button"
                 variant="primary"

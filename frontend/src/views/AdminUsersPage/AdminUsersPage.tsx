@@ -17,6 +17,8 @@ import {
 } from 'react-icons/fi';
 import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
+import { FilterPopover } from '../../components/FilterPopover/FilterPopover';
+import type { FilterField } from '../../components/FilterPopover/FilterPopover';
 import { TablePagination } from '../../components/TablePagination/TablePagination';
 import { TableEmptyCell } from '../../components/TableEmptyCell/TableEmptyCell';
 import { Modal } from '../../components/Modal/Modal';
@@ -34,6 +36,21 @@ type SortDir = 'asc' | 'desc';
 const DEFAULT_PAGE_SIZE = 10;
 const ROW_NUM_WIDTH = '3.5%';
 const NUM_DATA_COLS = 5;
+
+const USER_STATUS_OPTIONS: { value: string; label: string }[] = [
+  { value: '', label: 'Todos' },
+  { value: 'active', label: 'Activo' },
+  { value: 'inactive', label: 'Inactivo' },
+];
+
+const USER_ROLE_OPTIONS: { value: string; label: string }[] = [
+  { value: '', label: 'Todos' },
+  { value: 'ADMIN', label: 'ADMIN' },
+  { value: 'SELLER', label: 'SELLER' },
+  { value: 'CUSTOMER', label: 'CUSTOMER' },
+];
+
+const USER_FILTER_DEFAULTS = { status: '', role: '' };
 
 function UsersTableColgroup() {
   return (
@@ -93,6 +110,16 @@ function matchesSearch(u: AdminUserRow, q: string): boolean {
   return chunks.some((c) => (c ?? '').toLowerCase().includes(n));
 }
 
+function matchesUserFilter(
+  u: AdminUserRow,
+  filters: { status: string; role: string },
+): boolean {
+  if (filters.status === 'active' && !u.isActive) return false;
+  if (filters.status === 'inactive' && u.isActive) return false;
+  if (filters.role && u.role !== filters.role) return false;
+  return true;
+}
+
 function SortHeader({
   label,
   sortKey,
@@ -150,6 +177,7 @@ export function AdminUsersPage() {
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [userFilters, setUserFilters] = useState(USER_FILTER_DEFAULTS);
   const [userToDelete, setUserToDelete] = useState<AdminUserRow | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [editUserId, setEditUserId] = useState<string | null>(null);
@@ -179,11 +207,21 @@ export function AdminUsersPage() {
 
   const users = Array.isArray(data) ? data : [];
 
+  const userFilterFields: FilterField[] = useMemo(
+    () => [
+      { key: 'status', label: 'Estado', options: USER_STATUS_OPTIONS },
+      { key: 'role', label: 'Rol', options: USER_ROLE_OPTIONS },
+    ],
+    [],
+  );
+
   const filteredSorted = useMemo(() => {
     const q = search.trim();
-    const list = users.filter((u) => matchesSearch(u, q));
+    const list = users
+      .filter((u) => matchesSearch(u, q))
+      .filter((u) => matchesUserFilter(u, userFilters));
     return [...list].sort((a, b) => compareUsers(a, b, sortKey, sortDir));
-  }, [users, search, sortKey, sortDir]);
+  }, [users, search, sortKey, sortDir, userFilters]);
 
   const totalPages = Math.max(
     1,
@@ -196,7 +234,7 @@ export function AdminUsersPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, pageSize]);
+  }, [search, pageSize, userFilters]);
 
   const pageRows = useMemo(() => {
     const start = (page - 1) * pageSize;
@@ -271,14 +309,21 @@ export function AdminUsersPage() {
                 </button>
               ) : null}
         </div>
-        <Button
-          type="button"
-          variant="cta"
-          className="h-11 min-h-11 shrink-0 px-6 py-0"
-          onClick={() => setCreateOpen(true)}
-        >
-          Crear usuario
-        </Button>
+            <FilterPopover
+              fields={userFilterFields}
+              values={userFilters}
+              defaultValues={USER_FILTER_DEFAULTS}
+              onApply={(v) => setUserFilters(v as typeof USER_FILTER_DEFAULTS)}
+              onClear={() => setUserFilters(USER_FILTER_DEFAULTS)}
+            />
+            <Button
+              type="button"
+              variant="cta"
+              className="h-11 min-h-11 shrink-0 px-6 py-0"
+              onClick={() => setCreateOpen(true)}
+            >
+              Crear usuario
+            </Button>
           </div>
 
           <div className="admin-table-panel">

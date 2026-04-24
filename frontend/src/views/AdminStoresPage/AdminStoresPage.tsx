@@ -37,6 +37,8 @@ import {
 } from '../../components/AdminDetailPanel/AdminDetailPanel';
 import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
+import { FilterPopover } from '../../components/FilterPopover/FilterPopover';
+import type { FilterField } from '../../components/FilterPopover/FilterPopover';
 import { TablePagination } from '../../components/TablePagination/TablePagination';
 import { TableEmptyCell } from '../../components/TableEmptyCell/TableEmptyCell';
 import { Modal } from '../../components/Modal/Modal';
@@ -88,6 +90,21 @@ type SortDir = 'asc' | 'desc';
 
 const DEFAULT_PAGE_SIZE = 10;
 const ROW_NUM_WIDTH = '3.5%';
+
+const STORE_ACTIVE_OPTIONS: { value: string; label: string }[] = [
+  { value: '', label: 'Todos' },
+  { value: 'active', label: 'Activa' },
+  { value: 'inactive', label: 'Inactiva' },
+];
+
+const STORE_APPROVAL_OPTIONS: { value: string; label: string }[] = [
+  { value: '', label: 'Todos' },
+  { value: 'approved', label: 'Aprobada' },
+  { value: 'pending', label: 'Pendiente' },
+  { value: 'rejected', label: 'Rechazada' },
+];
+
+const STORE_FILTER_DEFAULTS = { activeStatus: '', approvalStatus: '' };
 
 function AdminStoresTableColgroup({ numDataCols }: { numDataCols: number }) {
   const colWidth = `${(100 - 3.5) / numDataCols}%`;
@@ -157,6 +174,22 @@ function matchesSearch(s: AdminStoreRow, q: string): boolean {
     s.user?.lastName,
   ];
   return chunks.some((c) => (c ?? '').toLowerCase().includes(n));
+}
+
+function matchesStoreFilter(
+  s: AdminStoreRow,
+  filters: { activeStatus: string; approvalStatus: string },
+): boolean {
+  if (filters.activeStatus === 'active' && !s.isActive) return false;
+  if (filters.activeStatus === 'inactive' && s.isActive) return false;
+  if (filters.approvalStatus === 'approved' && !s.isApproved) return false;
+  if (
+    filters.approvalStatus === 'pending' &&
+    (s.isApproved || s.isRejected)
+  )
+    return false;
+  if (filters.approvalStatus === 'rejected' && !s.isRejected) return false;
+  return true;
 }
 
 function StoreDetailLogo({
@@ -458,6 +491,7 @@ export function AdminStoresPage() {
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [storeFilters, setStoreFilters] = useState(STORE_FILTER_DEFAULTS);
   const [viewStoreId, setViewStoreId] = useState<string | null>(null);
   const [storeToDelete, setStoreToDelete] = useState<AdminStoreRow | null>(null);
   const [mode, setMode] = useState<'view' | 'edit'>('view');
@@ -497,15 +531,25 @@ export function AdminStoresPage() {
     return Array.isArray(raw) ? raw : [];
   }, [isSeller, myStoresQ.data, adminStoresQ.data]);
 
+  const storeFilterFields: FilterField[] = useMemo(
+    () => [
+      { key: 'activeStatus', label: 'Estado', options: STORE_ACTIVE_OPTIONS },
+      { key: 'approvalStatus', label: 'Aprobación', options: STORE_APPROVAL_OPTIONS },
+    ],
+    [],
+  );
+
   const deletePending = isSeller
     ? sellerDelete.isPending
     : adminDelete.isPending;
 
   const filteredSorted = useMemo(() => {
     const q = search.trim();
-    const list = stores.filter((s) => matchesSearch(s, q));
+    const list = stores
+      .filter((s) => matchesSearch(s, q))
+      .filter((s) => matchesStoreFilter(s, storeFilters));
     return [...list].sort((a, b) => compareStores(a, b, sortKey, sortDir));
-  }, [stores, search, sortKey, sortDir]);
+  }, [stores, search, sortKey, sortDir, storeFilters]);
 
   const totalPages = Math.max(
     1,
@@ -518,7 +562,7 @@ export function AdminStoresPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, pageSize]);
+  }, [search, pageSize, storeFilters]);
 
   const pageRows = useMemo(() => {
     const start = (page - 1) * pageSize;
@@ -599,6 +643,13 @@ isSeller
                 </button>
               ) : null}
             </div>
+            <FilterPopover
+              fields={storeFilterFields}
+              values={storeFilters}
+              defaultValues={STORE_FILTER_DEFAULTS}
+              onApply={(v) => setStoreFilters(v as typeof STORE_FILTER_DEFAULTS)}
+              onClear={() => setStoreFilters(STORE_FILTER_DEFAULTS)}
+            />
             <Button
               type="button"
               variant="cta"

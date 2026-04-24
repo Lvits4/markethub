@@ -15,6 +15,8 @@ import {
   FiX,
 } from 'react-icons/fi';
 import { TablePagination } from '../../components/TablePagination/TablePagination';
+import { FilterPopover } from '../../components/FilterPopover/FilterPopover';
+import type { FilterField } from '../../components/FilterPopover/FilterPopover';
 import { formatPrice } from '../../helpers/formatPrice';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { queryKeys } from '../../helpers/queryKeys';
@@ -29,6 +31,23 @@ const DEFAULT_PAGE_SIZE = 10;
 const NUM_DATA_COLS = 5;
 const ROW_NUM_WIDTH = '3.5%';
 const COL_WIDTH = `${(100 - 3.5) / NUM_DATA_COLS}%`;
+
+const COMMISSION_RANGE_OPTIONS: { value: string; label: string }[] = [
+  { value: '', label: 'Todos' },
+  { value: '0-5', label: '0 – 5%' },
+  { value: '5-10', label: '5 – 10%' },
+  { value: '10-20', label: '10 – 20%' },
+  { value: '20+', label: 'Más de 20%' },
+];
+
+const REVENUE_RANGE_OPTIONS: { value: string; label: string }[] = [
+  { value: '', label: 'Todos' },
+  { value: '0-1000', label: 'Menos de $1,000' },
+  { value: '1000-10000', label: '$1,000 – $10,000' },
+  { value: '10000+', label: 'Más de $10,000' },
+];
+
+const EARNINGS_FILTER_DEFAULTS = { commissionRange: '', revenueRange: '' };
 
 function EarningsTableColgroup() {
 return (
@@ -91,6 +110,44 @@ function matchesSearch(row: AdminEarningsRow, q: string) {
     formatPrice(row.totalRevenue).toLowerCase().includes(lq) ||
     formatPrice(row.adminEarnings).toLowerCase().includes(lq)
   );
+}
+
+function matchesEarningsFilter(
+  row: AdminEarningsRow,
+  filters: { commissionRange: string; revenueRange: string },
+): boolean {
+  if (filters.commissionRange) {
+    const c = row.commission;
+    switch (filters.commissionRange) {
+      case '0-5':
+        if (c < 0 || c >= 5) return false;
+        break;
+      case '5-10':
+        if (c < 5 || c >= 10) return false;
+        break;
+      case '10-20':
+        if (c < 10 || c >= 20) return false;
+        break;
+      case '20+':
+        if (c < 20) return false;
+        break;
+    }
+  }
+  if (filters.revenueRange) {
+    const r = row.totalRevenue;
+    switch (filters.revenueRange) {
+      case '0-1000':
+        if (r >= 1000) return false;
+        break;
+      case '1000-10000':
+        if (r < 1000 || r >= 10000) return false;
+        break;
+      case '10000+':
+        if (r < 10000) return false;
+        break;
+    }
+  }
+  return true;
 }
 
 function compareRows(a: AdminEarningsRow, b: AdminEarningsRow, key: SortKey, dir: SortDir) {
@@ -216,6 +273,7 @@ export function AdminEarningsPage() {
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [earningsFilters, setEarningsFilters] = useState(EARNINGS_FILTER_DEFAULTS);
 
   const tableHeaderScrollRef = useRef<HTMLDivElement>(null);
   const tableBodyScrollRef = useRef<HTMLDivElement>(null);
@@ -240,11 +298,21 @@ export function AdminEarningsPage() {
 
   const rows = Array.isArray(data) ? data : [];
 
+  const earningsFilterFields: FilterField[] = useMemo(
+    () => [
+      { key: 'commissionRange', label: 'Comisión', options: COMMISSION_RANGE_OPTIONS },
+      { key: 'revenueRange', label: 'Ventas totales', options: REVENUE_RANGE_OPTIONS },
+    ],
+    [],
+  );
+
   const filteredSorted = useMemo(() => {
     const q = search.trim();
-    const list = rows.filter((r) => matchesSearch(r, q));
+    const list = rows
+      .filter((r) => matchesSearch(r, q))
+      .filter((r) => matchesEarningsFilter(r, earningsFilters));
     return [...list].sort((a, b) => compareRows(a, b, sortKey, sortDir));
-  }, [rows, search, sortKey, sortDir]);
+  }, [rows, search, sortKey, sortDir, earningsFilters]);
 
   const totalPages = Math.max(
     1,
@@ -257,7 +325,7 @@ export function AdminEarningsPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, pageSize]);
+  }, [search, pageSize, earningsFilters]);
 
   const pageRows = useMemo(() => {
     const start = (page - 1) * pageSize;
@@ -321,6 +389,13 @@ export function AdminEarningsPage() {
               </button>
             ) : null}
           </div>
+          <FilterPopover
+            fields={earningsFilterFields}
+            values={earningsFilters}
+            defaultValues={EARNINGS_FILTER_DEFAULTS}
+            onApply={(v) => setEarningsFilters(v as typeof EARNINGS_FILTER_DEFAULTS)}
+            onClear={() => setEarningsFilters(EARNINGS_FILTER_DEFAULTS)}
+          />
         </div>
 
         <div className="admin-table-panel">
