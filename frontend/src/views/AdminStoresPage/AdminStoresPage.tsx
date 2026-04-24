@@ -29,11 +29,8 @@ import {
   AdminDetailPanelRoot,
   AdminDetailPanelTop,
   AdminDetailScrollSection,
-  AdminDetailStatTile,
-  AdminDetailStatsGrid,
   AdminDetailTextCard,
   AdminDetailTitleRow,
-  getAdminStorePanelStats,
 } from '../../components/AdminDetailPanel/AdminDetailPanel';
 import { AdminStatusBadge } from '../../components/AdminStatusBadge/AdminStatusBadge';
 import { Button } from '../../components/Button/Button';
@@ -47,7 +44,6 @@ import { useSellerCreateStoreModal } from '../../context/SellerCreateStoreModalP
 import { useAuth } from '../../hooks/useAuth';
 import { useDeleteStoreMutation } from '../../hooks/useStoreMutations';
 import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc';
-import { formatPrice } from '../../helpers/formatPrice';
 import { getErrorMessage } from '../../helpers/mapApiError';
 import { useAdminDeleteStore } from '../../hooks/useAdminDeleteStore';
 import { queryKeys } from '../../helpers/queryKeys';
@@ -231,7 +227,6 @@ function StoreDetailsPanel({
   const ownerName = store.user
     ? `${store.user.firstName} ${store.user.lastName}`.trim()
     : '';
-  const st = getAdminStorePanelStats(store);
   const descText = store.description?.trim() || 'Sin descripción';
   const shipText = store.shippingPolicy?.trim() || 'No definida';
   const retText = store.returnPolicy?.trim() || 'No definida';
@@ -262,24 +257,6 @@ function StoreDetailsPanel({
             </>
           }
         />
-
-        <AdminDetailStatsGrid>
-          <AdminDetailStatTile
-            label="Productos"
-            value={st.productsTotal}
-            hint={`${st.productsActive} activos`}
-          />
-          <AdminDetailStatTile
-            label="Pedidos"
-            value={st.ordersTotal}
-            hint={`${st.ordersDelivered} entregados`}
-          />
-          <AdminDetailStatTile
-            label="Ventas (bruto)"
-            value={formatPrice(st.revenue)}
-            hint="excl. cancelados"
-          />
-        </AdminDetailStatsGrid>
 
         <AdminDetailHeroSplit
           image={
