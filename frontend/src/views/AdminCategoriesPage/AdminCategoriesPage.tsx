@@ -515,7 +515,7 @@ export function AdminCategoriesPage() {
               <Button
                 type="button"
                 variant="ghost"
-                className="h-10 w-40 justify-center border border-zinc-300 bg-white px-4 text-sm text-zinc-800 hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700"
+                className="h-10 w-48 justify-center border border-zinc-300 bg-white px-4 text-sm text-zinc-800 hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700"
                 onClick={() => setCategoryToDelete(null)}
                 disabled={deleteCategoryMut.isPending}
               >
@@ -524,7 +524,7 @@ export function AdminCategoriesPage() {
               <Button
                 type="button"
                 variant="primary"
-                className="h-10 w-40 justify-center border-0 bg-rose-700/90 px-4 text-sm text-white hover:bg-rose-800 dark:bg-rose-700/90 dark:hover:bg-rose-800"
+                className="h-10 w-48 justify-center border-0 bg-rose-700/90 px-4 text-sm text-white hover:bg-rose-800 dark:bg-rose-700/90 dark:text-white dark:hover:bg-rose-800"
                 onClick={handleConfirmDelete}
                 disabled={deleteCategoryMut.isPending}
               >
