@@ -315,10 +315,10 @@ export function AdminEditProductForm({
       </div>
 
       <div
-        className={`flex w-full shrink-0 flex-col gap-2 border-t border-zinc-100 bg-zinc-50/90 px-5 py-4 dark:border-night-800 dark:bg-night-950/90 sm:flex-row sm:flex-wrap sm:items-center ${onCancel ? '' : 'sm:justify-end'}`}
+        className={`flex w-full shrink-0 flex-row flex-nowrap items-center gap-2 border-t border-zinc-100 bg-zinc-50/90 px-5 py-4 dark:border-night-800 dark:bg-night-950/90 ${onCancel ? '' : 'justify-end'}`}
       >
         <div
-          className={`flex w-full gap-2 sm:w-auto ${onCancel ? 'sm:mr-auto' : ''}`}
+          className={`flex gap-2 ${onCancel ? 'mr-auto' : ''}`}
         >
           {onCancel ? (
             <Button
@@ -326,7 +326,7 @@ export function AdminEditProductForm({
               variant="ghost"
               disabled={disabledNav}
               onClick={onCancel}
-              className="h-11 min-h-11 min-w-0 flex-1 basis-0 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:w-44"
+              className="h-11 min-h-11 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700"
             >
               Cancelar
             </Button>
@@ -337,21 +337,21 @@ export function AdminEditProductForm({
               variant="ghost"
               disabled={disabledNav}
               onClick={goBack}
-              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:w-44"
+              className="h-11 min-h-11 inline-flex items-center justify-center gap-1 border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700"
             >
               <FiChevronLeft className="h-4 w-4 shrink-0" aria-hidden />
               Atrás
             </Button>
           ) : null}
         </div>
-        <div className="flex w-full gap-2 sm:ml-auto sm:w-auto sm:flex-none">
+        <div className="flex gap-2 ml-auto">
           {step < lastIndex ? (
             <Button
               type="button"
               variant="cta"
               disabled={disabledNav}
               onClick={goNext}
-              className="h-11 min-h-11 inline-flex min-w-0 flex-1 items-center justify-center gap-1 px-3 sm:w-44 sm:flex-none"
+              className="h-11 min-h-11 inline-flex items-center justify-center gap-1 px-3"
             >
               Siguiente
               <FiChevronRight className="h-4 w-4 shrink-0" aria-hidden />
@@ -362,7 +362,7 @@ export function AdminEditProductForm({
               variant="cta"
               disabled={disabledNav}
               onClick={() => void submit()}
-              className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:w-44 sm:flex-none"
+              className="h-11 min-h-11 justify-center px-3"
             >
               {isUploadingImages
                 ? 'Subiendo imágenes…'

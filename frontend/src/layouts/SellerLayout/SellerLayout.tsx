@@ -1,80 +1,227 @@
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { SellerCreateStoreModalProvider } from '../../context/SellerCreateStoreModalProvider/SellerCreateStoreModalProvider';
+import { useState, type ComponentType } from 'react';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import {
+  FiBarChart2,
+  FiChevronLeft,
+  FiChevronRight,
+  FiClipboard,
+  FiDollarSign,
+  FiExternalLink,
+  FiGrid,
+  FiPackage,
+  FiShoppingBag,
+} from 'react-icons/fi';
+import { AdminAccountSettingsDrawer } from '../../components/AdminAccountSettingsDrawer/AdminAccountSettingsDrawer';
+import { AdminNavbar } from '../../components/AdminNavbar/AdminNavbar';
+import { useTheme } from '../../hooks/useTheme';
 import { routePaths } from '../../config/routes';
+import { useAuth } from '../../hooks/useAuth';
 
-const navClass =
-  'rounded-md px-3 py-2 text-sm font-medium text-zinc-600 transition-[color,background-color,box-shadow] duration-200 ease-out motion-reduce:transition-none hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-night-800 dark:hover:text-zinc-100';
+type NavItemProps = {
+  to: string;
+  end?: boolean;
+  icon: ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
+  label: string;
+  collapsed: boolean;
+};
 
-const activeClass =
-  'bg-forest/10 text-forest dark:bg-[color:rgb(16_34_81/0.65)] dark:text-market-dark-accent';
+const sidebarLabelGrid =
+  'grid min-w-0 transition-[grid-template-columns] duration-200 ease-out motion-reduce:transition-none';
+
+function SidebarNavItem({
+  to,
+  end,
+  icon: Icon,
+  label,
+  collapsed,
+}: NavItemProps) {
+  return (
+    <NavLink
+      to={to}
+      end={end}
+      title={collapsed ? label : undefined}
+      aria-label={collapsed ? label : undefined}
+      className={({ isActive }) =>
+        [
+          'admin-nav-link relative',
+          isActive ? 'admin-nav-link--active' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')
+      }
+    >
+      <span className="relative inline-flex shrink-0">
+        <Icon className="h-[18px] w-[18px]" aria-hidden />
+      </span>
+      <div
+        className={`${sidebarLabelGrid} ${collapsed ? 'grid-cols-[0fr]' : 'grid-cols-[1fr]'}`}
+        aria-hidden={collapsed}
+      >
+        <div className="min-w-0 overflow-hidden">
+          <span className="flex min-w-0 items-center gap-2">
+            <span className="min-w-0 flex-1 truncate">{label}</span>
+          </span>
+        </div>
+      </div>
+    </NavLink>
+  );
+}
 
 export function SellerLayout() {
-  const { pathname } = useLocation();
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
+  const { pathname: sellerOutletPath } = useLocation();
+  const { theme, toggleTheme } = useTheme();
+  const [collapsed, setCollapsed] = useState(false);
+  const [accountSettingsOpen, setAccountSettingsOpen] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Sesión cerrada');
+    navigate(routePaths.login, { replace: true });
+  };
 
   return (
-    <SellerCreateStoreModalProvider>
-    <div className="min-h-screen bg-zinc-50/80 pb-24 dark:bg-night-950/80">
-      <div className="border-b border-zinc-200 bg-white dark:border-night-800 dark:bg-night-900">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
-              Panel vendedor
-            </h1>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
-              Gestiona tiendas, productos y pedidos
-            </p>
+    <>
+      <div className="admin-shell flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-[var(--admin-page-bg)] text-zinc-800 dark:text-zinc-100">
+        <aside
+          className={`flex min-h-0 shrink-0 flex-col overflow-x-hidden border-r border-[var(--admin-border)] bg-[var(--admin-card)] transition-[width] duration-200 ease-out dark:bg-night-900 ${collapsed ? 'w-[72px]' : 'w-[248px]'}`}
+          aria-label="Navegación del panel"
+        >
+          <div
+            className={`flex shrink-0 border-b border-[var(--admin-border)] ${collapsed ? 'flex-col items-center gap-1.5 py-2.5' : 'h-14 items-center justify-between gap-2 px-3'}`}
+          >
+            <div
+              className={`flex min-w-0 items-center ${collapsed ? 'justify-center' : 'gap-2.5'}`}
+            >
+              <div
+                className="box-border flex aspect-square h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[9999px] border border-white/30 bg-admin-primary text-sm font-bold text-white shadow-sm"
+                aria-hidden
+              >
+                M
+              </div>
+              <div
+                className={`${sidebarLabelGrid} min-w-0 ${collapsed ? 'grid-cols-[0fr]' : 'grid-cols-[1fr] flex-1'}`}
+              >
+                <div className="min-w-0 overflow-hidden">
+                  <span
+                    className={`block truncate text-lg font-bold tracking-tight text-zinc-900 transition-opacity duration-200 ease-out motion-reduce:transition-none dark:text-zinc-50 ${collapsed ? 'pointer-events-none opacity-0' : 'opacity-100'}`}
+                    aria-hidden={collapsed}
+                  >
+                    MarketHub
+                  </span>
+                </div>
+              </div>
+              {collapsed ? (
+                <span className="sr-only">MarketHub</span>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              onClick={() => setCollapsed((c) => !c)}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-night-800"
+              aria-expanded={!collapsed}
+              aria-label={collapsed ? 'Expandir menú' : 'Contraer menú'}
+            >
+              {collapsed ? (
+                <FiChevronRight className="h-5 w-5" aria-hidden />
+              ) : (
+                <FiChevronLeft className="h-5 w-5" aria-hidden />
+              )}
+            </button>
           </div>
-          <nav className="flex flex-wrap gap-1" aria-label="Vendedor">
-        <NavLink
-          to={routePaths.seller}
-          end
-          className={({ isActive }) =>
-            `${navClass} ${isActive ? activeClass : ''}`
-          }
-        >
-          Inicio
-        </NavLink>
-        <NavLink
-          to={routePaths.sellerStores}
-          className={({ isActive }) =>
-            `${navClass} ${isActive ? activeClass : ''}`
-          }
-        >
-          Tiendas
-        </NavLink>
-        <NavLink
-          to={routePaths.sellerOrders}
-              className={({ isActive }) =>
-                `${navClass} ${isActive ? activeClass : ''}`
-              }
-            >
-              Pedidos
-            </NavLink>
-            <NavLink
+
+          <nav
+            className={`market-scroll min-h-0 flex-1 space-y-0.5 overflow-y-auto overflow-x-hidden overscroll-contain [scrollbar-gutter:stable] ${collapsed ? 'admin-sidebar-nav--collapsed px-1.5 py-2' : 'p-3'}`}
+          >
+            <SidebarNavItem
+              to={routePaths.seller}
+              end
+              icon={FiGrid}
+              label="Panel"
+              collapsed={collapsed}
+            />
+            <SidebarNavItem
+              to={routePaths.sellerStores}
+              icon={FiShoppingBag}
+              label="Tiendas"
+              collapsed={collapsed}
+            />
+            <SidebarNavItem
+              to={routePaths.sellerOrders}
+              icon={FiClipboard}
+              label="Pedidos"
+              collapsed={collapsed}
+            />
+            <SidebarNavItem
+              to={routePaths.sellerProducts}
+              icon={FiPackage}
+              label="Productos"
+              collapsed={collapsed}
+            />
+            <SidebarNavItem
               to={routePaths.sellerVentas}
-              className={({ isActive }) =>
-                `${navClass} ${isActive ? activeClass : ''}`
-              }
-            >
-              Ventas
-            </NavLink>
-            <NavLink
+              icon={FiDollarSign}
+              label="Ventas"
+              collapsed={collapsed}
+            />
+            <SidebarNavItem
               to={routePaths.sellerReport}
-              className={({ isActive }) =>
-                `${navClass} ${isActive ? activeClass : ''}`
-              }
+              icon={FiBarChart2}
+              label="Informes"
+              collapsed={collapsed}
+            />
+            <button
+              type="button"
+              title={collapsed ? 'Tienda pública' : undefined}
+              onClick={() => navigate(routePaths.browse)}
+              className={`admin-nav-link w-full ${collapsed ? 'text-center' : 'text-left'}`}
             >
-              Informe
-            </NavLink>
+              <FiExternalLink className="h-[18px] w-[18px] shrink-0" aria-hidden />
+              <div
+                className={`${sidebarLabelGrid} ${collapsed ? 'grid-cols-[0fr]' : 'grid-cols-[1fr]'}`}
+                aria-hidden={collapsed}
+              >
+                <div className="min-w-0 overflow-hidden">
+                  <span className="block truncate">Ver tienda pública</span>
+                </div>
+              </div>
+            </button>
           </nav>
+        </aside>
+
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <AdminNavbar
+            pathname={sellerOutletPath}
+            user={user}
+            isAdmin={false}
+            pendingCount={0}
+            theme={theme}
+            toggleTheme={toggleTheme}
+            onAccountSettingsOpen={() => setAccountSettingsOpen(true)}
+            onLogout={handleLogout}
+          />
+          <main className="flex min-h-0 flex-1 flex-col overflow-hidden p-5 md:p-8">
+            <div className="mx-auto flex min-h-0 w-full max-w-[1360px] flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain [scrollbar-gutter:stable]">
+              <div
+                key={sellerOutletPath}
+                className="route-outlet-fade flex min-h-0 min-w-0 flex-1 flex-col"
+              >
+                <Outlet />
+              </div>
+            </div>
+          </main>
         </div>
       </div>
-      <div className="mx-auto max-w-6xl px-4 py-8">
-        <div key={pathname} className="route-outlet-fade">
-          <Outlet />
-        </div>
-      </div>
-    </div>
-    </SellerCreateStoreModalProvider>
+      <AdminAccountSettingsDrawer
+        open={accountSettingsOpen}
+        onClose={() => setAccountSettingsOpen(false)}
+        onLogoutSuccess={() => {
+          setAccountSettingsOpen(false);
+          navigate(routePaths.login, { replace: true });
+        }}
+      />
+    </>
   );
 }

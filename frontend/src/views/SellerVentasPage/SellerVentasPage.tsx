@@ -12,6 +12,8 @@ import {
   FiX,
 } from 'react-icons/fi';
 import { TablePagination } from '../../components/TablePagination/TablePagination';
+import { FilterPopover } from '../../components/FilterPopover/FilterPopover';
+import type { FilterField } from '../../components/FilterPopover/FilterPopover';
 import { formatPrice } from '../../helpers/formatPrice';
 import { useSellerVentasQuery } from '../../queries/useSellerVentasQuery';
 import type { SellerVentasRow } from '../../types/admin';
@@ -21,6 +23,23 @@ type SortDir = 'asc' | 'desc';
 
 const DEFAULT_PAGE_SIZE = 10;
 const NUM_DATA_COLS = 7;
+
+const COMMISSION_RANGE_OPTIONS: { value: string; label: string }[] = [
+  { value: '', label: 'Todos' },
+  { value: '0-5', label: '0 – 5%' },
+  { value: '5-10', label: '5 – 10%' },
+  { value: '10-20', label: '10 – 20%' },
+  { value: '20+', label: 'Más de 20%' },
+];
+
+const REVENUE_RANGE_OPTIONS: { value: string; label: string }[] = [
+  { value: '', label: 'Todos' },
+  { value: '0-1000', label: 'Menos de $1,000' },
+  { value: '1000-10000', label: '$1,000 – $10,000' },
+  { value: '10000+', label: 'Más de $10,000' },
+];
+
+const VENTAS_FILTER_DEFAULTS = { commissionRange: '', revenueRange: '' };
 
 function VentasTableColgroup() {
   return (
@@ -99,6 +118,44 @@ function matchesSearch(row: SellerVentasRow, q: string) {
   );
 }
 
+function matchesVentasFilter(
+  row: SellerVentasRow,
+  filters: { commissionRange: string; revenueRange: string },
+): boolean {
+  if (filters.commissionRange) {
+    const c = row.commission;
+    switch (filters.commissionRange) {
+      case '0-5':
+        if (c < 0 || c >= 5) return false;
+        break;
+      case '5-10':
+        if (c < 5 || c >= 10) return false;
+        break;
+      case '10-20':
+        if (c < 10 || c >= 20) return false;
+        break;
+      case '20+':
+        if (c < 20) return false;
+        break;
+    }
+  }
+  if (filters.revenueRange) {
+    const r = row.totalRevenue;
+    switch (filters.revenueRange) {
+      case '0-1000':
+        if (r >= 1000) return false;
+        break;
+      case '1000-10000':
+        if (r < 1000 || r >= 10000) return false;
+        break;
+      case '10000+':
+        if (r < 10000) return false;
+        break;
+    }
+  }
+  return true;
+}
+
 function compareRows(a: SellerVentasRow, b: SellerVentasRow, key: SortKey, dir: SortDir) {
   const mul = dir === 'asc' ? 1 : -1;
   switch (key) {
@@ -129,6 +186,7 @@ export function SellerVentasPage() {
   const [sortDir, setSortDir] = useState<SortDir>('desc');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [ventasFilters, setVentasFilters] = useState(VENTAS_FILTER_DEFAULTS);
 
   const tableHeaderScrollRef = useRef<HTMLDivElement>(null);
   const tableBodyScrollRef = useRef<HTMLDivElement>(null);
@@ -153,11 +211,21 @@ export function SellerVentasPage() {
 
   const rows = Array.isArray(data) ? data : [];
 
+  const ventasFilterFields: FilterField[] = useMemo(
+    () => [
+      { key: 'commissionRange', label: 'Comisión', options: COMMISSION_RANGE_OPTIONS },
+      { key: 'revenueRange', label: 'Ventas totales', options: REVENUE_RANGE_OPTIONS },
+    ],
+    [],
+  );
+
   const filteredSorted = useMemo(() => {
     const q = search.trim();
-    const list = rows.filter((r) => matchesSearch(r, q));
+    const list = rows
+      .filter((r) => matchesSearch(r, q))
+      .filter((r) => matchesVentasFilter(r, ventasFilters));
     return [...list].sort((a, b) => compareRows(a, b, sortKey, sortDir));
-  }, [rows, search, sortKey, sortDir]);
+  }, [rows, search, sortKey, sortDir, ventasFilters]);
 
   const totalPages = Math.max(
     1,
@@ -170,7 +238,7 @@ export function SellerVentasPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, pageSize]);
+  }, [search, pageSize, ventasFilters]);
 
   const pageRows = useMemo(() => {
     const start = (page - 1) * pageSize;
@@ -200,36 +268,39 @@ export function SellerVentasPage() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <h2 className="flex shrink-0 items-center gap-2.5 text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-        Ventas
-      </h2>
-
       <div className="flex min-h-0 flex-1 flex-col gap-4">
         <div className="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative min-w-0 flex-1">
-            <FiSearch
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
-              aria-hidden
-            />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por tienda, comisión, ganancia…"
-              className={`box-border h-11 w-full rounded-md border border-zinc-200 bg-white py-0 pl-10 text-sm leading-normal text-zinc-900 shadow-sm ring-zinc-200 placeholder:text-zinc-400 focus:border-forest focus:outline-hidden focus:ring-2 focus:ring-forest/25 dark:border-night-700 dark:bg-night-950 dark:text-zinc-50 dark:ring-night-800 ${search ? 'pr-11' : 'pr-4'}`}
-              aria-label="Buscar ventas"
-            />
-            {search ? (
-              <button
-                type="button"
-                onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-slate-500 transition-colors hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
-                aria-label="Limpiar búsqueda"
-              >
-                <FiX className="h-3.5 w-3.5" aria-hidden />
-              </button>
-            ) : null}
-          </div>
+        <div className="relative min-w-0 flex-1">
+          <FiSearch
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
+            aria-hidden
+          />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar por tienda, comisión, ganancia…"
+            className={`box-border h-11 w-full rounded-md border border-zinc-200 bg-white py-0 pl-10 text-sm leading-normal text-zinc-900 shadow-sm ring-zinc-200 placeholder:text-zinc-400 focus:border-forest focus:outline-hidden focus:ring-2 focus:ring-forest/25 dark:border-night-700 dark:bg-night-950 dark:text-zinc-50 dark:ring-night-800 ${search ? 'pr-11' : 'pr-4'}`}
+            aria-label="Buscar ventas"
+          />
+          {search ? (
+            <button
+              type="button"
+              onClick={() => setSearch('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-slate-500 transition-colors hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
+              aria-label="Limpiar búsqueda"
+            >
+              <FiX className="h-3.5 w-3.5" aria-hidden />
+            </button>
+          ) : null}
+        </div>
+        <FilterPopover
+          fields={ventasFilterFields}
+          values={ventasFilters}
+          defaultValues={VENTAS_FILTER_DEFAULTS}
+          onApply={(v) => setVentasFilters(v as typeof VENTAS_FILTER_DEFAULTS)}
+          onClear={() => setVentasFilters(VENTAS_FILTER_DEFAULTS)}
+        />
         </div>
 
         <div className="admin-table-panel">

@@ -21,6 +21,7 @@ export const routePaths = {
   sellerProductNew: '/seller/products/new',
   sellerProductEdit: (id: string) => `/seller/products/${id}/edit`,
   sellerOrders: '/seller/orders',
+  sellerProducts: '/seller/products',
   sellerVentas: '/seller/ventas',
   sellerReport: '/seller/report',
   admin: '/admin',

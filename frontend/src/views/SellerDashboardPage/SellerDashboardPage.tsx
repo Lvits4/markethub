@@ -27,11 +27,11 @@ const LOW_STOCK_OPTIONS = [
 ] as const;
 
 const KPI_STYLES = [
-  { accent: 'border-l-emerald-500 dark:border-l-emerald-400', icon: 'text-emerald-500 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30' },
-  { accent: 'border-l-blue-500 dark:border-l-blue-400', icon: 'text-blue-500 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/30' },
-  { accent: 'border-l-amber-500 dark:border-l-amber-400', icon: 'text-amber-500 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/30' },
-  { accent: 'border-l-indigo-500 dark:border-l-indigo-400', icon: 'text-indigo-500 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-950/30' },
-  { accent: 'border-l-rose-500 dark:border-l-rose-400', icon: 'text-rose-500 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/30' },
+  { accent: 'border-l-emerald-500 dark:border-l-emerald-400', icon: 'text-emerald-500 dark:text-emerald-400' },
+  { accent: 'border-l-blue-500 dark:border-l-blue-400', icon: 'text-blue-500 dark:text-blue-400' },
+  { accent: 'border-l-amber-500 dark:border-l-amber-400', icon: 'text-amber-500 dark:text-amber-400' },
+  { accent: 'border-l-indigo-500 dark:border-l-indigo-400', icon: 'text-indigo-500 dark:text-indigo-400' },
+  { accent: 'border-l-rose-500 dark:border-l-rose-400', icon: 'text-rose-500 dark:text-rose-400' },
 ] as const;
 
 function KpiCard({
@@ -136,9 +136,6 @@ export function SellerDashboardPage() {
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <header className="flex shrink-0 flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
-          <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-2xl">
-            Panel
-          </h1>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 sm:text-sm">
             Resumen de tus tiendas
           </p>

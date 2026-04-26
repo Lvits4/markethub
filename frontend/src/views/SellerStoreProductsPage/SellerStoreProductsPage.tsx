@@ -24,102 +24,149 @@ export function SellerStoreProductsPage() {
 
   const store = stores?.find((s) => s.id === storeId);
 
-  return (
-    <div>
-      <div className="mb-6">
-        <Link
-          to={routePaths.seller}
-          className="text-sm font-medium text-forest"
-        >
-          ← Inicio
-        </Link>
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <p className="text-sm text-zinc-500">Cargando…</p>
       </div>
-      <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-        Productos · {store?.name ?? storeId}
-      </h2>
-      <div className="mt-4">
+    );
+  }
+
+  if (isError) {
+    return (
+      <p className="text-center text-sm text-red-600">
+        No se pudieron cargar los productos.
+      </p>
+    );
+  }
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Link
+            to={routePaths.sellerProducts}
+            className="text-sm font-medium text-admin-primary hover:underline"
+          >
+            ← Productos
+          </Link>
+          <span className="text-zinc-400">/</span>
+          <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            {store?.name ?? storeId}
+          </span>
+        </div>
         <Link
           to={`${routePaths.sellerProductNew}?storeId=${encodeURIComponent(storeId ?? '')}`}
-          className="inline-flex rounded-md bg-forest px-5 py-2.5 text-sm font-semibold text-white dark:bg-market-dark-surface dark:text-market-dark-accent dark:hover:bg-market-dark-surface-hover"
+          className="admin-cta-solid inline-flex items-center rounded-md px-4 py-2 text-sm font-semibold"
         >
           Nuevo producto
         </Link>
       </div>
 
-      {isLoading ? (
-        <p className="mt-10 text-center text-sm text-zinc-500">Cargando…</p>
-      ) : isError ? (
-        <p className="mt-10 text-center text-sm text-red-600">
-          No se pudieron cargar los productos.
-        </p>
-      ) : !data?.data.length ? (
-        <p className="mt-10 text-center text-sm text-zinc-500">
+      {!data?.data.length ? (
+        <p className="text-center text-sm text-zinc-500">
           No hay productos en esta tienda.
         </p>
       ) : (
-        <div className="mt-8 market-table-wrap">
-          <table className="w-full min-w-[640px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-zinc-100 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-night-800">
-                <th className="w-8 px-2 py-3 text-center text-zinc-400 dark:text-slate-500">#</th>
-                <th className="px-4 py-3">Producto</th>
-                <th className="px-4 py-3">Precio</th>
-                <th className="px-4 py-3">Stock</th>
-                <th className="px-4 py-3">Activo</th>
-                <th className="px-4 py-3 text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.data.map((p, i) => (
-              <tr
-                key={p.id}
-                className="border-b border-zinc-50 last:border-0 dark:border-night-800/80"
-              >
-                <td className="w-8 px-2 py-3 text-center tabular-nums text-zinc-400 dark:text-slate-500">
-                  {i + 1}
-                </td>
-                <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-50">
-                    {p.name}
-                  </td>
-                  <td className="px-4 py-3 tabular-nums">
-                    {formatPrice(numPrice(p.price))}
-                  </td>
-                  <td className="px-4 py-3 tabular-nums">{p.stock}</td>
-                  <td className="px-4 py-3">{p.isActive ? 'Sí' : 'No'}</td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex justify-end gap-2">
-                      <Link
-                        to={routePaths.sellerProductEdit(p.id)}
-                        className="text-sm font-medium text-forest"
-                      >
-                        Editar
-                      </Link>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        className="text-xs text-red-600"
-                        disabled={deleteMut.isPending}
-                        onClick={() => {
-                          if (
-                            !window.confirm(
-                              '¿Eliminar este producto de forma permanente? No podrás deshacerlo. Si tiene pedidos asociados, no se eliminará.',
-                            )
-                          )
-                            return;
-                          deleteMut.mutate(p.id, {
-                            onSuccess: () => toast.success('Producto eliminado'),
-                            onError: (e) => toast.error(getErrorMessage(e)),
-                          });
-                        }}
-                      >
-                        Eliminar
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="admin-table-panel">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <div className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-sky-500/20">
+              <table className="w-full min-w-[640px] table-fixed border-collapse text-left text-sm">
+                <colgroup>
+                  <col style={{ width: '3.5%' }} />
+                  <col style={{ width: '28%' }} />
+                  <col style={{ width: '14%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '14.5%' }} />
+                  <col style={{ width: '20%' }} />
+                </colgroup>
+                <thead className="bg-slate-100/92 backdrop-blur-md dark:bg-admin-elevated/95 dark:backdrop-blur-md">
+                  <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+                    <th className="w-8 px-2 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+                      #
+                    </th>
+                    <th className="px-4 py-3.5">Producto</th>
+                    <th className="px-4 py-3.5 text-right">Precio</th>
+                    <th className="px-4 py-3.5 text-right">Stock</th>
+                    <th className="px-4 py-3.5 text-center">Activo</th>
+                    <th className="px-4 py-3.5 text-center">Tienda</th>
+                    <th className="px-4 py-3.5 text-right">Acciones</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+            <div className="market-scroll min-h-0 flex-1 overflow-y-auto overflow-x-auto">
+              <table className="w-full min-w-[640px] table-fixed border-collapse text-left text-sm">
+                <colgroup>
+                  <col style={{ width: '3.5%' }} />
+                  <col style={{ width: '28%' }} />
+                  <col style={{ width: '14%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '14.5%' }} />
+                  <col style={{ width: '20%' }} />
+                </colgroup>
+                <tbody>
+                  {data.data.map((p, i) => (
+                    <tr
+                      key={p.id}
+                      className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
+                    >
+                      <td className="w-8 px-2 py-2 text-center tabular-nums text-slate-400 dark:text-slate-500">
+                        {i + 1}
+                      </td>
+                      <td className="px-4 py-2 font-medium text-slate-900 dark:text-slate-100">
+                        {p.name}
+                      </td>
+                      <td className="px-4 py-2 text-right tabular-nums text-slate-700 dark:text-slate-300">
+                        {formatPrice(numPrice(p.price))}
+                      </td>
+                      <td className="px-4 py-2 text-right tabular-nums text-slate-700 dark:text-slate-300">
+                        {p.stock}
+                      </td>
+                      <td className="px-4 py-2 text-center text-slate-700 dark:text-slate-300">
+                        {p.isActive ? 'Sí' : 'No'}
+                      </td>
+                      <td className="px-4 py-2 text-center text-slate-500 dark:text-slate-400">
+                        {store?.name ?? storeId}
+                      </td>
+                      <td className="px-4 py-2 text-right">
+                        <div className="flex justify-end gap-2">
+                          <Link
+                            to={routePaths.sellerProductEdit(p.id)}
+                            className="text-sm font-medium text-admin-primary hover:underline"
+                          >
+                            Editar
+                          </Link>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="text-xs text-red-600"
+                            disabled={deleteMut.isPending}
+                            onClick={() => {
+                              if (
+                                !window.confirm(
+                                  '¿Eliminar este producto de forma permanente? No podrás deshacerlo. Si tiene pedidos asociados, no se eliminará.',
+                                )
+                              )
+                                return;
+                              deleteMut.mutate(p.id, {
+                                onSuccess: () => toast.success('Producto eliminado'),
+                                onError: (e) => toast.error(getErrorMessage(e)),
+                              });
+                            }}
+                          >
+                            Eliminar
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
     </div>

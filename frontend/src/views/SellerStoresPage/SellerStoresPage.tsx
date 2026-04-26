@@ -1,9 +1,5 @@
-import { SellerMyStoresPanel } from '../SellerDashboardPage/SellerMyStoresPanel';
+import { AdminStoresPage } from '../AdminStoresPage/AdminStoresPage';
 
 export function SellerStoresPage() {
-  return (
-    <div>
-      <SellerMyStoresPanel />
-    </div>
-  );
+  return <AdminStoresPage />;
 }

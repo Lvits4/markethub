@@ -31,17 +31,9 @@ export function SellerMyStoresPanel() {
 
   return (
     <section aria-label="Mis tiendas">
-      <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-        Mis tiendas
-      </h2>
-      <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-        Crea tiendas y gestiona su información. Las nuevas quedan pendientes de
-        aprobación del administrador.
-      </p>
-
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-zinc-600 dark:text-zinc-300">
-          Añade una tienda con todos los datos que quieras mostrar a tus clientes.
+          Crea tiendas y gestiona su información. Las nuevas quedan pendientes de aprobación del administrador.
         </p>
         <Button
           type="button"
@@ -57,34 +49,34 @@ export function SellerMyStoresPanel() {
       </div>
 
       {isLoading ? (
-        <p className="mt-10 text-center text-sm text-zinc-500">Cargando…</p>
+        <p className="py-8 text-center text-sm text-zinc-500">Cargando…</p>
       ) : isError ? (
-        <p className="mt-10 text-center text-sm text-red-600">
+        <p className="py-8 text-center text-sm text-red-600">
           No se pudieron cargar las tiendas.
         </p>
       ) : !data?.length ? (
-        <p className="mt-10 text-center text-sm text-zinc-500">
+        <p className="py-8 text-center text-sm text-zinc-500">
           No tienes tiendas todavía.
         </p>
       ) : (
-        <ul className="mt-8 space-y-4">
+        <ul className="mt-6 space-y-4">
           {data.map((s) => (
             <li
               key={s.id}
-              className="rounded-md bg-white p-5 shadow-market ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800"
+              className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-5 shadow-sm dark:shadow-none"
             >
               {editingId === s.id ? (
                 <div className="space-y-3">
-                  <input
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    className="w-full rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
-                  />
-                  <textarea
-                    value={editDescription}
-                    onChange={(e) => setEditDescription(e.target.value)}
-                    rows={2}
-                    className="w-full rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
+          <input
+          value={editName}
+          onChange={(e) => setEditName(e.target.value)}
+          className="w-full rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
+        />
+        <textarea
+          value={editDescription}
+          onChange={(e) => setEditDescription(e.target.value)}
+          rows={2}
+          className="w-full rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
                   />
                   <div className="flex flex-wrap gap-2">
                     <Button
@@ -149,7 +141,7 @@ export function SellerMyStoresPanel() {
                       Productos
                     </Link>
                   </div>
-                  <div className="mt-4 flex flex-wrap gap-2 border-t border-zinc-100 pt-4 dark:border-night-800">
+                  <div className="mt-4 flex flex-wrap gap-2 border-t border-[var(--admin-border)] pt-4 dark:border-night-800">
                     <Button
                       type="button"
                       variant="ghost"

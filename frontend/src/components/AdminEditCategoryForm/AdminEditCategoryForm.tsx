@@ -127,26 +127,26 @@ export function AdminEditCategoryForm({
         </div>
       </div>
       <div
-        className={`flex w-full shrink-0 flex-col gap-2 border-t border-zinc-100 bg-zinc-50/90 px-5 py-4 dark:border-night-800 dark:bg-night-950/90 sm:flex-row sm:flex-wrap sm:items-center ${onCancel ? 'sm:justify-between' : 'sm:justify-end'}`}
+    className={`flex w-full shrink-0 flex-row flex-wrap items-center gap-2 border-t border-zinc-100 bg-zinc-50/90 px-5 py-4 dark:border-night-800 dark:bg-night-950/90 ${onCancel ? 'justify-between' : 'justify-end'}`}
       >
-        {onCancel ? (
-          <Button
-            type="button"
-            variant="ghost"
-            disabled={busy}
-            onClick={onCancel}
-            className="h-11 min-h-11 w-full justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:w-44 sm:flex-none"
-          >
-            Cancelar
-          </Button>
-        ) : null}
+      {onCancel ? (
         <Button
           type="button"
-          variant="cta"
+          variant="ghost"
           disabled={busy}
-          onClick={handleSubmit}
-          className="h-11 min-h-11 w-full justify-center px-3 sm:w-44 sm:flex-none"
+          onClick={onCancel}
+          className="h-11 min-h-11 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:w-44"
         >
+          Cancelar
+        </Button>
+      ) : null}
+      <Button
+        type="button"
+        variant="cta"
+        disabled={busy}
+        onClick={handleSubmit}
+        className="h-11 min-h-11 justify-center px-3 sm:w-44"
+      >
           {busy ? 'Guardando…' : 'Guardar cambios'}
         </Button>
       </div>

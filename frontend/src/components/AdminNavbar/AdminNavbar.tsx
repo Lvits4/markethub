@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  FiBarChart2,
   FiBell,
+  FiClipboard,
   FiDollarSign,
   FiGrid,
   FiLogOut,
   FiMoon,
+  FiPackage,
   FiSettings,
   FiShield,
   FiShoppingBag,
@@ -26,6 +29,12 @@ const PAGE_META: Record<string, PageMeta> = {
   [routePaths.adminEarnings]: { title: 'Ganancias', icon: FiDollarSign },
   [routePaths.adminUsers]: { title: 'Usuarios', icon: FiUsers },
   [routePaths.adminCategories]: { title: 'Categorías', icon: FiTag },
+  [routePaths.seller]: { title: 'Panel', icon: FiGrid },
+  [routePaths.sellerStores]: { title: 'Tiendas', icon: FiShoppingBag },
+  [routePaths.sellerOrders]: { title: 'Pedidos', icon: FiClipboard },
+  [routePaths.sellerProducts]: { title: 'Productos', icon: FiPackage },
+  [routePaths.sellerVentas]: { title: 'Ventas', icon: FiDollarSign },
+  [routePaths.sellerReport]: { title: 'Informes', icon: FiBarChart2 },
 };
 
 function getPageMeta(pathname: string): PageMeta {
@@ -35,6 +44,12 @@ function getPageMeta(pathname: string): PageMeta {
   if (pathname.startsWith(routePaths.adminEarnings)) return PAGE_META[routePaths.adminEarnings];
   if (pathname.startsWith(routePaths.adminUsers)) return PAGE_META[routePaths.adminUsers];
   if (pathname.startsWith(routePaths.adminCategories)) return PAGE_META[routePaths.adminCategories];
+  if (pathname.startsWith(routePaths.sellerStores)) return PAGE_META[routePaths.sellerStores];
+  if (pathname.startsWith(routePaths.sellerOrders)) return PAGE_META[routePaths.sellerOrders];
+  if (pathname.startsWith(routePaths.sellerProducts)) return PAGE_META[routePaths.sellerProducts];
+  if (pathname.startsWith(routePaths.sellerVentas)) return PAGE_META[routePaths.sellerVentas];
+  if (pathname.startsWith(routePaths.sellerReport)) return PAGE_META[routePaths.sellerReport];
+  if (pathname.startsWith('/seller')) return PAGE_META[routePaths.seller];
   return PAGE_META[routePaths.admin];
 }
 

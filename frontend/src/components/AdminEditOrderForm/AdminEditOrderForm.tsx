@@ -117,15 +117,15 @@ export function AdminEditOrderForm({
         </div>
       </div>
 
-      <div className="flex w-full shrink-0 flex-col gap-2 border-t border-zinc-100 bg-zinc-50/90 px-5 py-4 dark:border-night-800 dark:bg-night-950/90 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
-        <div className="flex w-full gap-2 sm:w-auto">
+      <div     className="flex w-full shrink-0 flex-row flex-wrap items-center gap-2 border-t border-zinc-100 bg-zinc-50/90 px-5 py-4 dark:border-night-800 dark:bg-night-950/90 justify-end">
+        <div className="flex gap-2">
           {onCancel ? (
             <Button
               type="button"
               variant="ghost"
               disabled={busy}
               onClick={onCancel}
-              className="h-11 min-h-11 min-w-0 flex-1 basis-0 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:flex-none sm:w-44"
+              className="h-11 min-h-11 justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:w-44"
             >
               Cancelar
             </Button>
@@ -135,7 +135,7 @@ export function AdminEditOrderForm({
             variant="cta"
             disabled={busy || unchanged}
             onClick={handleSave}
-            className="h-11 min-h-11 min-w-0 flex-1 justify-center px-3 sm:w-44 sm:flex-none"
+            className="h-11 min-h-11 justify-center px-3 sm:w-44"
           >
             {busy ? 'Guardando…' : 'Guardar cambios'}
           </Button>

@@ -158,7 +158,9 @@ export function SellerProductFormPage() {
 
   if (isEdit && loadingProduct) {
     return (
-      <p className="text-center text-sm text-zinc-500">Cargando producto…</p>
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <p className="text-sm text-zinc-500">Cargando producto…</p>
+      </div>
     );
   }
 
@@ -166,7 +168,7 @@ export function SellerProductFormPage() {
     return (
       <p className="text-center text-sm text-red-600">
         Producto no encontrado.{' '}
-        <Link to={routePaths.seller} className="font-semibold underline">
+        <Link to={routePaths.sellerProducts} className="font-semibold underline">
           Volver
         </Link>
       </p>
@@ -176,12 +178,12 @@ export function SellerProductFormPage() {
   if (!isEdit && !storeIdParam) {
     return (
       <p className="text-center text-sm text-zinc-600">
-        Abre “Nuevo producto” desde una tienda.{' '}
+        Abre "Nuevo producto" desde una tienda.{' '}
         <Link
-          to={routePaths.seller}
-          className="font-semibold text-forest"
+          to={routePaths.sellerProducts}
+          className="font-semibold text-admin-primary hover:underline"
         >
-          Ir al panel vendedor
+          Ir a productos
         </Link>
       </p>
     );
@@ -190,29 +192,29 @@ export function SellerProductFormPage() {
   const backHref =
     effectiveStoreId != null && effectiveStoreId !== ''
       ? routePaths.sellerStoreProducts(effectiveStoreId)
-      : routePaths.seller;
+      : routePaths.sellerProducts;
+
+  const inputClass =
+    'mt-1 w-full rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950';
 
   return (
-    <div>
-      <div className="mb-6">
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
+      <div className="mb-2">
         <Link
           to={backHref}
-          className="text-sm font-medium text-forest"
+          className="text-sm font-medium text-admin-primary hover:underline"
         >
           ← Volver
         </Link>
       </div>
-      <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-        {isEdit ? 'Editar producto' : 'Nuevo producto'}
-      </h2>
 
-      <div className="mt-6 max-w-xl space-y-4 rounded-md bg-white p-6 shadow-market ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
+      <div className="max-w-2xl space-y-4 rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-6 shadow-sm dark:shadow-none">
         <div>
           <label className="text-xs text-zinc-500">Nombre</label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="mt-1 w-full rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
+            className={inputClass}
           />
         </div>
         <div>
@@ -221,7 +223,7 @@ export function SellerProductFormPage() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            className="mt-1 w-full rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
+            className={inputClass}
           />
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -233,7 +235,7 @@ export function SellerProductFormPage() {
               step="0.01"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="mt-1 w-full rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
+              className={inputClass}
             />
           </div>
           <div>
@@ -243,7 +245,7 @@ export function SellerProductFormPage() {
               min={0}
               value={stock}
               onChange={(e) => setStock(e.target.value)}
-              className="mt-1 w-full rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
+              className={inputClass}
             />
           </div>
         </div>
@@ -275,12 +277,19 @@ export function SellerProductFormPage() {
               onPickFiles={handlePickFiles}
               hintText="PNG, JPG, WebP… Se suben al elegir o soltar archivos."
             />
-          </div>
-        </fieldset>
+      </div>
+      </fieldset>
+      <div className="flex flex-row flex-wrap items-center gap-2 justify-end border-t border-[var(--admin-border)] pt-4">
+        <Link
+          to={backHref}
+          className="h-11 min-h-11 inline-flex items-center justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:w-44"
+        >
+          Cancelar
+        </Link>
         <Button
           type="button"
-          variant="primary"
-          className="w-full justify-center"
+          variant="cta"
+          className="h-11 min-h-11 justify-center px-3 sm:w-44"
           disabled={createMut.isPending || updateMut.isPending}
           onClick={submit}
         >
@@ -290,6 +299,7 @@ export function SellerProductFormPage() {
               ? 'Actualizar'
               : 'Crear'}
         </Button>
+      </div>
       </div>
     </div>
   );
