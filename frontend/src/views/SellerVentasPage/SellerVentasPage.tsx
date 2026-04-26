@@ -41,17 +41,19 @@ const REVENUE_RANGE_OPTIONS: { value: string; label: string }[] = [
 
 const VENTAS_FILTER_DEFAULTS = { commissionRange: '', revenueRange: '' };
 
+const VENTAS_DATA_COL_WIDTH = `${(100 - 3.5) / 7}%`;
+
 function VentasTableColgroup() {
   return (
     <colgroup>
       <col style={{ width: '3.5%' }} />
-      <col style={{ width: '20%' }} />
-      <col style={{ width: '16%' }} />
-      <col style={{ width: '10%' }} />
-      <col style={{ width: '16%' }} />
-      <col style={{ width: '14%' }} />
-      <col style={{ width: '12%' }} />
-      <col style={{ width: '8.5%' }} />
+      <col style={{ width: VENTAS_DATA_COL_WIDTH }} />
+      <col style={{ width: VENTAS_DATA_COL_WIDTH }} />
+      <col style={{ width: VENTAS_DATA_COL_WIDTH }} />
+      <col style={{ width: VENTAS_DATA_COL_WIDTH }} />
+      <col style={{ width: VENTAS_DATA_COL_WIDTH }} />
+      <col style={{ width: VENTAS_DATA_COL_WIDTH }} />
+      <col style={{ width: VENTAS_DATA_COL_WIDTH }} />
     </colgroup>
   );
 }
@@ -310,7 +312,7 @@ export function SellerVentasPage() {
               onScroll={onTableHeaderScroll}
               className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-sky-500/20"
             >
-              <table className="w-full min-w-[840px] table-fixed border-collapse text-left text-sm">
+              <table className="w-full min-w-[900px] table-fixed border-collapse text-left text-sm">
                 <VentasTableColgroup />
                 <thead className="bg-slate-100/92 backdrop-blur-md dark:bg-admin-elevated/95 dark:backdrop-blur-md">
                   <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
@@ -381,7 +383,7 @@ export function SellerVentasPage() {
               onScroll={onTableBodyScroll}
               className="market-scroll min-h-0 flex-1 overflow-y-auto overflow-x-auto"
             >
-              <table className="w-full min-w-[840px] table-fixed border-collapse text-left text-sm">
+              <table className="w-full min-w-[900px] table-fixed border-collapse text-left text-sm">
                 <VentasTableColgroup />
                 <tbody>
                   {pageRows.length === 0 ? (

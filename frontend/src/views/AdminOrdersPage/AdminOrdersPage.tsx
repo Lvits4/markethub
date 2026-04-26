@@ -65,7 +65,8 @@ type SortDir = 'asc' | 'desc';
 const DEFAULT_PAGE_SIZE = 10;
 const NUM_COLS = 6;
 const ROW_NUM_WIDTH = '3.5%';
-const ORDER_TABLE_COL_WIDTHS = [ROW_NUM_WIDTH, '19.3%', '19.3%', '19.3%', '19.3%', '19.3%'] as const;
+const DATA_COL_WIDTH = `${(100 - 3.5) / 5}%`;
+const ORDER_TABLE_COL_WIDTHS = [ROW_NUM_WIDTH, DATA_COL_WIDTH, DATA_COL_WIDTH, DATA_COL_WIDTH, DATA_COL_WIDTH, DATA_COL_WIDTH] as const;
 
 function orderToAdminRow(
   o: Order & { createdAt?: string; updatedAt?: string },

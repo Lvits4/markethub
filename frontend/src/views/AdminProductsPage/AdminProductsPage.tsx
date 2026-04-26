@@ -27,8 +27,6 @@ import {
   AdminDetailPanelRoot,
   AdminDetailPanelTop,
   AdminDetailScrollSection,
-  AdminDetailStatTile,
-  AdminDetailStatsGrid,
   AdminDetailTextCard,
   AdminDetailTitleRow,
 } from '../../components/AdminDetailPanel/AdminDetailPanel';
@@ -156,8 +154,6 @@ function ProductDetailImage({ url }: { url: string }) {
 
 function ProductDetailsPanel({ product }: { product: Product }) {
   const [detailTab, setDetailTab] = useState<'datos' | 'galeria'>('datos');
-  const images = product.images ?? [];
-  const imgCount = images.length;
   const heroImageUrl = primaryProductImageUrl(product);
   const galleryImages = galleryProductImages(product);
 
@@ -182,26 +178,7 @@ function ProductDetailsPanel({ product }: { product: Product }) {
           }
         />
 
-        <AdminDetailStatsGrid>
-          <AdminDetailStatTile
-            label="Precio"
-            value={formatPrice(numOrZero(product.price))}
-            hint="venta"
-          />
-          <AdminDetailStatTile label="Stock" value={product.stock} hint="unidades" />
-          <AdminDetailStatTile
-            label="Imágenes"
-            value={imgCount}
-            hint={imgCount === 1 ? '1 archivo' : `${imgCount} archivos`}
-          />
-          <AdminDetailStatTile
-            label="Tienda"
-            value={product.store?.name ?? '—'}
-            hint={product.store?.slug ? `/${product.store.slug}` : 'catálogo'}
-          />
-        </AdminDetailStatsGrid>
-
-        <AdminDetailHeroSplit
+      <AdminDetailHeroSplit
           image={
             <AdminDetailImageFrame ariaLabel="Imagen principal del producto">
               {heroImageUrl ? (
