@@ -27,11 +27,11 @@ const LOW_STOCK_OPTIONS = [
 ] as const;
 
 const KPI_STYLES = [
-  { accent: 'border-l-emerald-500 dark:border-l-emerald-400', icon: 'text-emerald-500 dark:text-emerald-400' },
   { accent: 'border-l-blue-500 dark:border-l-blue-400', icon: 'text-blue-500 dark:text-blue-400' },
-  { accent: 'border-l-amber-500 dark:border-l-amber-400', icon: 'text-amber-500 dark:text-amber-400' },
   { accent: 'border-l-indigo-500 dark:border-l-indigo-400', icon: 'text-indigo-500 dark:text-indigo-400' },
-  { accent: 'border-l-rose-500 dark:border-l-rose-400', icon: 'text-rose-500 dark:text-rose-400' },
+  { accent: 'border-l-sky-500 dark:border-l-sky-400', icon: 'text-sky-500 dark:text-sky-400' },
+  { accent: 'border-l-cyan-500 dark:border-l-cyan-400', icon: 'text-cyan-500 dark:text-cyan-400' },
+  { accent: 'border-l-teal-500 dark:border-l-teal-400', icon: 'text-teal-500 dark:text-teal-400' },
 ] as const;
 
 function KpiCard({
@@ -48,16 +48,16 @@ function KpiCard({
   const style = KPI_STYLES[variant];
   return (
     <div
-      className={`flex h-full min-h-[5.75rem] min-w-0 w-full items-center gap-3 rounded-md border border-[var(--admin-border)] border-l-4 bg-[var(--admin-card)] px-4 py-3.5 shadow-sm dark:shadow-none sm:min-h-[6.25rem] sm:px-4 sm:py-4 ${style.accent}`}
+      className={`flex h-full min-h-[4.5rem] min-w-0 w-full items-center gap-2.5 rounded-md border border-[var(--admin-border)] border-l-4 bg-[var(--admin-card)] px-3 py-2.5 shadow-sm dark:shadow-none sm:min-h-[5rem] sm:px-3 sm:py-3 ${style.accent}`}
     >
       <div className={`shrink-0 ${style.icon}`}>
         {icon}
       </div>
       <div className="min-w-0 flex flex-col justify-center">
-        <p className="line-clamp-2 text-xs font-medium leading-snug text-zinc-600 dark:text-zinc-400 sm:text-[13px]">
+        <p className="line-clamp-2 text-[11px] font-medium leading-snug text-zinc-600 dark:text-zinc-400 sm:text-xs">
           {label}
         </p>
-        <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-50 sm:mt-2 sm:text-3xl">
+        <p className="mt-1 text-xl font-semibold tabular-nums tracking-tight text-zinc-900 dark:text-zinc-50 sm:mt-1.5 sm:text-2xl">
           {value}
         </p>
       </div>
@@ -142,60 +142,60 @@ export function SellerDashboardPage() {
         </div>
       </header>
 
-      <div className="grid shrink-0 grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5 xl:grid-cols-5">
-        <div className="min-w-0">
-          <KpiCard
-            variant={0}
-            label="Cantidad de ventas"
-            value={data.salesCount}
-            icon={<HiShoppingCart className="h-6 w-6 sm:h-7 sm:w-7" />}
-          />
+        <div className="grid shrink-0 grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5 xl:grid-cols-5">
+          <div className="min-w-0">
+            <KpiCard
+              variant={0}
+              label="Cantidad de ventas"
+              value={data.salesCount}
+              icon={<HiShoppingCart className="h-5 w-5 sm:h-6 sm:w-6" />}
+            />
+          </div>
+          <div className="min-w-0">
+            <KpiCard
+              variant={1}
+              label="Mis ganancias"
+              value={formatPrice(data.sellerEarnings)}
+              icon={<HiCurrencyDollar className="h-5 w-5 sm:h-6 sm:w-6" />}
+            />
+          </div>
+          <div className="min-w-0">
+            <KpiCard
+              variant={2}
+              label="Total comisión a pagar"
+              value={formatPrice(data.commissionOwed)}
+              icon={<HiPercentBadge className="h-5 w-5 sm:h-6 sm:w-6" />}
+            />
+          </div>
+          <div className="min-w-0">
+            <KpiCard
+              variant={3}
+              label="Cantidad de productos"
+              value={data.totalProducts}
+              icon={<HiCube className="h-5 w-5 sm:h-6 sm:w-6" />}
+            />
+          </div>
+          <div className="min-w-0">
+            <KpiCard
+              variant={4}
+              label={
+                <span className="inline-flex items-center gap-1">
+                  Productos casi agotados
+                  <FormSelect
+                    variant="compact"
+                    aria-label="Umbral de stock bajo"
+                    value={String(lowStockThreshold)}
+                    onChange={handleThresholdChange}
+                    options={[...LOW_STOCK_OPTIONS]}
+                    triggerClassName="!py-0 !px-1 !text-[10px] !min-h-0 !h-5 inline-flex"
+                  />
+                </span>
+              }
+              value={data.lowStockCount}
+              icon={<HiExclamationTriangle className="h-5 w-5 sm:h-6 sm:w-6" />}
+            />
+          </div>
         </div>
-        <div className="min-w-0">
-          <KpiCard
-            variant={1}
-            label="Mis ganancias"
-            value={formatPrice(data.sellerEarnings)}
-            icon={<HiCurrencyDollar className="h-6 w-6 sm:h-7 sm:w-7" />}
-          />
-        </div>
-        <div className="min-w-0">
-          <KpiCard
-            variant={2}
-            label="Total comisión a pagar"
-            value={formatPrice(data.commissionOwed)}
-            icon={<HiPercentBadge className="h-6 w-6 sm:h-7 sm:w-7" />}
-          />
-        </div>
-        <div className="min-w-0">
-          <KpiCard
-            variant={3}
-            label="Cantidad de productos"
-            value={data.totalProducts}
-            icon={<HiCube className="h-6 w-6 sm:h-7 sm:w-7" />}
-          />
-        </div>
-        <div className="min-w-0">
-          <KpiCard
-            variant={4}
-            label={
-              <span className="inline-flex items-center gap-1">
-                Productos casi agotados
-                <FormSelect
-                  variant="compact"
-                  aria-label="Umbral de stock bajo"
-                  value={String(lowStockThreshold)}
-                  onChange={handleThresholdChange}
-                  options={[...LOW_STOCK_OPTIONS]}
-                  triggerClassName="!py-0 !px-1 !text-[10px] !min-h-0 !h-5 inline-flex"
-                />
-              </span>
-            }
-            value={data.lowStockCount}
-            icon={<HiExclamationTriangle className="h-6 w-6 sm:h-7 sm:w-7" />}
-          />
-        </div>
-      </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-none lg:flex-row lg:items-stretch">
         <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">
