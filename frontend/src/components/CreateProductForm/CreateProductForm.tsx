@@ -10,6 +10,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useCreateProductMutation } from '../../hooks/useProductSellerMutations';
 import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery';
 import { useAdminStoresQuery } from '../../queries/useAdminStoresQuery';
+import { useMyStoresQuery } from '../../queries/useMyStoresQuery';
 import { uploadFile } from '../../requests/fileRequests';
 
 const fieldClass =
@@ -42,8 +43,11 @@ export function CreateProductForm({
   onSuccess,
   onCancel,
 }: CreateProductFormProps) {
-  const { token } = useAuth();
-  const { data: stores } = useAdminStoresQuery();
+  const { token, user } = useAuth();
+  const isSeller = user?.role === 'SELLER';
+  const adminStoresQ = useAdminStoresQuery();
+  const myStoresQ = useMyStoresQuery();
+  const stores = isSeller ? myStoresQ.data : adminStoresQ.data;
   const { data: categories } = useCategoriesFlatQuery();
 
   const [step, setStep] = useState(0);
