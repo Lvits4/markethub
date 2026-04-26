@@ -15,16 +15,8 @@ import {
   HiCube,
   HiExclamationTriangle,
 } from 'react-icons/hi2';
-import { FormSelect } from '../../components/CreateProductForm/FormSelect';
 import { formatPrice } from '../../helpers/formatPrice';
 import { useSellerDashboardQuery } from '../../queries/useSellerDashboardQuery';
-
-const LOW_STOCK_OPTIONS = [
-  { value: '3', label: '3' },
-  { value: '5', label: '5' },
-  { value: '10', label: '10' },
-  { value: '15', label: '15' },
-] as const;
 
 const KPI_STYLES = [
   { accent: 'border-l-blue-500 dark:border-l-blue-400', icon: 'text-blue-500 dark:text-blue-400' },
@@ -72,21 +64,24 @@ function truncateLabel(name: string, max = 14) {
 }
 
 export function SellerDashboardPage() {
-  const [lowStockThreshold, setLowStockThreshold] = useState<number>(() => {
-    const saved = localStorage.getItem('sellerLowStockThreshold');
-    const n = saved ? Number(saved) : 5;
-    return n === 3 || n === 5 || n === 10 || n === 15 ? n : 5;
-  });
+const [lowStockThreshold, setLowStockThreshold] = useState<number>(() => {
+  const saved = localStorage.getItem('sellerLowStockThreshold');
+  const n = saved ? Number(saved) : 5;
+  return n > 0 && Number.isFinite(n) ? n : 5;
+});
+const [thresholdInput, setThresholdInput] = useState(String(lowStockThreshold));
 
-  const { data, isLoading, isError } = useSellerDashboardQuery(lowStockThreshold);
+const { data, isLoading, isError } = useSellerDashboardQuery(lowStockThreshold);
 
-  const handleThresholdChange = (v: string) => {
-    const n = Number(v);
-    if (n === 3 || n === 5 || n === 10 || n === 15) {
-      setLowStockThreshold(n);
-      localStorage.setItem('sellerLowStockThreshold', String(n));
-    }
-  };
+const commitThreshold = (v: string) => {
+  const n = Number(v);
+  if (n > 0 && Number.isFinite(n)) {
+    setLowStockThreshold(n);
+    localStorage.setItem('sellerLowStockThreshold', String(n));
+  } else {
+    setThresholdInput(String(lowStockThreshold));
+  }
+};
 
   const dailyOrdersChart = useMemo(() => {
     if (!data?.dailyOrders) return [];
@@ -178,19 +173,23 @@ export function SellerDashboardPage() {
           <div className="min-w-0">
             <KpiCard
               variant={4}
-              label={
-                <span className="inline-flex items-center gap-1">
-                  Productos casi agotados
-                  <FormSelect
-                    variant="compact"
-                    aria-label="Umbral de stock bajo"
-                    value={String(lowStockThreshold)}
-                    onChange={handleThresholdChange}
-                    options={[...LOW_STOCK_OPTIONS]}
-                    triggerClassName="!py-0 !px-1 !text-[10px] !min-h-0 !h-5 inline-flex"
-                  />
-                </span>
-              }
+            label={
+              <span className="inline-flex items-center gap-1">
+                Productos casi agotados
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={thresholdInput}
+                  onChange={(e) => setThresholdInput(e.target.value.replace(/[^0-9]/g, ''))}
+                  onBlur={() => commitThreshold(thresholdInput)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') commitThreshold(thresholdInput);
+                  }}
+                  aria-label="Umbral de stock bajo"
+                  className="ml-0.5 h-6 w-14 rounded-sm border border-zinc-300 bg-white px-1.5 text-center text-[11px] font-medium tabular-nums text-zinc-700 outline-none transition focus:border-teal-500 focus:ring-1 focus:ring-teal-500/30 dark:border-night-600 dark:bg-night-800 dark:text-zinc-200 dark:focus:border-teal-400"
+                />
+              </span>
+            }
               value={data.lowStockCount}
               icon={<HiExclamationTriangle className="h-5 w-5 sm:h-6 sm:w-6" />}
             />
