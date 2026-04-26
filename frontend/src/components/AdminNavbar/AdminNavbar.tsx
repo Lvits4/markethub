@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  FiBarChart2,
   FiBell,
   FiClipboard,
   FiDollarSign,
@@ -34,7 +33,7 @@ const PAGE_META: Record<string, PageMeta> = {
   [routePaths.sellerOrders]: { title: 'Pedidos', icon: FiClipboard },
   [routePaths.sellerProducts]: { title: 'Productos', icon: FiPackage },
   [routePaths.sellerVentas]: { title: 'Ventas', icon: FiDollarSign },
-  [routePaths.sellerReport]: { title: 'Informes', icon: FiBarChart2 },
+
 };
 
 function getPageMeta(pathname: string): PageMeta {
@@ -48,7 +47,6 @@ function getPageMeta(pathname: string): PageMeta {
   if (pathname.startsWith(routePaths.sellerOrders)) return PAGE_META[routePaths.sellerOrders];
   if (pathname.startsWith(routePaths.sellerProducts)) return PAGE_META[routePaths.sellerProducts];
   if (pathname.startsWith(routePaths.sellerVentas)) return PAGE_META[routePaths.sellerVentas];
-  if (pathname.startsWith(routePaths.sellerReport)) return PAGE_META[routePaths.sellerReport];
   if (pathname.startsWith('/seller')) return PAGE_META[routePaths.seller];
   return PAGE_META[routePaths.admin];
 }

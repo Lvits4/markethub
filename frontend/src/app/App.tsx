@@ -23,7 +23,6 @@ import { SellerLayout } from '../layouts/SellerLayout/SellerLayout';
 import { SellerDashboardPage } from '../views/SellerDashboardPage/SellerDashboardPage';
 import { SellerOrdersPage } from '../views/SellerOrdersPage/SellerOrdersPage';
 import { SellerProductFormPage } from '../views/SellerProductFormPage/SellerProductFormPage';
-import { SellerReportPage } from '../views/SellerReportPage/SellerReportPage';
 import { SellerStoreProductsPage } from '../views/SellerStoreProductsPage/SellerStoreProductsPage';
 import { SellerVentasPage } from '../views/SellerVentasPage/SellerVentasPage';
 import { SellerStoresPage } from '../views/SellerStoresPage/SellerStoresPage';
@@ -148,7 +147,7 @@ export default function App() {
       <Route path="orders" element={<SellerOrdersPage />} />
       <Route path="products" element={<SellerProductsPage />} />
       <Route path="ventas" element={<SellerVentasPage />} />
-              <Route path="report" element={<SellerReportPage />} />
+        
                 <Route
                   path="stores/:storeId/products"
                   element={<SellerStoreProductsPage />}

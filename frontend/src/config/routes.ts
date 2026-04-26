@@ -23,7 +23,6 @@ export const routePaths = {
   sellerOrders: '/seller/orders',
   sellerProducts: '/seller/products',
   sellerVentas: '/seller/ventas',
-  sellerReport: '/seller/report',
   admin: '/admin',
   adminUsers: '/admin/users',
   adminStores: '/admin/stores',

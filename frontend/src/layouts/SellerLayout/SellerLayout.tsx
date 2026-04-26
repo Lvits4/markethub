@@ -2,7 +2,6 @@ import { useState, type ComponentType } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
-  FiBarChart2,
   FiChevronLeft,
   FiChevronRight,
   FiClipboard,
@@ -166,12 +165,7 @@ export function SellerLayout() {
               label="Ventas"
               collapsed={collapsed}
             />
-            <SidebarNavItem
-              to={routePaths.sellerReport}
-              icon={FiBarChart2}
-              label="Informes"
-              collapsed={collapsed}
-            />
+
             <button
               type="button"
               title={collapsed ? 'Tienda pública' : undefined}

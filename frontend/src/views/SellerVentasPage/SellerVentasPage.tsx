@@ -6,8 +6,8 @@ import {
   useState,
 } from 'react';
 import {
-  FiChevronLeft,
-  FiChevronRight,
+  FiChevronDown,
+  FiChevronUp,
   FiSearch,
   FiX,
 } from 'react-icons/fi';
@@ -74,15 +74,11 @@ function SortHeader({
   align?: 'left' | 'right';
 }) {
   const active = activeKey === sortKey;
-  const AscIcon = FiChevronLeft;
-  const DescIcon = FiChevronRight;
   return (
     <th
       className={`px-4 py-3.5 ${align === 'right' ? 'text-right' : 'text-left'}`}
     >
-      <div
-        className={`inline-flex items-center gap-2 ${align === 'right' ? 'flex-row-reverse' : ''}`}
-      >
+      <div className="inline-flex items-center gap-2">
         <span className="leading-tight">{label}</span>
         <span className="inline-flex shrink-0 flex-col items-center gap-0 leading-none">
           <button
@@ -91,7 +87,7 @@ function SortHeader({
             aria-label={`Ordenar ${label} ascendente`}
             onClick={() => onSort(sortKey, 'asc')}
           >
-            <AscIcon className="h-3 w-3 rotate-90" aria-hidden />
+            <FiChevronUp className="h-3 w-3" aria-hidden />
           </button>
           <button
             type="button"
@@ -99,7 +95,7 @@ function SortHeader({
             aria-label={`Ordenar ${label} descendente`}
             onClick={() => onSort(sortKey, 'desc')}
           >
-            <DescIcon className="h-3 w-3 rotate-90" aria-hidden />
+            <FiChevronDown className="h-3 w-3" aria-hidden />
           </button>
         </span>
       </div>
@@ -316,9 +312,9 @@ export function SellerVentasPage() {
                 <VentasTableColgroup />
                 <thead className="bg-slate-100/92 backdrop-blur-md dark:bg-admin-elevated/95 dark:backdrop-blur-md">
                   <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
-                    <th className="w-10 px-2 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-                      #
-                    </th>
+    <th className="px-2 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+          #
+        </th>
                     <SortHeader
                       label="Tienda"
                       sortKey="store"
@@ -403,7 +399,7 @@ export function SellerVentasPage() {
                         key={row.storeId}
                         className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
                       >
-                        <td className="w-10 px-2 py-2 text-center align-middle tabular-nums text-slate-400 dark:text-slate-500">
+                        <td className="px-2 py-2 text-center align-middle tabular-nums text-slate-400 dark:text-slate-500">
                           {(page - 1) * pageSize + idx + 1}
                         </td>
                         <td className="px-4 py-2 align-middle">
