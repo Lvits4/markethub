@@ -165,11 +165,11 @@ export function CatalogPage() {
         </div>
       </header>
 
-      <div className="relative mb-5 flex min-h-[52px] items-stretch gap-2">
+      <div className="relative mb-5 flex min-h-[44px] items-stretch gap-2">
         <SearchInput
           value={search}
           onChange={setSearch}
-          className="min-h-[52px] min-w-0 flex-1"
+          className="min-h-[44px] min-w-0 flex-1"
         />
         <div
           className="relative flex shrink-0 self-stretch"
@@ -177,7 +177,7 @@ export function CatalogPage() {
         >
           <Button
             type="button"
-            className="h-full min-h-[52px] min-w-22 shrink-0 px-4 py-0"
+            className="h-full min-h-[44px] min-w-20 shrink-0 px-3 py-0 text-sm"
             aria-expanded={filterPopoverOpen}
             aria-haspopup="dialog"
             onClick={() => {
@@ -316,9 +316,9 @@ export function CatalogPage() {
           </p>
         ) : (
           <>
-            <ul className="grid grid-cols-2 gap-4 pb-4 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
+            <ul className="grid grid-cols-2 gap-3 pb-4 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
               {accumulated.map((item) => (
-                <li key={item.id}>
+                <li key={item.id} className="w-full max-w-66 justify-self-center">
                   <MarketProductCard item={item} />
                 </li>
               ))}

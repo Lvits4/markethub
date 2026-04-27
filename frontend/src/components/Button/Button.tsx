@@ -22,7 +22,7 @@ export function Button({
     outline:
       'rounded-md border-2 border-sky-400 bg-transparent px-5 py-3 text-sky-600 hover:bg-sky-400/10 dark:border-[color:rgb(69_139_222/0.42)] dark:text-market-dark-accent dark:hover:bg-[color:rgb(21_42_94/0.55)]',
     ghost:
-      'rounded-md px-4 py-2 text-zinc-800 dark:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-night-800',
+      'rounded-md px-4 py-2 text-zinc-800 dark:text-zinc-100 bg-zinc-100/85 hover:bg-zinc-200/75 dark:bg-night-800/90 dark:hover:bg-night-700',
     icon:
       'rounded-md p-2.5 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-night-800',
     cta: 'admin-cta-solid rounded-md text-sm font-medium',

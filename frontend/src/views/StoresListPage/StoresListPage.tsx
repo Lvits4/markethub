@@ -152,13 +152,13 @@ export function StoresListPage() {
 
       <div
         id="stores-search"
-        className="relative mb-5 flex min-h-[52px] items-stretch gap-2 scroll-mt-24"
+        className="relative mb-5 flex min-h-[44px] items-stretch gap-2 scroll-mt-24"
       >
         <SearchInput
           value={search}
           onChange={setSearch}
           placeholder="Buscar tiendas…"
-          className="min-h-[52px] min-w-0 flex-1"
+          className="min-h-[44px] min-w-0 flex-1"
         />
         <div
           className="relative flex shrink-0 self-stretch"
@@ -166,7 +166,7 @@ export function StoresListPage() {
         >
           <Button
             type="button"
-            className="h-full min-h-[52px] min-w-22 shrink-0 px-4 py-0"
+            className="h-full min-h-[44px] min-w-20 shrink-0 px-3 py-0 text-sm"
             aria-expanded={filterPopoverOpen}
             aria-haspopup="dialog"
             onClick={() => {

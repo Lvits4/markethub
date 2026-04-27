@@ -251,7 +251,7 @@ export function StorePublicPage() {
         </button>
       </div>
 
-      <section className="mb-8 overflow-hidden rounded-md bg-white shadow-market ring-1 ring-zinc-200/60 dark:bg-night-900 dark:shadow-market-dark dark:ring-night-800">
+      <section className="mb-8 overflow-hidden rounded-md">
         <div className="grid grid-cols-1 sm:grid-cols-[minmax(11rem,min(38vw,20rem))_1fr]">
           <div className="relative aspect-5/3 w-full min-h-44 border-b border-zinc-200 bg-zinc-100 dark:border-night-700 dark:bg-night-800 sm:aspect-auto sm:min-h-0 sm:border-b-0 sm:border-r">
             {store.logo ? (
@@ -319,12 +319,12 @@ export function StorePublicPage() {
         Productos de la tienda
       </h2>
 
-      <div className="relative mb-5 flex min-h-[52px] items-stretch gap-2">
+      <div className="relative mb-5 flex min-h-[44px] items-stretch gap-2">
         <SearchInput
           value={search}
           onChange={setSearch}
           placeholder="Buscar en esta tienda…"
-          className="min-h-[52px] min-w-0 flex-1"
+          className="min-h-[44px] min-w-0 flex-1"
         />
         <div
           className="relative flex shrink-0 self-stretch"
@@ -332,7 +332,7 @@ export function StorePublicPage() {
         >
           <Button
             type="button"
-            className="h-full min-h-[52px] min-w-22 shrink-0 px-4 py-0"
+            className="h-full min-h-[44px] min-w-20 shrink-0 px-3 py-0 text-sm"
             aria-expanded={filterPopoverOpen}
             aria-haspopup="dialog"
             onClick={() => {
