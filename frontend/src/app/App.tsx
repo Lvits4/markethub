@@ -168,8 +168,8 @@ export default function App() {
               <Route path="/" element={<MainLayout />}>
                 <Route index element={<CatalogEntry />} />
                 <Route path="browse" element={<CatalogPage />} />
-                <Route path="stores/:storeId" element={<StorePublicPage />} />
                 <Route path="stores" element={<StoresListPage />} />
+                <Route path="stores/:storeId" element={<StorePublicPage />} />
                 <Route path="product/:id" element={<ProductDetailPage />} />
                 <Route
                   path="favorites"

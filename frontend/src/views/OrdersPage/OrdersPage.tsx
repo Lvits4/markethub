@@ -55,7 +55,7 @@ export function OrdersPage() {
     <div className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:pb-10 sm:pt-8 lg:pb-12">
       <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-3xl">
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-2xl">
             Mis pedidos
           </h1>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">

@@ -142,7 +142,7 @@ export function StoresListPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 pt-6 sm:pt-8">
       <header className="mb-6 sm:mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
+        <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">
           Tiendas
         </h1>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
@@ -150,7 +150,10 @@ export function StoresListPage() {
         </p>
       </header>
 
-      <div className="relative mb-5 flex min-h-[52px] items-stretch gap-2">
+      <div
+        id="stores-search"
+        className="relative mb-5 flex min-h-[52px] items-stretch gap-2 scroll-mt-24"
+      >
         <SearchInput
           value={search}
           onChange={setSearch}

@@ -115,7 +115,7 @@ export function CartPage() {
     <div className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:pb-10 sm:pt-8 lg:pb-12">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-3xl">
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-2xl">
             Carrito
           </h1>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">

@@ -217,7 +217,7 @@ export function ProductDetailPage() {
 
         <div className="flex flex-col gap-6 lg:sticky lg:top-21">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">
+            <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-2xl">
               {product.name}
             </h1>
             {product.description ? (
