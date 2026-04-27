@@ -464,7 +464,7 @@ export function AdminEarningsPage() {
                     pageRows.map((row, idx) => (
                       <tr
                         key={row.storeId}
-                        className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-blue-500/10 dark:hover:bg-white/[0.06]"
+                        className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-blue-500/10 dark:hover:bg-white/6"
                       >
                         <td className="w-10 px-2 py-2 text-center align-middle tabular-nums text-slate-400 dark:text-slate-500">
                           {(page - 1) * pageSize + idx + 1}

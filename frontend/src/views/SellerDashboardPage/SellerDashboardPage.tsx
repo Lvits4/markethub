@@ -40,7 +40,7 @@ function KpiCard({
   const style = KPI_STYLES[variant];
   return (
     <div
-      className={`flex h-full min-h-[4.5rem] min-w-0 w-full items-center gap-2.5 rounded-md border border-[var(--admin-border)] border-l-4 bg-[var(--admin-card)] px-3 py-2.5 shadow-sm dark:shadow-none sm:min-h-[5rem] sm:px-3 sm:py-3 ${style.accent}`}
+      className={`flex h-full min-h-[4.5rem] min-w-0 w-full items-center gap-2.5 rounded-md border border-(--admin-border) border-l-4 bg-(--admin-card) px-3 py-2.5 shadow-sm dark:shadow-none sm:min-h-[5rem] sm:px-3 sm:py-3 ${style.accent}`}
     >
       <div className={`shrink-0 ${style.icon}`}>
         {icon}
@@ -197,7 +197,7 @@ const commitThreshold = (v: string) => {
         </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-none lg:flex-row lg:items-stretch">
-        <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">
+        <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-(--admin-border) bg-(--admin-card) p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">
           <div className="mb-2 min-w-0">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               Pedidos por día
@@ -260,7 +260,7 @@ const commitThreshold = (v: string) => {
           </div>
         </section>
 
-        <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">
+        <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-(--admin-border) bg-(--admin-card) p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">
           <div className="mb-2 min-w-0">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               Ventas mensuales
@@ -354,7 +354,7 @@ const commitThreshold = (v: string) => {
       </div>
 
       {topStoresChart.length > 0 && (
-        <section className="flex max-lg:min-h-[220px] flex-col rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 shadow-sm dark:shadow-none lg:min-h-0">
+        <section className="flex max-lg:min-h-[220px] flex-col rounded-md border border-(--admin-border) bg-(--admin-card) p-3 shadow-sm dark:shadow-none lg:min-h-0">
           <div className="mb-2 min-w-0">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               Mis tiendas por ganancia

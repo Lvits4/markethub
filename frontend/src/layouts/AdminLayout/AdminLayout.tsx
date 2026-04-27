@@ -88,13 +88,13 @@ export function AdminLayout() {
 
   return (
     <>
-      <div className="admin-shell flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-[var(--admin-page-bg)] text-zinc-800 dark:text-zinc-100">
+      <div className="admin-shell flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-(--admin-page-bg) text-zinc-800 dark:text-zinc-100">
         <aside
-          className={`admin-sidebar-rail flex min-h-0 shrink-0 flex-col overflow-x-hidden border-r border-[var(--admin-border)] bg-[var(--admin-card)] transition-[width] duration-200 ease-out ${collapsed ? 'w-[72px]' : 'w-[248px]'}`}
+          className={`admin-sidebar-rail flex min-h-0 shrink-0 flex-col overflow-x-hidden border-r border-(--admin-border) bg-(--admin-card) transition-[width] duration-200 ease-out ${collapsed ? 'w-[72px]' : 'w-[248px]'}`}
           aria-label="Navegación del panel"
         >
           <div
-            className={`flex shrink-0 border-b border-[var(--admin-border)] ${collapsed ? 'flex-col items-center gap-1.5 py-2.5' : 'h-14 items-center justify-between gap-2 px-3'}`}
+            className={`flex shrink-0 border-b border-(--admin-border) ${collapsed ? 'flex-col items-center gap-1.5 py-2.5' : 'h-14 items-center justify-between gap-2 px-3'}`}
           >
             <div
               className={`flex min-w-0 items-center ${collapsed ? 'justify-center' : 'gap-2.5'}`}

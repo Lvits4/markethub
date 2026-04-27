@@ -58,7 +58,7 @@ const fieldTriggerDisabledClass =
   'cursor-not-allowed opacity-60';
 
 const compactTriggerBaseClass =
-  'flex min-h-0 min-w-[7.5rem] items-center justify-between gap-2 rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] px-2.5 py-1.5 text-left text-xs font-medium text-zinc-800 shadow-sm outline-hidden ring-admin-primary/0 transition hover:border-zinc-300 focus-visible:ring-2 dark:text-zinc-100 dark:hover:border-night-600';
+  'flex min-h-0 min-w-[7.5rem] items-center justify-between gap-2 rounded-md border border-(--admin-border) bg-(--admin-card) px-2.5 py-1.5 text-left text-xs font-medium text-zinc-800 shadow-sm outline-hidden ring-admin-primary/0 transition hover:border-zinc-300 focus-visible:ring-2 dark:text-zinc-100 dark:hover:border-night-600';
 
 const compactTriggerDisabledClass = 'cursor-not-allowed opacity-60';
 
@@ -69,7 +69,7 @@ const fieldListUlClass =
   'market-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain py-1';
 
 const compactListPanelClass =
-  'fixed z-[90] flex min-w-full flex-col overflow-hidden overscroll-contain rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] shadow-lg ring-1 ring-black/5 dark:ring-white/10';
+  'fixed z-[90] flex min-w-full flex-col overflow-hidden overscroll-contain rounded-md border border-(--admin-border) bg-(--admin-card) shadow-lg ring-1 ring-black/5 dark:ring-white/10';
 
 const compactListUlClass =
   'market-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain py-0.5';
@@ -298,11 +298,11 @@ export function FormSelect({
                   const isSelected = opt.value === value;
                   const optionClass = isCompact
                     ? isSelected
-                      ? 'cursor-pointer px-3 py-1.5 text-left text-xs font-semibold text-admin-primary bg-[var(--admin-primary-soft)] dark:text-market-dark-accent'
+                      ? 'cursor-pointer px-3 py-1.5 text-left text-xs font-semibold text-admin-primary bg-(--admin-primary-soft) dark:text-market-dark-accent'
                       : 'cursor-pointer px-3 py-1.5 text-left text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800/80'
                     : isSelected
                       ? 'mx-1 cursor-pointer rounded-md px-3 py-2.5 text-sm font-medium bg-blue-50 text-blue-900 dark:bg-sky-500/15 dark:text-sky-100'
-                      : 'mx-1 cursor-pointer rounded-md px-3 py-2.5 text-sm text-zinc-800 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-white/[0.06]';
+                      : 'mx-1 cursor-pointer rounded-md px-3 py-2.5 text-sm text-zinc-800 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-white/6';
                   return (
                     <li
                       key={opt.value === '' ? '__empty__' : opt.value}

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { FiArrowLeft, FiHeart, FiShare2 } from 'react-icons/fi';
+import { FiArrowLeft, FiHeart } from 'react-icons/fi';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
 import { QuantitySelector } from '../../components/QuantitySelector/QuantitySelector';
@@ -82,11 +82,6 @@ export function ProductDetailPage() {
 
   const handleBuy = () => void addToCart();
 
-  const handleBuyNow = async () => {
-    const ok = await addToCart();
-    if (ok) navigate(routePaths.cart);
-  };
-
   const handleFavorite = async () => {
     if (!isAuthenticated) {
       toast.error('Inicia sesión para favoritos');
@@ -102,21 +97,6 @@ export function ProductDetailPage() {
       }
     } catch (e) {
       toast.error(getErrorMessage(e));
-    }
-  };
-
-  const handleShare = async () => {
-    if (!product) return;
-    const url = window.location.href;
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: product.name, url });
-      } else {
-        await navigator.clipboard.writeText(url);
-        toast.success('Enlace copiado al portapapeles');
-      }
-    } catch {
-      /* usuario canceló o fallo clipboard */
     }
   };
 
@@ -158,9 +138,9 @@ export function ProductDetailPage() {
         </span>
       </nav>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_min(100%,380px)] lg:items-start lg:gap-10">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,0.78fr)_min(100%,420px)] lg:items-start lg:gap-10">
         <div>
-          <div className="relative aspect-4/5 w-full overflow-hidden rounded-md bg-zinc-100 shadow-market ring-1 ring-zinc-200/60 dark:bg-night-800 dark:shadow-market-dark dark:ring-night-700/50 sm:aspect-5/6 lg:aspect-square">
+          <div className="relative aspect-[4/4.8] w-full overflow-hidden rounded-md bg-zinc-100 shadow-market ring-1 ring-zinc-200/60 dark:bg-night-800 dark:shadow-market-dark dark:ring-night-700/50 sm:aspect-[4/5.1] lg:aspect-[4/4.55] lg:max-h-[430px]">
             <Link
               to={routePaths.catalog}
               className="absolute left-3 top-3 z-10 rounded-md bg-white/95 p-2.5 text-zinc-900 shadow-sm backdrop-blur-sm dark:bg-night-900/95 dark:text-zinc-100"
@@ -225,50 +205,47 @@ export function ProductDetailPage() {
                 {product.description}
               </p>
             ) : null}
-            <p className="mt-6 text-3xl font-bold text-forest">
-              {formatPrice(product.price)}
-            </p>
-          </div>
-
-          <div className="rounded-md bg-white p-5 shadow-market ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-market-dark dark:ring-night-800">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
               {maxQty === 0 ? (
                 <span className="font-medium text-amber-700 dark:text-amber-400">
                   Sin stock disponible
                 </span>
               ) : (
                 <>
-                  <span className="font-semibold text-forest">
-                    En stock
-                  </span>
+                  <span className="font-semibold text-forest">En stock</span>
                   {` · ${maxQty} unidades`}
                 </>
               )}
             </p>
-
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
-              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                Cantidad
-              </span>
-              <QuantitySelector
-                value={qty}
-                min={1}
-                max={maxQty}
-                onChange={setQty}
-                disabled={maxQty === 0}
-              />
+            <p className="mt-6 text-3xl font-bold text-forest">
+              {formatPrice(product.price)}
+            </p>
+            <div className="mt-5 grid gap-4 sm:grid-cols-[1fr_auto] sm:items-end">
+              <div>
+                <span className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                  Cantidad
+                </span>
+                <div className="mt-2">
+                  <QuantitySelector
+                    value={qty}
+                    min={1}
+                    max={maxQty}
+                    onChange={setQty}
+                    disabled={maxQty === 0}
+                  />
+                </div>
+              </div>
+              <div className="sm:text-right">
+                <span className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                  Subtotal
+                </span>
+                <p className="mt-2 text-2xl font-bold leading-none text-zinc-900 dark:text-zinc-50">
+                  {formatPrice(lineTotal)}
+                </p>
+              </div>
             </div>
 
-            <div className="mt-5 flex items-center justify-between border-t border-zinc-100 pt-5 dark:border-night-800">
-              <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                Subtotal
-              </span>
-              <span className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
-                {formatPrice(lineTotal)}
-              </span>
-            </div>
-
-            <div className="mt-5 flex flex-col gap-3">
+            <div className="mt-4 flex flex-col gap-3">
               <Button
                 type="button"
                 variant="primary"
@@ -278,27 +255,8 @@ export function ProductDetailPage() {
               >
                 Añadir al carrito
               </Button>
-              <Button
-                type="button"
-                className="w-full justify-center py-3.5 text-base"
-                disabled={maxQty === 0 || addItem.isPending}
-                onClick={() => void handleBuyNow()}
-              >
-                Comprar ahora
-              </Button>
             </div>
 
-            <div className="mt-4 flex justify-center">
-              <Button
-                type="button"
-                variant="ghost"
-                className="gap-2 text-sm text-zinc-600 dark:text-zinc-400"
-                onClick={() => void handleShare()}
-              >
-                <FiShare2 className="h-4 w-4" />
-                Compartir
-              </Button>
-            </div>
           </div>
         </div>
       </div>

@@ -308,7 +308,7 @@ export function SellerVentasPage() {
             <div
               ref={tableHeaderScrollRef}
               onScroll={onTableHeaderScroll}
-              className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-white/[0.08]"
+              className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-white/8"
             >
               <table className="w-full min-w-[900px] table-fixed border-collapse text-center text-sm">
                 <VentasTableColgroup />
@@ -393,7 +393,7 @@ export function SellerVentasPage() {
                     pageRows.map((row, idx) => (
                       <tr
                         key={row.storeId}
-                        className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-white/[0.06] dark:hover:bg-white/[0.04]"
+                        className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-white/6 dark:hover:bg-white/4"
                       >
                         <td className="px-2 py-2.5 text-center align-middle tabular-nums text-slate-400 dark:text-slate-500">
                           {(page - 1) * pageSize + idx + 1}

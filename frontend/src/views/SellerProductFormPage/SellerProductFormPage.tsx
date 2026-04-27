@@ -195,7 +195,7 @@ export function SellerProductFormPage() {
       : routePaths.sellerProducts;
 
   const inputClass =
-    'mt-1 w-full rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950';
+    'mt-1 w-full rounded-md border border-(--admin-border) bg-(--admin-card) px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950';
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
@@ -208,7 +208,7 @@ export function SellerProductFormPage() {
         </Link>
       </div>
 
-      <div className="max-w-2xl space-y-4 rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-6 shadow-sm dark:shadow-none">
+      <div className="max-w-2xl space-y-4 rounded-md border border-(--admin-border) bg-(--admin-card) p-6 shadow-sm dark:shadow-none">
         <div>
           <label className="text-xs text-zinc-500">Nombre</label>
           <input
@@ -279,7 +279,7 @@ export function SellerProductFormPage() {
             />
       </div>
       </fieldset>
-      <div className="flex flex-row flex-wrap items-center gap-2 justify-end border-t border-[var(--admin-border)] pt-4">
+      <div className="flex flex-row flex-wrap items-center gap-2 justify-end border-t border-(--admin-border) pt-4">
         <Link
           to={backHref}
           className="h-11 min-h-11 inline-flex items-center justify-center border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 shadow-sm hover:bg-zinc-100 dark:border-night-600 dark:bg-night-800 dark:text-zinc-100 dark:hover:bg-night-700 sm:w-44"

@@ -41,7 +41,7 @@ function KpiCard({
   const style = KPI_STYLES[variant];
   return (
     <div
-      className={`flex h-full min-h-[5.75rem] min-w-0 w-full items-center gap-3 rounded-md border border-[var(--admin-border)] border-l-4 bg-[var(--admin-card)] px-4 py-3.5 shadow-sm dark:shadow-none sm:min-h-[6.25rem] sm:px-4 sm:py-4 ${style.accent}`}
+      className={`flex h-full min-h-[5.75rem] min-w-0 w-full items-center gap-3 rounded-md border border-(--admin-border) border-l-4 bg-(--admin-card) px-4 py-3.5 shadow-sm dark:shadow-none sm:min-h-[6.25rem] sm:px-4 sm:py-4 ${style.accent}`}
     >
       <div className={`shrink-0 ${style.icon}`}>
         {icon}
@@ -72,7 +72,7 @@ function RecentSaleRow({ sale }: { sale: AdminRecentSaleRow }) {
     minute: '2-digit',
   });
   return (
-    <div className="flex items-center gap-3 rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] px-3 py-2.5">
+    <div className="flex items-center gap-3 rounded-md border border-(--admin-border) bg-(--admin-card) px-3 py-2.5">
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-50">
           {sale.storeName ?? 'Tienda eliminada'}
@@ -177,7 +177,7 @@ export function AdminDashboardPage() {
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-none lg:flex-row lg:items-stretch">
-        <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">
+        <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-(--admin-border) bg-(--admin-card) p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">
           <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
             <div className="min-w-0">
               <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
@@ -279,7 +279,7 @@ export function AdminDashboardPage() {
           </div>
         </section>
 
-        <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">
+        <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-(--admin-border) bg-(--admin-card) p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">
           <div className="mb-2 min-w-0">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               Historial de ventas recientes

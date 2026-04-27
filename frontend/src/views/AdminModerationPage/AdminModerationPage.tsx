@@ -511,7 +511,7 @@ label="Cliente"
               pageRows.map((s, idx) => (
             <tr
               key={s.id}
-              className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-blue-500/10 dark:hover:bg-white/[0.06]"
+              className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-blue-500/10 dark:hover:bg-white/6"
             >
               <td className="w-10 px-2 py-2 text-center align-middle tabular-nums text-slate-400 dark:text-slate-500">
                 {(page - 1) * pageSize + idx + 1}
@@ -549,7 +549,7 @@ label="Cliente"
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="!text-blue-600 hover:bg-blue-500/10 dark:!text-blue-400 dark:hover:bg-blue-500/12"
+                                className="text-blue-600! hover:bg-blue-500/10 dark:text-blue-400! dark:hover:bg-blue-500/12"
                                 aria-label={`Ver detalle de ${s.name}`}
                                 onClick={() => setViewStoreId(s.id)}
                               >
@@ -558,7 +558,7 @@ label="Cliente"
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="!text-emerald-600 hover:bg-emerald-500/10 dark:!text-forest dark:hover:bg-white/10"
+                                className="text-emerald-600! hover:bg-emerald-500/10 dark:text-forest! dark:hover:bg-white/10"
                                 aria-label={`Aprobar ${s.name}`}
                                 disabled={busy}
                                 onClick={() => onApprove(s.id)}
@@ -568,7 +568,7 @@ label="Cliente"
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="!text-red-600 hover:bg-red-500/10 dark:!text-red-400 dark:hover:bg-red-950/35"
+                                className="text-red-600! hover:bg-red-500/10 dark:text-red-400! dark:hover:bg-red-950/35"
                                 aria-label={`Rechazar ${s.name}`}
                                 disabled={busy}
                                 onClick={() => onReject(s.id)}

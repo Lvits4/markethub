@@ -28,7 +28,7 @@ export function QuantitySelector({
         onClick={dec}
         disabled={disabled || value <= min}
         aria-label="Disminuir cantidad"
-        className="!rounded-md !p-2"
+        className="rounded-md! p-2!"
       >
         <FiMinus className="h-4 w-4" />
       </Button>
@@ -41,7 +41,7 @@ export function QuantitySelector({
         onClick={inc}
         disabled={disabled || (max != null && value >= max)}
         aria-label="Aumentar cantidad"
-        className="!rounded-md !p-2"
+        className="rounded-md! p-2!"
       >
         <FiPlus className="h-4 w-4" />
       </Button>

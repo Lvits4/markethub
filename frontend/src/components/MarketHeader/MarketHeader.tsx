@@ -64,7 +64,7 @@ export function MarketHeader() {
         >
           <MarketHubMark
             size="nav"
-            className="!border-forest !bg-forest !text-white !shadow-md dark:!border-market-dark-accent dark:!bg-market-dark-accent dark:!text-night-950"
+            className="border-forest! bg-forest! text-white! shadow-md! dark:border-market-dark-accent! dark:bg-market-dark-accent! dark:text-night-950!"
           />
           MarketHub
         </NavLink>
@@ -128,7 +128,7 @@ export function MarketHeader() {
             </NavLink>
           </div>
 
-          <ThemeToggle className="!h-10 !w-10 !rounded-lg !bg-transparent !text-zinc-700 !shadow-none !ring-0 !outline-none transition-colors hover:!bg-transparent hover:!text-forest active:!bg-transparent active:!text-forest dark:!bg-transparent dark:!text-white/90 dark:hover:!bg-transparent dark:hover:!text-market-dark-accent dark:active:!bg-transparent dark:active:!text-market-dark-accent" />
+          <ThemeToggle className="h-10! w-10! rounded-lg! bg-transparent! text-zinc-700! shadow-none! ring-0! outline-none! transition-colors hover:bg-transparent! hover:text-forest! active:bg-transparent! active:text-forest! dark:bg-transparent! dark:text-white/90! dark:hover:bg-transparent! dark:hover:text-market-dark-accent! dark:active:bg-transparent! dark:active:text-market-dark-accent!" />
 
           {isAuthenticated ? (
             <NavLink

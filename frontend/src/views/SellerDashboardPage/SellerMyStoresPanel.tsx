@@ -63,20 +63,20 @@ export function SellerMyStoresPanel() {
           {data.map((s) => (
             <li
               key={s.id}
-              className="rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] p-5 shadow-sm dark:shadow-none"
+              className="rounded-md border border-(--admin-border) bg-(--admin-card) p-5 shadow-sm dark:shadow-none"
             >
               {editingId === s.id ? (
                 <div className="space-y-3">
           <input
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
-          className="w-full rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
+          className="w-full rounded-md border border-(--admin-border) bg-(--admin-card) px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
         />
         <textarea
           value={editDescription}
           onChange={(e) => setEditDescription(e.target.value)}
           rows={2}
-          className="w-full rounded-md border border-[var(--admin-border)] bg-[var(--admin-card)] px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
+          className="w-full rounded-md border border-(--admin-border) bg-(--admin-card) px-3 py-2 text-sm dark:border-night-700 dark:bg-night-950"
                   />
                   <div className="flex flex-wrap gap-2">
                     <Button
@@ -141,7 +141,7 @@ export function SellerMyStoresPanel() {
                       Productos
                     </Link>
                   </div>
-                  <div className="mt-4 flex flex-wrap gap-2 border-t border-[var(--admin-border)] pt-4 dark:border-night-800">
+                  <div className="mt-4 flex flex-wrap gap-2 border-t border-(--admin-border) pt-4 dark:border-night-800">
                     <Button
                       type="button"
                       variant="ghost"
