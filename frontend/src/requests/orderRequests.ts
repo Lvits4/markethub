@@ -4,12 +4,12 @@ import { fetchDefault } from './fetchDefault';
 
 export async function createOrderFromCart(
   token: string,
-  shippingAddress: string,
+  payload: { shippingAddress: string; cartItemId?: string },
 ): Promise<Order[]> {
   return fetchDefault<Order[]>(apiPaths.orders, {
     token,
     method: 'POST',
-    body: { shippingAddress },
+    body: payload,
   });
 }
 

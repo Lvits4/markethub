@@ -32,9 +32,17 @@ export class OrdersService {
       throw new BadRequestException('El carrito está vacío');
     }
 
+    const storesToProcess = dto.cartItemId
+      ? this.getSummaryForSingleItem(summary.stores, dto.cartItemId)
+      : summary.stores;
+
+    if (storesToProcess.length === 0) {
+      throw new BadRequestException('Item no encontrado en el carrito');
+    }
+
     const orders: Order[] = [];
 
-    for (const storeGroup of summary.stores) {
+    for (const storeGroup of storesToProcess) {
       const order = this.ordersRepository.create({
         userId: user.id,
         storeId: storeGroup.storeId,
@@ -69,9 +77,41 @@ export class OrdersService {
       orders.push(savedOrder);
     }
 
-    await this.cartService.clearCart(user.id);
+    if (dto.cartItemId) {
+      await this.cartService.removeItem(user.id, dto.cartItemId);
+    } else {
+      await this.cartService.clearCart(user.id);
+    }
 
     return this.findByUserId(user.id);
+  }
+
+  private getSummaryForSingleItem(
+    stores: Array<{
+      storeId: string;
+      storeName: string;
+      items: Array<{
+        id: string;
+        product: { id: string; price: string | number };
+        quantity: number;
+        total: number;
+      }>;
+      subtotal: number;
+    }>,
+    cartItemId: string,
+  ) {
+    for (const group of stores) {
+      const selectedItem = group.items.find((item) => item.id === cartItemId);
+      if (!selectedItem) continue;
+      return [
+        {
+          ...group,
+          items: [selectedItem],
+          subtotal: selectedItem.total,
+        },
+      ];
+    }
+    return [];
   }
 
   async findByUserId(userId: string): Promise<Order[]> {

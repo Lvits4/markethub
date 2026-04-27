@@ -42,6 +42,7 @@ export function CartPage() {
   const [couponOpen, setCouponOpen] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
+  const [checkoutItemId, setCheckoutItemId] = useState<string | null>(null);
 
   const items = cart?.items ?? [];
 
@@ -72,15 +73,22 @@ export function CartPage() {
     0,
   );
 
+  const checkoutItem = checkoutItemId
+    ? items.find((item) => item.id === checkoutItemId)
+    : undefined;
+  const checkoutSubtotal = checkoutItem
+    ? unitPriceNumber(checkoutItem.product?.price) * checkoutItem.quantity
+    : subtotal;
   const shipping = 0;
-  const total = subtotal + shipping;
+  const total = checkoutSubtotal + shipping;
 
-  const openCheckoutModal = () => {
+  const openCheckoutModal = (cartItemId?: string) => {
     if (!isAuthenticated) {
       toast.error('Inicia sesión para crear el pedido');
       navigate(routePaths.login);
       return;
     }
+    setCheckoutItemId(cartItemId ?? null);
     setCheckoutModalOpen(true);
   };
 
@@ -93,19 +101,28 @@ export function CartPage() {
     const note = orderNote.trim();
     const fullAddress =
       note.length > 0 ? `${addr}\n\nNota: ${note}` : addr;
-    createOrder.mutate(fullAddress, {
-      onSuccess: (orders) => {
-        setCheckoutModalOpen(false);
-        toast.success('Pedido confirmado');
-        const first = orders[0];
-        if (first?.id) {
-          navigate(routePaths.orderDetail(first.id));
-        } else {
-          navigate(routePaths.orders);
-        }
+    createOrder.mutate(
+      {
+        shippingAddress: fullAddress,
+        cartItemId: checkoutItemId ?? undefined,
       },
-      onError: (e) => toast.error(getErrorMessage(e)),
-    });
+      {
+        onSuccess: (orders) => {
+          setCheckoutModalOpen(false);
+          setCheckoutItemId(null);
+          toast.success(
+            checkoutItemId ? 'Compra directa confirmada' : 'Pedido confirmado',
+          );
+          const first = orders[0];
+          if (first?.id) {
+            navigate(routePaths.orderDetail(first.id));
+          } else {
+            navigate(routePaths.orders);
+          }
+        },
+        onError: (e) => toast.error(getErrorMessage(e)),
+      },
+    );
   };
 
   const showCheckoutCta =
@@ -127,7 +144,7 @@ export function CartPage() {
             type="button"
             variant="primary"
             className="shrink-0 justify-center px-5 py-2.5 text-sm font-semibold sm:py-3 sm:text-base"
-            onClick={openCheckoutModal}
+            onClick={() => openCheckoutModal()}
           >
             Crear pedido
           </Button>
@@ -213,16 +230,26 @@ export function CartPage() {
                         onChange={(n) => void handleQty(it.id, n)}
                         disabled={updateItem.isPending}
                       />
-                      <Button
-                        type="button"
-                        className="shrink-0 gap-1.5 bg-red-600! px-3 py-2 text-xs font-semibold text-white! shadow-sm hover:bg-red-700! dark:bg-red-700! dark:hover:bg-red-600!"
-                        onClick={() => void handleRemove(it.id)}
-                        disabled={removeItem.isPending}
-                        aria-label="Quitar del carrito"
-                      >
-                        <FiTrash2 className="h-4 w-4 shrink-0" aria-hidden />
-                        Quitar
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="shrink-0 px-3 py-2 text-xs font-semibold"
+                          onClick={() => openCheckoutModal(it.id)}
+                        >
+                          Comprar ahora
+                        </Button>
+                        <Button
+                          type="button"
+                          className="shrink-0 gap-1.5 bg-red-600! px-3 py-2 text-xs font-semibold text-white! shadow-sm hover:bg-red-700! dark:bg-red-700! dark:hover:bg-red-600!"
+                          onClick={() => void handleRemove(it.id)}
+                          disabled={removeItem.isPending}
+                          aria-label="Quitar del carrito"
+                        >
+                          <FiTrash2 className="h-4 w-4 shrink-0" aria-hidden />
+                          Quitar
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </li>
@@ -235,8 +262,9 @@ export function CartPage() {
             onClose={() => {
               if (createOrder.isPending) return;
               setCheckoutModalOpen(false);
+              setCheckoutItemId(null);
             }}
-            title="Crear pedido"
+            title={checkoutItem ? 'Compra directa' : 'Crear pedido'}
             contentWrapperClassName="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
           >
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5 pb-5 pt-1">
@@ -252,7 +280,7 @@ export function CartPage() {
                   <div className="flex justify-between gap-3 text-zinc-600 dark:text-zinc-400">
                     <dt>Productos</dt>
                     <dd className="font-medium tabular-nums text-zinc-900 dark:text-zinc-100">
-                      {formatPrice(subtotal)}
+                      {formatPrice(checkoutSubtotal)}
                     </dd>
                   </div>
                   <div className="flex justify-between gap-3 text-zinc-600 dark:text-zinc-400">
@@ -283,7 +311,9 @@ export function CartPage() {
                       Dirección de entrega
                     </h3>
                     <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-                      La usaremos para todos los pedidos de esta compra.
+                      {checkoutItem
+                        ? 'La usaremos para esta compra directa.'
+                        : 'La usaremos para todos los pedidos de esta compra.'}
                     </p>
                     <label className="mt-3 flex flex-col gap-1">
                       <span className="sr-only">Dirección completa</span>

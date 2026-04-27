@@ -7,15 +7,10 @@ import {
 } from 'react';
 import { Button } from '../../components/Button/Button';
 import { FormSelect } from '../../components/CreateProductForm/FormSelect';
-import { ProductCard } from '../../components/ProductCard/ProductCard';
+import { MarketProductCard } from '../../components/MarketProductCard/MarketProductCard';
 import { SearchInput } from '../../components/SearchInput/SearchInput';
-import { useAuth } from '../../hooks/useAuth';
-import { useFavoriteToggle } from '../../hooks/useFavoriteToggle';
-import { useFavoriteCheckQuery } from '../../queries/useFavoriteCheckQuery';
 import { useFavoritesQuery } from '../../queries/useFavoritesQuery';
 import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery';
-import toast from 'react-hot-toast';
-import { getErrorMessage } from '../../helpers/mapApiError';
 import type { Product, ProductSortBy } from '../../types/product';
 
 const SORT_OPTIONS: { value: ProductSortBy; label: string }[] = [
@@ -35,30 +30,6 @@ const filterFieldsetClass = 'm-0 min-w-0 border-0 p-0';
 function productPrice(p: Product): number {
   const v = p.price;
   return typeof v === 'string' ? Number.parseFloat(v) : v;
-}
-
-function FavoriteRowCard({ product }: { product: Product }) {
-  const { isAuthenticated } = useAuth();
-  const { data: isFav } = useFavoriteCheckQuery(product.id, isAuthenticated);
-  const { remove } = useFavoriteToggle(product.id);
-
-  const handleFav = async () => {
-    try {
-      await remove.mutateAsync();
-      toast.success('Quitado de favoritos');
-    } catch (e) {
-      toast.error(getErrorMessage(e));
-    }
-  };
-
-  return (
-    <ProductCard
-      product={product}
-      isFavorite={Boolean(isFav)}
-      onToggleFavorite={handleFav}
-      favoriteDisabled={remove.isPending}
-    />
-  );
 }
 
 export function FavoritesPage() {
@@ -333,7 +304,7 @@ export function FavoritesPage() {
         <ul className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
           {filteredProducts.map((p) => (
             <li key={p.id}>
-              <FavoriteRowCard product={p} />
+              <MarketProductCard item={p} fromFavoritesList />
             </li>
           ))}
         </ul>

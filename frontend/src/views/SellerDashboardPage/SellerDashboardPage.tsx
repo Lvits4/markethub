@@ -40,7 +40,7 @@ function KpiCard({
   const style = KPI_STYLES[variant];
   return (
     <div
-      className={`flex h-full min-h-[4.5rem] min-w-0 w-full items-center gap-2.5 rounded-md border border-(--admin-border) border-l-4 bg-(--admin-card) px-3 py-2.5 shadow-sm dark:shadow-none sm:min-h-[5rem] sm:px-3 sm:py-3 ${style.accent}`}
+      className={`flex h-full min-h-18 min-w-0 w-full items-center gap-2.5 rounded-md border border-(--admin-border) border-l-4 bg-(--admin-card) px-3 py-2.5 shadow-sm dark:shadow-none sm:min-h-20 sm:px-3 sm:py-3 ${style.accent}`}
     >
       <div className={`shrink-0 ${style.icon}`}>
         {icon}

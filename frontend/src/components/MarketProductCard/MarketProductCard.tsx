@@ -11,7 +11,16 @@ import type { Product } from '../../types/product';
 import { addToCartSchema } from '../../validations/addToCartSchema';
 import { ProductCard } from '../ProductCard/ProductCard';
 
-export function MarketProductCard({ item }: { item: Product }) {
+type MarketProductCardProps = {
+  item: Product;
+  /** En la vista de favoritos el corazón solo quita; el carrito sigue disponible. */
+  fromFavoritesList?: boolean;
+};
+
+export function MarketProductCard({
+  item,
+  fromFavoritesList = false,
+}: MarketProductCardProps) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { data: isFav } = useFavoriteCheckQuery(item.id, isAuthenticated);
@@ -24,6 +33,11 @@ export function MarketProductCard({ item }: { item: Product }) {
       return;
     }
     try {
+      if (fromFavoritesList) {
+        await remove.mutateAsync();
+        toast.success('Quitado de favoritos');
+        return;
+      }
       if (isFav) {
         await remove.mutateAsync();
         toast.success('Quitado de favoritos');
@@ -67,12 +81,16 @@ export function MarketProductCard({ item }: { item: Product }) {
   const addPending =
     addItem.isPending && addItem.variables?.productId === item.id;
 
+  const favoritePending = fromFavoritesList
+    ? remove.isPending
+    : add.isPending || remove.isPending;
+
   return (
     <ProductCard
       product={item}
-      isFavorite={Boolean(isFav)}
+      isFavorite={fromFavoritesList ? true : Boolean(isFav)}
       onToggleFavorite={handleFav}
-      favoriteDisabled={add.isPending || remove.isPending}
+      favoriteDisabled={favoritePending}
       onAddToCart={handleAddToCart}
       addToCartDisabled={addPending || item.stock < 1}
     />

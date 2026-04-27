@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import { FiTrash2 } from 'react-icons/fi';
+import { FiArrowLeft, FiTrash2 } from 'react-icons/fi';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { routePaths } from '../../config/routes';
 import { getErrorMessage } from '../../helpers/mapApiError';
@@ -12,6 +12,40 @@ import { usePaymentByOrderQuery } from '../../queries/usePaymentByOrderQuery';
 function numAmount(v: string | number) {
   const n = typeof v === 'string' ? Number.parseFloat(v) : v;
   return Number.isFinite(n) ? n : 0;
+}
+
+function recipientLabel(order: {
+  user?: { firstName: string; lastName: string; email: string };
+}): string {
+  const u = order.user;
+  if (!u) return '—';
+  const name = `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim();
+  if (name.length > 0) return name;
+  return u.email ?? '—';
+}
+
+function formatPaymentStatus(status: string): string {
+  const u = status.toUpperCase();
+  if (u === 'COMPLETED') return 'Completado';
+  if (u === 'PENDING') return 'Pendiente';
+  if (u === 'FAILED') return 'Fallido';
+  return status;
+}
+
+function OrderStatusBadge({ label }: { label: string }) {
+  return (
+    <span className="inline-flex rounded-full bg-sky-500/15 px-2.5 py-0.5 text-xs font-semibold text-sky-800 dark:bg-sky-500/20 dark:text-sky-300">
+      {label}
+    </span>
+  );
+}
+
+function PaymentStatusBadge({ label }: { label: string }) {
+  return (
+    <span className="inline-flex rounded-full bg-blue-500/15 px-2.5 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-400/25 dark:text-blue-200">
+      {label}
+    </span>
+  );
 }
 
 export function OrderDetailPage() {
@@ -41,7 +75,7 @@ export function OrderDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16 text-center text-sm text-zinc-500">
+      <div className="mx-auto w-full max-w-6xl px-4 py-16 text-center text-sm text-zinc-500 lg:px-6">
         Cargando pedido…
       </div>
     );
@@ -49,11 +83,11 @@ export function OrderDetailPage() {
 
   if (isError || !order) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-16 text-center text-sm text-red-600">
+      <div className="mx-auto w-full max-w-6xl px-4 py-16 text-center text-sm text-red-600 lg:px-6">
         Pedido no encontrado.{' '}
         <Link
           to={routePaths.orders}
-          className="font-semibold text-forest"
+          className="font-semibold text-sky-600 dark:text-sky-400"
         >
           Volver a mis pedidos
         </Link>
@@ -61,95 +95,121 @@ export function OrderDetailPage() {
     );
   }
 
+  const items = order.items ?? [];
+
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:pb-10 sm:pt-8 lg:pb-12">
-      <div className="mb-6">
+    <div className="mx-auto w-full max-w-6xl px-4 pb-28 pt-4 sm:pb-10 sm:pt-6 lg:px-6 lg:pb-12">
+      <nav
+        className="mb-3 flex flex-wrap items-center gap-2 text-sm"
+        aria-label="Navegación del pedido"
+      >
         <Link
           to={routePaths.orders}
-          className="inline-flex rounded-md px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-200/60 dark:text-zinc-100 dark:hover:bg-night-800"
+          className="inline-flex items-center gap-1.5 rounded-md py-1.5 pl-1 pr-2 text-sm font-medium text-zinc-700 transition hover:text-sky-600 dark:text-zinc-300 dark:hover:text-sky-400"
         >
-          ← Mis pedidos
+          <FiArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
+          Atrás
         </Link>
-      </div>
+        <span aria-hidden className="text-zinc-300 dark:text-zinc-600">
+          /
+        </span>
+        <span className="line-clamp-1 text-xs text-zinc-500 dark:text-zinc-400 sm:text-sm">
+          Detalle del pedido
+        </span>
+      </nav>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-          Pedido
-        </h1>
-        <button
-          type="button"
-          onClick={onDelete}
-          disabled={deleteOrder.isPending}
-          className="inline-flex items-center justify-center gap-2 self-start rounded-md border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 shadow-sm transition hover:bg-red-50 disabled:opacity-60 dark:border-red-900/50 dark:bg-night-900 dark:text-red-400 dark:hover:bg-red-950/40"
-        >
-          <FiTrash2 className="h-4 w-4" aria-hidden />
-          {deleteOrder.isPending ? 'Eliminando…' : 'Eliminar pedido'}
-        </button>
-      </div>
-
-      <div className="mt-6 rounded-md bg-white p-5 shadow-market ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
-        <dl className="grid gap-3 text-sm sm:grid-cols-2">
-          <div>
-            <dt className="text-zinc-500">Estado</dt>
-            <dd className="font-medium text-zinc-900 dark:text-zinc-50">
-              {formatOrderStatus(order.status)}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-zinc-500">Total</dt>
-            <dd className="font-semibold tabular-nums text-forest">
-              {formatPrice(numAmount(order.totalAmount))}
-            </dd>
-          </div>
-          <div className="sm:col-span-2">
-            <dt className="text-zinc-500">Envío</dt>
-            <dd className="text-zinc-800 dark:text-zinc-200">
-              {order.shippingAddress ?? '—'}
-            </dd>
-          </div>
-        </dl>
-      </div>
-
-      {payment ? (
-        <div className="mt-6 rounded-md bg-white p-5 shadow-market ring-1 ring-zinc-200/70 dark:bg-night-900 dark:ring-night-800">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">
-            Pago
-          </h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
-            Estado: <span className="font-medium">{payment.status}</span>
-            {payment.transactionId ? (
-              <>
-                {' '}
-                · Transacción:{' '}
-                <span className="font-mono text-xs">{payment.transactionId}</span>
-              </>
-            ) : null}
-          </p>
-          <p className="mt-1 text-sm tabular-nums text-zinc-800 dark:text-zinc-200">
-            Importe: {formatPrice(numAmount(payment.amount))}
-          </p>
-        </div>
-      ) : null}
-
-      <div className="mt-6">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">
-          Artículos
-        </h2>
-        <ul className="mt-3 space-y-2">
-          {(order.items ?? []).map((it) => (
-            <li
-              key={it.id}
-              className="flex flex-wrap justify-between gap-2 rounded-md border border-zinc-100 px-4 py-3 text-sm dark:border-night-800"
+      <div className="flex w-full flex-col gap-4 lg:gap-5">
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-2xl">
+                Pedido
+              </h1>
+              {order.store?.name ? (
+                <p className="mt-0.5 text-sm text-sky-700 dark:text-sky-400">
+                  Tienda: {order.store.name}
+                </p>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              onClick={onDelete}
+              disabled={deleteOrder.isPending}
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm transition hover:bg-red-50 disabled:opacity-60 dark:border-red-900/50 dark:bg-night-900 dark:text-red-400 dark:hover:bg-red-950/40"
             >
-              <span>
-                {it.quantity}× {it.product?.name ?? 'Producto'}
+              <FiTrash2 className="h-4 w-4" aria-hidden />
+              {deleteOrder.isPending ? 'Eliminando…' : 'Eliminar'}
+            </button>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <OrderStatusBadge label={formatOrderStatus(order.status)} />
+            {payment ? (
+              <PaymentStatusBadge label={formatPaymentStatus(payment.status)} />
+            ) : null}
+          </div>
+        </div>
+
+        <div className="w-full">
+          <span className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            Artículos
+          </span>
+          <ul className="mt-2 space-y-2 text-sm">
+            {items.map((it) => (
+              <li
+                key={it.id}
+                className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-zinc-200/80 pb-2 last:border-0 last:pb-0 dark:border-night-700/80"
+              >
+                <span className="min-w-0 leading-snug text-zinc-800 dark:text-zinc-200">
+                  {it.quantity}× {it.product?.name ?? 'Producto'}
+                </span>
+                <span className="shrink-0 tabular-nums font-medium text-sky-700 dark:text-sky-400">
+                  {formatPrice(numAmount(it.unitPrice) * it.quantity)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="grid w-full gap-5 border-t border-zinc-200/80 pt-4 dark:border-night-700 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6 xl:gap-8">
+          <div>
+            <span className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              Total del pedido
+            </span>
+            <p className="mt-2 text-3xl font-bold text-sky-600 dark:text-sky-400 sm:text-4xl">
+              {formatPrice(numAmount(order.totalAmount))}
+            </p>
+          </div>
+
+          <div>
+            <span className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              Envío
+            </span>
+            <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+                Destinatario:{' '}
               </span>
-              <span className="tabular-nums text-zinc-600 dark:text-zinc-400">
-                {formatPrice(numAmount(it.unitPrice) * it.quantity)}
+              {recipientLabel(order)}
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+                Dirección:{' '}
               </span>
-            </li>
-          ))}
-        </ul>
+              {order.shippingAddress ?? '—'}
+            </p>
+          </div>
+
+          {payment ? (
+            <div>
+              <span className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                Pago
+              </span>
+              <p className="mt-3 font-mono text-sm leading-snug break-all text-zinc-800 dark:text-zinc-200">
+                {payment.transactionId?.trim() || '—'}
+              </p>
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );

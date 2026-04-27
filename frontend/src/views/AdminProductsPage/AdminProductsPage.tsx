@@ -224,7 +224,7 @@ function ProductDetailsPanel({ product }: { product: Product }) {
             {galleryImages.map((img) => (
               <div
                 key={img.id}
-                className="flex min-h-[5rem] items-center justify-center rounded-lg border border-slate-200/80 bg-white p-2 dark:border-blue-500/15 dark:bg-admin-elevated"
+                className="flex min-h-20 items-center justify-center rounded-lg border border-slate-200/80 bg-white p-2 dark:border-blue-500/15 dark:bg-admin-elevated"
               >
                 <ProductDetailImage url={img.url} />
               </div>

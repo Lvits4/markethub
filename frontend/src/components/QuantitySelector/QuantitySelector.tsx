@@ -32,7 +32,7 @@ export function QuantitySelector({
       >
         <FiMinus className="h-4 w-4" />
       </Button>
-      <span className="min-w-[2rem] text-center text-sm font-semibold tabular-nums">
+      <span className="min-w-8 text-center text-sm font-semibold tabular-nums">
         {value}
       </span>
       <Button

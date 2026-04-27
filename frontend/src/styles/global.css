@@ -531,7 +531,7 @@ html:has(.admin-shell) #root {
 }
 
 .admin-nav-link:hover {
-  @apply bg-zinc-100 dark:bg-white/[0.05];
+  @apply bg-zinc-100 dark:bg-white/5;
 }
 
 .admin-nav-link--active {

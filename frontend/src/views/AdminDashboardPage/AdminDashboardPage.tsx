@@ -41,7 +41,7 @@ function KpiCard({
   const style = KPI_STYLES[variant];
   return (
     <div
-      className={`flex h-full min-h-[5.75rem] min-w-0 w-full items-center gap-3 rounded-md border border-(--admin-border) border-l-4 bg-(--admin-card) px-4 py-3.5 shadow-sm dark:shadow-none sm:min-h-[6.25rem] sm:px-4 sm:py-4 ${style.accent}`}
+      className={`flex h-full min-h-23 min-w-0 w-full items-center gap-3 rounded-md border border-(--admin-border) border-l-4 bg-(--admin-card) px-4 py-3.5 shadow-sm dark:shadow-none sm:min-h-25 sm:px-4 sm:py-4 ${style.accent}`}
     >
       <div className={`shrink-0 ${style.icon}`}>
         {icon}

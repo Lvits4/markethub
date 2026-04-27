@@ -8,9 +8,9 @@ export function useCreateOrderMutation() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: (shippingAddress: string) => {
+    mutationFn: (payload: { shippingAddress: string; cartItemId?: string }) => {
       if (!token) throw new Error('No autenticado');
-      return createOrderFromCart(token, shippingAddress);
+      return createOrderFromCart(token, payload);
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: queryKeys.cart });
