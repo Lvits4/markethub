@@ -139,7 +139,7 @@ export function FilterPopover({
                     options={field.options}
                     variant="field"
                     triggerClassName="!mt-0 rounded-lg border-zinc-200 bg-zinc-50 py-2.5 dark:border-night-600 dark:bg-night-800/80"
-                    listClassName="rounded-xl border-zinc-200/90 dark:border-sky-500/25"
+                    listClassName="rounded-xl border-zinc-200/90 dark:border-blue-500/20"
                   />
                 </div>
               </fieldset>

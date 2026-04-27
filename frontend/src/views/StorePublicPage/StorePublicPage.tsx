@@ -262,7 +262,7 @@ export function StorePublicPage() {
               />
             ) : (
               <div
-                className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-forest/30 to-zinc-200 dark:from-sky-600/28 dark:to-night-800"
+                className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-forest/30 to-zinc-200 dark:from-blue-600/25 dark:to-night-800"
                 aria-hidden
               >
                 <span className="text-4xl font-bold tracking-tight text-forest dark:text-market-dark-accent sm:text-5xl md:text-6xl">
@@ -371,7 +371,7 @@ export function StorePublicPage() {
                       searchPlaceholder="Buscar categoría…"
                       listMaxHeightPx={320}
                       triggerClassName="!mt-0 rounded-lg border-zinc-200 bg-zinc-50 py-2.5 dark:border-night-600 dark:bg-night-800/80"
-                      listClassName="rounded-xl border-zinc-200/90 dark:border-sky-500/25"
+                      listClassName="rounded-xl border-zinc-200/90 dark:border-blue-500/20"
                     />
                   </div>
                 </fieldset>
@@ -389,7 +389,7 @@ export function StorePublicPage() {
                       }))}
                       variant="field"
                       triggerClassName="!mt-0 rounded-lg border-zinc-200 bg-zinc-50 py-2.5 dark:border-night-600 dark:bg-night-800/80"
-                      listClassName="rounded-xl border-zinc-200/90 dark:border-sky-500/25"
+                      listClassName="rounded-xl border-zinc-200/90 dark:border-blue-500/20"
                     />
                   </div>
                 </fieldset>

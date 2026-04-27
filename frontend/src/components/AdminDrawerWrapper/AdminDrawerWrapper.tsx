@@ -79,7 +79,7 @@ export function AdminDrawerWrapper({
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}
-        className={`flex h-full w-full max-w-admin-drawer cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl transition-transform ease-out dark:border-sky-500/20 dark:bg-admin-drawer ${
+        className={`flex h-full w-full max-w-admin-drawer cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl transition-transform ease-out dark:border-blue-500/15 dark:bg-admin-drawer ${
           visible ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{ transitionDuration: `${ANIMATION_MS}ms` }}

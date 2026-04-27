@@ -85,7 +85,7 @@ export function SellerLayout() {
     <>
       <div className="admin-shell flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-[var(--admin-page-bg)] text-zinc-800 dark:text-zinc-100">
         <aside
-          className={`flex min-h-0 shrink-0 flex-col overflow-x-hidden border-r border-[var(--admin-border)] bg-[var(--admin-card)] transition-[width] duration-200 ease-out dark:bg-night-900 ${collapsed ? 'w-[72px]' : 'w-[248px]'}`}
+          className={`admin-sidebar-rail flex min-h-0 shrink-0 flex-col overflow-x-hidden border-r border-[var(--admin-border)] bg-[var(--admin-card)] transition-[width] duration-200 ease-out ${collapsed ? 'w-[72px]' : 'w-[248px]'}`}
           aria-label="Navegación del panel"
         >
           <div
@@ -132,7 +132,7 @@ export function SellerLayout() {
           </div>
 
           <nav
-            className={`market-scroll min-h-0 flex-1 space-y-0.5 overflow-y-auto overflow-x-hidden overscroll-contain [scrollbar-gutter:stable] ${collapsed ? 'admin-sidebar-nav--collapsed px-1.5 py-2' : 'p-3'}`}
+            className={`market-scroll min-h-0 flex-1 space-y-0.5 overflow-y-auto overflow-x-hidden overscroll-contain [scrollbar-gutter:stable] ${collapsed ? 'admin-sidebar-nav--collapsed px-0 py-2' : 'p-3'}`}
           >
             <SidebarNavItem
               to={routePaths.seller}
@@ -196,8 +196,8 @@ export function SellerLayout() {
             onAccountSettingsOpen={() => setAccountSettingsOpen(true)}
             onLogout={handleLogout}
           />
-          <main className="flex min-h-0 flex-1 flex-col overflow-hidden p-5 md:p-8">
-            <div className="mx-auto flex min-h-0 w-full max-w-[1360px] flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain [scrollbar-gutter:stable]">
+          <main className="admin-main-area flex min-h-0 flex-1 flex-col items-center overflow-hidden py-5 md:py-8">
+            <div className="flex min-h-0 w-[min(100%,1360px)] flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain px-5 md:px-8 [scrollbar-gutter:stable]">
               <div
                 key={sellerOutletPath}
                 className="route-outlet-fade flex min-h-0 min-w-0 flex-1 flex-col"

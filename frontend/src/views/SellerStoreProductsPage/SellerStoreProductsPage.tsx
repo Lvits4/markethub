@@ -70,7 +70,7 @@ export function SellerStoreProductsPage() {
       ) : (
         <div className="admin-table-panel">
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <div className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-sky-500/20">
+            <div className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-blue-500/15">
               <table className="w-full min-w-[640px] table-fixed border-collapse text-left text-sm">
                 <colgroup>
                   <col style={{ width: '3.5%' }} />
@@ -111,7 +111,7 @@ export function SellerStoreProductsPage() {
                   {data.data.map((p, i) => (
                     <tr
                       key={p.id}
-                      className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
+                      className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-blue-500/10 dark:hover:bg-white/[0.06]"
                     >
                       <td className="w-8 px-2 py-2 text-center tabular-nums text-slate-400 dark:text-slate-500">
                         {i + 1}

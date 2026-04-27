@@ -56,13 +56,13 @@
   --color-auth-primary: #3b82f6;
   --color-auth-primary-hover: #2563eb;
   --color-auth-bg: #eef2fb;
-  /* Modo noche: superficies azul profundo (no gris neutro) */
-  --color-night-950: #060a14;
-  --color-night-900: #0a1020;
-  --color-night-800: #121a2e;
-  --color-night-700: #1a2540;
-  --color-night-600: #243252;
-  --color-night-base: #050811;
+  /* Modo noche: escalones un poco más claros entre capas (menos “todo el mismo gris”) */
+  --color-night-950: #12151c;
+  --color-night-900: #181b24;
+  --color-night-800: #22262f;
+  --color-night-700: #2d323e;
+  --color-night-600: #3d4454;
+  --color-night-base: #0c0e12;
   /* Unificar radios del design system con `rounded-md` (0.375rem) */
   --radius-xs: 0.375rem;
   --radius-sm: 0.375rem;
@@ -75,7 +75,7 @@
   --radius: 0.375rem;
   --radius-market: 0.375rem;
   --shadow-market: 0 10px 40px -12px rgb(0 0 0 / 0.08);
-  --shadow-market-dark: 0 16px 48px -10px rgb(15 23 42 / 0.55), 0 0 0 1px rgb(59 130 246 / 0.06);
+  --shadow-market-dark: 0 16px 48px -10px rgb(0 0 0 / 0.4), 0 0 0 1px rgb(148 163 184 / 0.06);
   /*
    * Marketplace oscuro: misma línea que .dark .admin-cta-solid (“Nueva categoría”):
    * fondo navy #102251, texto azul suave #458bde (no azules saturados tipo blue-600).
@@ -84,16 +84,16 @@
   --color-market-dark-surface-hover: #152a5e;
   --color-market-dark-accent: #458bde;
   /* Superficies admin (drawers, tablas oscuras): evita decenas de hex arbitrarios en JSX */
-  --color-admin-drawer: #0b152f;
-  --color-admin-drawer-head: #0d1938;
+  --color-admin-drawer: #12161f;
+  --color-admin-drawer-head: #161b26;
   --color-admin-canvas: #f5f8fc;
-  --color-admin-canvas-dark: #091126;
-  --color-admin-elevated: #0f1a38;
-  --color-admin-footer: #0c1630;
-  --color-admin-field: #0b1735;
-  --color-admin-dropdown: #121a2e;
-  --color-admin-media-bg: #0a1228;
-  --color-admin-pill-dark: #162647;
+  --color-admin-canvas-dark: #12151d;
+  --color-admin-elevated: #1c212c;
+  --color-admin-footer: #141820;
+  --color-admin-field: #151a24;
+  --color-admin-dropdown: #1a202c;
+  --color-admin-media-bg: #131822;
+  --color-admin-pill-dark: #222836;
   --color-auth-screen-from: #e6eaf3;
   --color-auth-screen-to: #dce3ef;
   --color-auth-hero-end: #172554;
@@ -148,15 +148,15 @@ html.dark {
 html.dark::before {
   content: '';
   position: fixed;
-  inset: -30% -20%;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
+  /* Ambiente muy suave: viñeta + un halo frío difuso (sin competir con el contenido) */
   background:
-    radial-gradient(ellipse 55% 45% at 20% 15%, rgb(69 139 222 / 0.16), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 85% 75%, rgb(69 139 222 / 0.1), transparent 50%),
-    radial-gradient(ellipse 40% 35% at 50% 100%, rgb(45 100 180 / 0.14), transparent 45%);
-  filter: blur(72px);
-  opacity: 0.95;
+    radial-gradient(125% 85% at 50% -8%, rgb(148 163 184 / 0.035), transparent 58%),
+    radial-gradient(85% 55% at 100% 105%, rgb(71 102 158 / 0.035), transparent 48%),
+    linear-gradient(180deg, rgb(12 14 18 / 0) 0%, rgb(8 9 11 / 0.42) 100%);
+  opacity: 1;
 }
 
 html.dark body {
@@ -244,9 +244,9 @@ body {
 }
 
 .dark .table-pagination-root {
-  border-top-color: rgb(56 189 248 / 0.18);
-  background-color: rgb(12 22 48 / 0.88);
-  color: rgb(148 163 184);
+  border-top-color: rgb(148 163 184 / 0.1);
+  background-color: rgb(12 14 20 / 0.94);
+  color: rgb(163 173 190);
 }
 
 .table-pagination-cell {
@@ -383,10 +383,15 @@ body {
 }
 
 .dark .admin-shell {
-  --admin-page-bg: #0a0f1c;
-  --admin-card: #111827;
-  --admin-border: rgb(96 165 250 / 0.12);
-  --admin-primary-soft: color-mix(in srgb, var(--color-admin-primary) 22%, transparent);
+  /* Lienzo vs sidebar vs panel: tres tonos distinguibles sin saltos bruscos */
+  --admin-page-bg: #090b0f;
+  --admin-card: #10131a;
+  --admin-border: rgb(148 163 184 / 0.11);
+  --admin-primary-soft: color-mix(in srgb, var(--color-admin-primary) 18%, transparent);
+  --admin-panel-bg: #151922;
+  --admin-panel-bg-deep: #10141c;
+  --admin-panel-border: rgb(148 163 184 / 0.16);
+  --admin-table-header-bg: rgb(22 26 36 / 0.98);
 }
 
 /*
@@ -414,6 +419,36 @@ html:has(.admin-shell) #root {
   overflow: hidden;
 }
 
+/* Área principal del panel: ligero degradado + viñeta (el navbar tiene algo que “difuminar”) */
+.dark .admin-shell .admin-main-area {
+  background-color: var(--admin-page-bg);
+  background-image:
+    radial-gradient(ellipse 92% 52% at 50% -6%, rgb(71 102 158 / 0.038), transparent 56%),
+    linear-gradient(180deg, rgb(11 13 17) 0%, var(--admin-page-bg) 48%, rgb(7 8 11) 100%);
+}
+
+/* Sidebar: sombra hacia el contenido para separar del lienzo */
+.dark .admin-shell .admin-sidebar-rail {
+  box-shadow:
+    6px 0 32px -8px rgb(0 0 0 / 0.45),
+    inset -1px 0 0 0 rgb(148 163 184 / 0.05);
+}
+
+/* Barra superior admin/vendedor: capa sólida + sombra (funciona aunque el blur sea sutil) */
+.dark .admin-shell .admin-top-bar {
+  background: linear-gradient(
+    180deg,
+    rgb(16 19 26 / 0.97) 0%,
+    rgb(12 14 19 / 0.96) 100%
+  );
+  border-bottom-color: rgb(148 163 184 / 0.09);
+  box-shadow:
+    0 1px 0 0 rgb(255 255 255 / 0.045) inset,
+    0 12px 40px -10px rgb(0 0 0 / 0.42);
+  backdrop-filter: blur(20px) saturate(1.15);
+  -webkit-backdrop-filter: blur(20px) saturate(1.15);
+}
+
 /* Tablas: contraste frente al fondo gris/crema en tema claro (borde + superficie blanca) */
 .admin-table-panel {
   @apply flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border backdrop-blur-xl;
@@ -425,11 +460,23 @@ html:has(.admin-shell) #root {
 }
 
 .dark .admin-table-panel {
-  border-color: rgb(56 189 248 / 0.25);
-  background-color: rgb(10 18 40 / 0.92);
+  border-color: var(--admin-panel-border);
+  background-color: var(--admin-panel-bg);
+  background-image: linear-gradient(
+    168deg,
+    rgb(24 28 38) 0%,
+    var(--admin-panel-bg) 42%,
+    var(--admin-panel-bg-deep) 100%
+  );
   box-shadow:
-    0 24px 56px -16px rgb(0 0 0 / 0.55),
-    inset 0 1px 0 0 rgb(56 189 248 / 0.11);
+    0 1px 0 0 rgb(255 255 255 / 0.05) inset,
+    0 24px 48px -20px rgb(0 0 0 / 0.52),
+    0 0 0 1px rgb(0 0 0 / 0.28);
+}
+
+.dark .admin-table-panel thead {
+  background-color: var(--admin-table-header-bg) !important;
+  box-shadow: 0 1px 0 0 rgb(255 255 255 / 0.04);
 }
 
 .market-table-wrap {
@@ -441,9 +488,18 @@ html:has(.admin-shell) #root {
 }
 
 .dark .market-table-wrap {
-  background-color: var(--color-night-900);
-  border-color: rgb(51 65 85 / 0.55);
-  box-shadow: var(--shadow-market-dark);
+  background-color: var(--admin-panel-bg);
+  background-image: linear-gradient(
+    168deg,
+    rgb(24 28 38) 0%,
+    var(--admin-panel-bg) 45%,
+    var(--admin-panel-bg-deep) 100%
+  );
+  border-color: var(--admin-panel-border);
+  box-shadow:
+    0 1px 0 0 rgb(255 255 255 / 0.05) inset,
+    0 20px 44px -18px rgb(0 0 0 / 0.48),
+    0 0 0 1px rgb(0 0 0 / 0.26);
 }
 
 .market-table-wrap--clip {
@@ -475,7 +531,7 @@ html:has(.admin-shell) #root {
 }
 
 .admin-nav-link:hover {
-  @apply bg-zinc-100 dark:bg-night-800/80;
+  @apply bg-zinc-100 dark:bg-white/[0.05];
 }
 
 .admin-nav-link--active {
@@ -485,8 +541,15 @@ html:has(.admin-shell) #root {
 }
 
 .dark .admin-nav-link--active {
-  color: var(--color-market-dark-accent);
-  box-shadow: none;
+  background: linear-gradient(
+    135deg,
+    rgb(16 34 81 / 0.55) 0%,
+    rgb(21 42 94 / 0.38) 100%
+  );
+  color: rgb(186 214 247);
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.055),
+    0 0 0 1px rgb(69 139 222 / 0.16);
 }
 
 /* CTA sólido: azul marca en claro, navy/cyan en oscuro (tablas admin, formularios) */
@@ -539,16 +602,29 @@ html:has(.admin-shell) #root {
 .admin-sidebar-nav--collapsed .admin-sidebar-icon-row {
   width: 100%;
   justify-content: center;
-  padding-left: 0.375rem;
-  padding-right: 0.375rem;
+  gap: 0;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .admin-sidebar-nav--collapsed .admin-nav-link {
   box-sizing: border-box;
 }
 
+/* El bloque de etiqueta sigue en el DOM (0fr) pero flex aún reservaba hueco por gap-3; colapsar ancho real */
+.admin-sidebar-nav--collapsed .admin-nav-link > div:last-of-type {
+  width: 0;
+  min-width: 0;
+  max-width: 0;
+  flex: 0 0 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
 .admin-sidebar-nav--collapsed .admin-nav-link--active {
-  @apply mx-auto size-11 shrink-0 rounded-full px-0 py-0;
+  @apply mx-auto size-11 shrink-0 items-center justify-center rounded-full px-0 py-0;
 }
 
 /* Catálogo: popover de filtros — lista nativa del <select> acorde al tema */

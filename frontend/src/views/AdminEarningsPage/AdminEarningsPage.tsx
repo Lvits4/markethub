@@ -80,7 +80,7 @@ function SortHeader({
         <span className="inline-flex shrink-0 flex-col items-center gap-0 leading-none">
           <button
             type="button"
-            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'asc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
+            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-white/10 ${active && dir === 'asc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
             aria-label={`Ordenar ${label} ascendente`}
             onClick={() => onSort(sortKey, 'asc')}
           >
@@ -88,7 +88,7 @@ function SortHeader({
           </button>
           <button
             type="button"
-            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'desc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
+            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-white/10 ${active && dir === 'desc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
             aria-label={`Ordenar ${label} descendente`}
             onClick={() => onSort(sortKey, 'desc')}
           >
@@ -220,7 +220,7 @@ function CommissionCell({
           step={0.5}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          className="w-16 rounded border border-slate-300 bg-white px-2 py-1 text-sm tabular-nums outline-hidden focus:border-forest focus:ring-2 focus:ring-forest/25 dark:border-sky-500/30 dark:bg-admin-field dark:text-slate-100"
+          className="w-16 rounded border border-slate-300 bg-white px-2 py-1 text-sm tabular-nums outline-hidden focus:border-forest focus:ring-2 focus:ring-forest/25 dark:border-blue-500/25 dark:bg-admin-field dark:text-slate-100"
           autoFocus
           onKeyDown={(e) => {
             if (e.key === 'Enter') save();
@@ -233,7 +233,7 @@ function CommissionCell({
           type="button"
           onClick={save}
           disabled={saving}
-          className="rounded px-1.5 py-0.5 text-xs font-medium text-blue-600 hover:bg-blue-500/10 dark:text-sky-400 dark:hover:bg-sky-500/15"
+          className="rounded px-1.5 py-0.5 text-xs font-medium text-blue-600 hover:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/12"
         >
           ✓
         </button>
@@ -241,7 +241,7 @@ function CommissionCell({
           type="button"
           onClick={cancel}
           disabled={saving}
-          className="rounded px-1.5 py-0.5 text-xs font-medium text-slate-500 hover:bg-slate-200 dark:hover:bg-sky-950/50"
+          className="rounded px-1.5 py-0.5 text-xs font-medium text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10"
         >
           ✕
         </button>
@@ -253,7 +253,7 @@ function CommissionCell({
     <button
       type="button"
       onClick={startEdit}
-      className="group inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-sm tabular-nums transition hover:bg-slate-200 dark:hover:bg-sky-950/50"
+      className="group inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-sm tabular-nums transition hover:bg-slate-200 dark:hover:bg-white/10"
       title="Clic para editar comisión"
     >
       {commission}%
@@ -393,7 +393,7 @@ export function AdminEarningsPage() {
             <div
               ref={tableHeaderScrollRef}
               onScroll={onTableHeaderScroll}
-              className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-sky-500/20"
+              className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-blue-500/15"
             >
               <table className="w-full min-w-[840px] table-fixed border-collapse text-left text-sm">
                 <EarningsTableColgroup />
@@ -464,7 +464,7 @@ export function AdminEarningsPage() {
                     pageRows.map((row, idx) => (
                       <tr
                         key={row.storeId}
-                        className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
+                        className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-blue-500/10 dark:hover:bg-white/[0.06]"
                       >
                         <td className="w-10 px-2 py-2 text-center align-middle tabular-nums text-slate-400 dark:text-slate-500">
                           {(page - 1) * pageSize + idx + 1}
@@ -488,7 +488,7 @@ export function AdminEarningsPage() {
         <td className="px-4 py-2 align-middle tabular-nums text-slate-700 dark:text-slate-300">
           {formatPrice(row.sellerEarnings)}
         </td>
-        <td className="px-4 py-2 align-middle tabular-nums font-medium text-green-600 dark:text-green-400">
+        <td className="px-4 py-2 align-middle tabular-nums font-semibold text-emerald-700 dark:text-forest">
           {formatPrice(row.adminEarnings)}
         </td>
                 </tr>

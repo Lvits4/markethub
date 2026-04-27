@@ -63,7 +63,7 @@ const compactTriggerBaseClass =
 const compactTriggerDisabledClass = 'cursor-not-allowed opacity-60';
 
 const fieldListPanelClass =
-  'fixed z-[90] flex flex-col overflow-hidden overscroll-contain rounded-md border border-zinc-200/90 bg-white shadow-lg ring-1 ring-black/5 dark:border-sky-500/20 dark:bg-admin-dropdown dark:shadow-admin-dropdown dark:ring-sky-500/10';
+  'fixed z-[90] flex flex-col overflow-hidden overscroll-contain rounded-md border border-zinc-200/90 bg-white shadow-lg ring-1 ring-black/5 dark:border-blue-500/15 dark:bg-admin-dropdown dark:shadow-admin-dropdown dark:ring-sky-500/10';
 
 const fieldListUlClass =
   'market-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain py-1';
@@ -274,7 +274,7 @@ export function FormSelect({
             style={panelPositionStyle}
           >
             {searchable ? (
-              <div className="shrink-0 border-b border-zinc-200/90 p-2 dark:border-sky-500/20">
+              <div className="shrink-0 border-b border-zinc-200/90 p-2 dark:border-blue-500/15">
                 <input
                   type="search"
                   value={listFilter}

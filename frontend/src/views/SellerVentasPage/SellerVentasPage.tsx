@@ -64,26 +64,28 @@ function SortHeader({
   activeKey,
   dir,
   onSort,
-  align = 'left',
+  align = 'center',
 }: {
   label: string;
   sortKey: SortKey;
   activeKey: SortKey;
   dir: SortDir;
   onSort: (key: SortKey, direction: SortDir) => void;
-  align?: 'left' | 'right';
+  align?: 'left' | 'center' | 'right';
 }) {
   const active = activeKey === sortKey;
+  const alignClass =
+    align === 'right' ? 'text-right' : align === 'left' ? 'text-left' : 'text-center';
+  const flexJustify =
+    align === 'right' ? 'justify-end' : align === 'left' ? 'justify-start' : 'justify-center';
   return (
-    <th
-      className={`px-4 py-3.5 ${align === 'right' ? 'text-right' : 'text-left'}`}
-    >
-      <div className="inline-flex items-center gap-2">
+    <th className={`px-4 py-3.5 ${alignClass}`}>
+      <div className={`flex items-center gap-2 ${flexJustify}`}>
         <span className="leading-tight">{label}</span>
         <span className="inline-flex shrink-0 flex-col items-center gap-0 leading-none">
           <button
             type="button"
-            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'asc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
+            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-white/10 ${active && dir === 'asc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
             aria-label={`Ordenar ${label} ascendente`}
             onClick={() => onSort(sortKey, 'asc')}
           >
@@ -91,7 +93,7 @@ function SortHeader({
           </button>
           <button
             type="button"
-            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'desc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
+            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-white/10 ${active && dir === 'desc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
             aria-label={`Ordenar ${label} descendente`}
             onClick={() => onSort(sortKey, 'desc')}
           >
@@ -306,12 +308,12 @@ export function SellerVentasPage() {
             <div
               ref={tableHeaderScrollRef}
               onScroll={onTableHeaderScroll}
-              className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-sky-500/20"
+              className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-white/[0.08]"
             >
-              <table className="w-full min-w-[900px] table-fixed border-collapse text-left text-sm">
+              <table className="w-full min-w-[900px] table-fixed border-collapse text-center text-sm">
                 <VentasTableColgroup />
                 <thead className="bg-slate-100/92 backdrop-blur-md dark:bg-admin-elevated/95 dark:backdrop-blur-md">
-                  <tr className="text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+                  <tr className="text-xs font-semibold uppercase tracking-[0.06em] text-slate-600 dark:text-slate-400/90">
     <th className="px-2 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
           #
         </th>
@@ -328,7 +330,6 @@ export function SellerVentasPage() {
                       activeKey={sortKey}
                       dir={sortDir}
                       onSort={handleSort}
-                      align="right"
                     />
                     <SortHeader
                       label="Comisión"
@@ -336,7 +337,6 @@ export function SellerVentasPage() {
                       activeKey={sortKey}
                       dir={sortDir}
                       onSort={handleSort}
-                      align="right"
                     />
                     <SortHeader
                       label="Mi ganancia"
@@ -344,7 +344,6 @@ export function SellerVentasPage() {
                       activeKey={sortKey}
                       dir={sortDir}
                       onSort={handleSort}
-                      align="right"
                     />
                     <SortHeader
                       label="Comisión admin"
@@ -352,7 +351,6 @@ export function SellerVentasPage() {
                       activeKey={sortKey}
                       dir={sortDir}
                       onSort={handleSort}
-                      align="right"
                     />
                     <SortHeader
                       label="Pedidos"
@@ -360,7 +358,6 @@ export function SellerVentasPage() {
                       activeKey={sortKey}
                       dir={sortDir}
                       onSort={handleSort}
-                      align="right"
                     />
                     <SortHeader
                       label="Productos"
@@ -368,7 +365,6 @@ export function SellerVentasPage() {
                       activeKey={sortKey}
                       dir={sortDir}
                       onSort={handleSort}
-                      align="right"
                     />
                   </tr>
                 </thead>
@@ -379,7 +375,7 @@ export function SellerVentasPage() {
               onScroll={onTableBodyScroll}
               className="market-scroll min-h-0 flex-1 overflow-y-auto overflow-x-auto"
             >
-              <table className="w-full min-w-[900px] table-fixed border-collapse text-left text-sm">
+              <table className="w-full min-w-[900px] table-fixed border-collapse text-center text-sm">
                 <VentasTableColgroup />
                 <tbody>
                   {pageRows.length === 0 ? (
@@ -397,32 +393,32 @@ export function SellerVentasPage() {
                     pageRows.map((row, idx) => (
                       <tr
                         key={row.storeId}
-                        className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
+                        className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-white/[0.06] dark:hover:bg-white/[0.04]"
                       >
-                        <td className="px-2 py-2 text-center align-middle tabular-nums text-slate-400 dark:text-slate-500">
+                        <td className="px-2 py-2.5 text-center align-middle tabular-nums text-slate-400 dark:text-slate-500">
                           {(page - 1) * pageSize + idx + 1}
                         </td>
-                        <td className="px-4 py-2 align-middle">
-                          <p className="font-medium leading-tight text-slate-900 dark:text-slate-100">
+                        <td className="px-4 py-2.5 align-middle">
+                          <p className="text-center font-medium leading-tight text-slate-900 dark:text-slate-100">
                             {row.storeName}
                           </p>
                         </td>
-                        <td className="px-4 py-2 text-right align-middle tabular-nums text-slate-700 dark:text-slate-300">
+                        <td className="px-4 py-2.5 align-middle tabular-nums text-slate-700 dark:text-slate-300">
                           {formatPrice(row.totalRevenue)}
                         </td>
-                        <td className="px-4 py-2 text-right align-middle tabular-nums text-slate-700 dark:text-slate-300">
+                        <td className="px-4 py-2.5 align-middle tabular-nums text-slate-700 dark:text-slate-300">
                           {row.commission}%
                         </td>
-                        <td className="px-4 py-2 text-right align-middle tabular-nums font-medium text-emerald-600 dark:text-emerald-400">
+                        <td className="px-4 py-2.5 align-middle tabular-nums font-semibold text-emerald-700 dark:text-forest">
                           {formatPrice(row.sellerEarnings)}
                         </td>
-                        <td className="px-4 py-2 text-right align-middle tabular-nums text-slate-700 dark:text-slate-300">
+                        <td className="px-4 py-2.5 align-middle tabular-nums text-slate-700 dark:text-slate-300">
                           {formatPrice(row.adminEarnings)}
                         </td>
-                        <td className="px-4 py-2 text-right align-middle tabular-nums text-slate-700 dark:text-slate-300">
+                        <td className="px-4 py-2.5 align-middle tabular-nums text-slate-700 dark:text-slate-300">
                           {row.totalOrders}
                         </td>
-                        <td className="px-4 py-2 text-right align-middle tabular-nums text-slate-700 dark:text-slate-300">
+                        <td className="px-4 py-2.5 align-middle tabular-nums text-slate-700 dark:text-slate-300">
                           {row.activeProducts}
                         </td>
                       </tr>

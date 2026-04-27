@@ -178,7 +178,7 @@ function OrderDetailsPanel({ order }: { order: Order }) {
           title="Pedido"
           badges={
             <>
-              <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
+              <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-slate-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300">
                 {formatPrice(numAmount(order.totalAmount))}
               </span>
               <AdminStatusBadge tone={orderStatusTone(order.status)}>
@@ -248,7 +248,7 @@ function OrderDetailsPanel({ order }: { order: Order }) {
       >
         {detailTab === 'envio' ? (
           <div className="space-y-3 pb-1">
-            <div className="rounded-lg border border-slate-200/80 bg-white p-3 dark:border-sky-500/20 dark:bg-admin-elevated">
+            <div className="rounded-lg border border-slate-200/80 bg-white p-3 dark:border-blue-500/15 dark:bg-admin-elevated">
               <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                 Dirección completa
               </p>
@@ -273,7 +273,7 @@ function OrderDetailsPanel({ order }: { order: Order }) {
                 {items.map((item, i) => (
                   <tr
                     key={item.id}
-                    className="border-t border-slate-100 dark:border-sky-500/10"
+                    className="border-t border-slate-100 dark:border-blue-500/8"
                   >
                     <td className="w-7 px-1.5 py-1.5 text-center tabular-nums text-slate-400 dark:text-slate-500">
                       {i + 1}
@@ -324,7 +324,7 @@ function OrderDetailsDrawer({
 }) {
   return (
     <AdminDrawerWrapper open={open} onClose={onClose} ariaLabel="Detalle de pedido">
-      <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-admin-drawer-head">
+      <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-blue-500/15 dark:bg-admin-drawer-head">
         <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
           Panel de detalles
         </h2>
@@ -332,7 +332,7 @@ function OrderDetailsDrawer({
           <Button
             type="button"
             variant="icon"
-            className="h-8 w-8 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-sky-500/20"
+            className="h-8 w-8 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-blue-500/15"
             aria-label="Cerrar panel"
             onClick={onClose}
           >
@@ -358,7 +358,7 @@ function OrderDetailsDrawer({
         )}
       </div>
       {order && onDeleteOrder ? (
-        <div className="shrink-0 border-t border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-admin-drawer-head">
+        <div className="shrink-0 border-t border-slate-200/80 bg-white px-4 py-3 dark:border-blue-500/15 dark:bg-admin-drawer-head">
           <Button
             type="button"
             variant="outline"
@@ -408,7 +408,7 @@ function SortHeader({
         <span className="inline-flex shrink-0 flex-col items-center gap-0 leading-none">
           <button
             type="button"
-            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'asc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
+            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-white/10 ${active && dir === 'asc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
             aria-label={`Ordenar ${label} ascendente`}
             onClick={() => onSort(sortKey, 'asc')}
           >
@@ -416,7 +416,7 @@ function SortHeader({
           </button>
           <button
             type="button"
-            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'desc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
+            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-white/10 ${active && dir === 'desc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
             aria-label={`Ordenar ${label} descendente`}
             onClick={() => onSort(sortKey, 'desc')}
           >
@@ -590,7 +590,7 @@ export function AdminOrdersPage() {
               <div
                 ref={tableHeaderScrollRef}
                 onScroll={onTableHeaderScroll}
-                className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-sky-500/20"
+                className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-blue-500/15"
               >
                 <table className="w-full min-w-[900px] table-fixed border-collapse text-left text-sm">
                   <OrdersTableColgroup />
@@ -658,7 +658,7 @@ export function AdminOrdersPage() {
               pageRows.map((o, idx) => (
             <tr
               key={o.id}
-              className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
+              className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-blue-500/10 dark:hover:bg-white/[0.06]"
             >
               <td className="w-10 px-2 py-2 text-center align-middle tabular-nums text-slate-400 dark:text-slate-500">
                 {(page - 1) * pageSize + idx + 1}
@@ -694,7 +694,7 @@ export function AdminOrdersPage() {
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="!text-blue-600 hover:bg-blue-500/10 dark:!text-sky-400 dark:hover:bg-sky-500/15"
+                                className="!text-blue-600 hover:bg-blue-500/10 dark:!text-blue-400 dark:hover:bg-blue-500/12"
                                 aria-label={`Ver detalle del pedido ${o.id.slice(0, 8)}`}
                                 onClick={() => {
                                   setMode('view');
@@ -706,7 +706,7 @@ export function AdminOrdersPage() {
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="!text-yellow-600 hover:bg-yellow-500/15 dark:!text-sky-300 dark:hover:bg-sky-500/15"
+                                className="!text-yellow-600 hover:bg-yellow-500/15 dark:!text-sky-300 dark:hover:bg-blue-500/12"
                                 aria-label={`Editar pedido ${o.id.slice(0, 8)}`}
                                 onClick={() => {
                                   setMode('edit');

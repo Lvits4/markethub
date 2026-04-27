@@ -19,7 +19,7 @@ const navActive =
   'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold bg-forest/10 text-forest dark:bg-market-dark-surface dark:text-market-dark-accent dark:shadow-[0_1px_2px_rgba(0,0,0,0.2)]';
 
 const headerBarClass =
-  'fixed top-0 right-0 left-0 z-50 h-14 border-b border-zinc-300/70 bg-white/75 shadow-[0_10px_40px_-18px_rgba(15,23,42,0.18)] backdrop-blur-2xl backdrop-saturate-150 supports-[backdrop-filter]:bg-white/65 dark:border-night-600/70 dark:bg-night-950/75 dark:shadow-[0_12px_40px_-14px_rgba(0,0,0,0.55)] dark:backdrop-blur-3xl dark:backdrop-saturate-150 supports-[backdrop-filter]:dark:bg-night-950/65';
+  'fixed top-0 right-0 left-0 z-50 h-14 border-b border-zinc-300/55 bg-white/82 shadow-[0_10px_44px_-18px_rgba(15,23,42,0.2),inset_0_1px_0_0_rgba(255,255,255,0.72)] backdrop-blur-3xl backdrop-saturate-[1.45] supports-[backdrop-filter]:bg-white/[0.52] dark:border-night-600/45 dark:bg-night-950/78 dark:shadow-[0_14px_48px_-16px_rgba(0,0,0,0.5),inset_0_1px_0_0_rgba(255,255,255,0.08)] dark:backdrop-blur-[40px] dark:backdrop-saturate-[1.2] supports-[backdrop-filter]:dark:bg-night-950/[0.48]';
 
 export function MarketHeader() {
   const { isAuthenticated } = useAuth();

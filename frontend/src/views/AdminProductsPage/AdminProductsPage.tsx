@@ -165,10 +165,10 @@ function ProductDetailsPanel({ product }: { product: Product }) {
           subtitle={`/${product.slug}`}
           badges={
             <>
-              <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
+              <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300">
                 {formatPrice(numOrZero(product.price))}
               </span>
-              <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-slate-700 dark:border-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300">
+              <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-slate-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300">
                 Stock: {product.stock}
               </span>
               <AdminStatusBadge tone={product.isActive ? 'success' : 'danger'}>
@@ -224,7 +224,7 @@ function ProductDetailsPanel({ product }: { product: Product }) {
             {galleryImages.map((img) => (
               <div
                 key={img.id}
-                className="flex min-h-[5rem] items-center justify-center rounded-lg border border-slate-200/80 bg-white p-2 dark:border-sky-500/20 dark:bg-admin-elevated"
+                className="flex min-h-[5rem] items-center justify-center rounded-lg border border-slate-200/80 bg-white p-2 dark:border-blue-500/15 dark:bg-admin-elevated"
               >
                 <ProductDetailImage url={img.url} />
               </div>
@@ -256,7 +256,7 @@ function ProductDetailsDrawer({
 }) {
   return (
     <AdminDrawerWrapper open={open} onClose={onClose} ariaLabel="Detalle de producto">
-      <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-sky-500/20 dark:bg-admin-drawer-head">
+      <div className="flex items-center justify-between border-b border-slate-200/80 bg-white px-4 py-3 dark:border-blue-500/15 dark:bg-admin-drawer-head">
         <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
           Panel de detalles
         </h2>
@@ -264,7 +264,7 @@ function ProductDetailsDrawer({
           <Button
             type="button"
             variant="icon"
-            className="h-8 w-8 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-sky-500/20"
+            className="h-8 w-8 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-blue-500/15"
             aria-label="Cerrar panel"
             onClick={onClose}
           >
@@ -320,7 +320,7 @@ function SortHeader({
         <span className="inline-flex shrink-0 flex-col items-center gap-0 leading-none">
           <button
             type="button"
-            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'asc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
+            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-white/10 ${active && dir === 'asc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
             aria-label={`Ordenar ${label} ascendente`}
             onClick={() => onSort(sortKey, 'asc')}
           >
@@ -328,7 +328,7 @@ function SortHeader({
           </button>
           <button
             type="button"
-            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-sky-950/50 ${active && dir === 'desc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
+            className={`rounded p-0 leading-none transition-colors hover:bg-slate-200 dark:hover:bg-white/10 ${active && dir === 'desc' ? 'text-forest' : 'text-slate-400 dark:text-slate-500'}`}
             aria-label={`Ordenar ${label} descendente`}
             onClick={() => onSort(sortKey, 'desc')}
           >
@@ -483,7 +483,7 @@ export function AdminProductsPage() {
               <div
                 ref={tableHeaderScrollRef}
                 onScroll={onTableHeaderScroll}
-                className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-sky-500/20"
+                className="no-scrollbar shrink-0 overflow-x-auto overflow-y-hidden border-b border-slate-200/80 dark:border-blue-500/15"
               >
                 <table className="w-full min-w-[900px] table-fixed border-collapse text-left text-sm">
                   <AdminProductsTableColgroup />
@@ -564,7 +564,7 @@ label="Nombre"
               pageRows.map((p, idx) => (
             <tr
               key={p.id}
-              className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-sky-500/[0.12] dark:hover:bg-sky-950/20"
+              className="border-b border-slate-200/55 transition-colors last:border-0 hover:bg-slate-50/90 dark:border-blue-500/10 dark:hover:bg-white/[0.06]"
             >
               <td className="w-10 px-2 py-2 text-center align-middle tabular-nums text-slate-400 dark:text-slate-500">
                 {(page - 1) * pageSize + idx + 1}
@@ -599,7 +599,7 @@ label="Nombre"
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="!text-blue-600 hover:bg-blue-500/10 dark:!text-sky-400 dark:hover:bg-sky-500/15"
+                                className="!text-blue-600 hover:bg-blue-500/10 dark:!text-blue-400 dark:hover:bg-blue-500/12"
                                 aria-label={`Ver detalle de ${p.name}`}
                                 onClick={() => {
                                   setMode('view');
@@ -611,7 +611,7 @@ label="Nombre"
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="!text-yellow-600 hover:bg-yellow-500/15 dark:!text-sky-300 dark:hover:bg-sky-500/15"
+                                className="!text-yellow-600 hover:bg-yellow-500/15 dark:!text-sky-300 dark:hover:bg-blue-500/12"
                                 aria-label={`Editar ${p.name}`}
                                 onClick={() => {
                                   setMode('edit');

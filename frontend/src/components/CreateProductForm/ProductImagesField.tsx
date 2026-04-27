@@ -74,14 +74,14 @@ export function ProductImagesField({
     disabled
       ? 'cursor-not-allowed border-zinc-200 bg-zinc-50/40 opacity-50 dark:border-night-700 dark:bg-night-950/30'
       : dragOver
-        ? 'cursor-pointer border-code-blue bg-blue-50/80 dark:border-sky-400 dark:bg-sky-500/10'
-        : 'cursor-pointer border-zinc-300 bg-zinc-50/60 hover:border-zinc-400 hover:bg-zinc-100/80 dark:border-night-600 dark:bg-night-950/40 dark:hover:border-sky-500/35 dark:hover:bg-night-900/60'
+        ? 'cursor-pointer border-code-blue bg-blue-50/80 dark:border-blue-400 dark:bg-blue-500/10'
+        : 'cursor-pointer border-zinc-300 bg-zinc-50/60 hover:border-zinc-400 hover:bg-zinc-100/80 dark:border-night-600 dark:bg-night-950/40 dark:hover:border-blue-500/35 dark:hover:bg-night-900/60'
   }`;
 
   const body = (
     <>
       <span
-        className={`flex items-center justify-center rounded-full bg-zinc-200/90 text-zinc-600 transition-colors group-hover:bg-zinc-300/90 dark:bg-night-700 dark:text-sky-300/90 dark:group-hover:bg-night-600 ${
+        className={`flex items-center justify-center rounded-full bg-zinc-200/90 text-zinc-600 transition-colors group-hover:bg-zinc-300/90 dark:bg-night-700 dark:text-blue-300/90 dark:group-hover:bg-night-600 ${
           compact ? 'h-9 w-9' : 'h-12 w-12'
         }`}
       >
