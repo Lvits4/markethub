@@ -99,7 +99,8 @@
   --color-auth-hero-end: #172554;
   --color-code-blue: #1f6feb;
   --shadow-admin-dropdown: 0 16px 40px -12px rgb(0 0 0 / 0.55);
-  --max-width-admin-drawer: 48rem;
+  /* Drawers admin (p. ej. ajustes de cuenta): más estrecho que 48rem para no tapar la tabla */
+  --max-width-admin-drawer: 36rem;
   --z-auth-underlay: 1;
   --z-admin-overlay: 80;
   --z-popover-layer: 90;
@@ -517,8 +518,50 @@ html:has(.admin-shell) #root {
   animation: route-outlet-fade-in 220ms ease-out both;
 }
 
+/** Transición al cambiar de vista en el marketplace (comprador): fade + ligero deslizamiento. */
+@keyframes route-outlet-market-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.route-outlet-market {
+  animation: route-outlet-market-in 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/** Cambio entre login / registro en `/auth`. */
+@keyframes route-outlet-auth-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.route-outlet-auth {
+  animation: route-outlet-auth-in 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .route-outlet-fade {
+    animation: none;
+  }
+
+  .route-outlet-market {
+    animation: none;
+  }
+
+  .route-outlet-auth {
     animation: none;
   }
 }

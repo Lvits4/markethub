@@ -10,7 +10,7 @@ function MainLayoutShell() {
     <div className="min-h-screen pb-24 lg:pb-8">
       <MarketHeader />
       <main className="pt-14">
-        <div key={pathname} className="route-outlet-fade">
+        <div key={pathname} className="route-outlet-market">
           <Outlet />
         </div>
       </main>

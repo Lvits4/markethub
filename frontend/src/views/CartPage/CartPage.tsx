@@ -334,7 +334,7 @@ export function CartPage() {
                 <button
                   type="button"
                   onClick={() => setCouponOpen((o) => !o)}
-                  className="flex w-full items-center justify-between gap-2 rounded-lg border border-dashed border-zinc-200 px-3 py-2.5 text-left text-sm font-medium text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50 dark:border-night-600 dark:text-zinc-300 dark:hover:border-night-500 dark:hover:bg-night-800/50"
+                  className="flex w-full items-center justify-between gap-2 rounded-lg border border-dashed border-zinc-200 px-3 py-2.5 text-left text-sm font-medium text-zinc-700 transition-[border-color,background-color] duration-200 hover:border-zinc-300 hover:bg-zinc-50 motion-reduce:transition-none dark:border-night-600 dark:text-zinc-300 dark:hover:border-night-500 dark:hover:bg-night-800/50"
                   aria-expanded={couponOpen}
                 >
                   <span className="flex items-center gap-2">
@@ -342,29 +342,35 @@ export function CartPage() {
                     Cupón promocional
                   </span>
                   <FiChevronDown
-                    className={`h-4 w-4 shrink-0 text-zinc-400 transition-transform ${couponOpen ? 'rotate-180' : ''}`}
+                    className={`h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-200 ease-out motion-reduce:transition-none ${couponOpen ? 'rotate-180' : ''}`}
                     aria-hidden
                   />
                 </button>
-                {couponOpen ? (
-                  <div className="rounded-lg border border-zinc-100 bg-zinc-50/40 p-3 dark:border-night-700/60 dark:bg-night-800/25">
-                    <input
-                      type="text"
-                      value={coupon}
-                      onChange={(e) => setCoupon(e.target.value)}
-                      placeholder="Código"
-                      className={checkoutFieldClass}
-                      autoComplete="off"
-                    />
+                <div
+                  className={`grid overflow-hidden motion-safe:transition-[grid-template-rows] motion-safe:duration-300 motion-safe:ease-out motion-reduce:transition-none ${couponOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+                >
+                  <div className="min-h-0">
+                    <div
+                      className={`rounded-lg border border-zinc-100 bg-zinc-50/40 p-3 dark:border-night-700/60 dark:bg-night-800/25 motion-safe:transition-[opacity,transform] motion-safe:duration-300 motion-safe:ease-out motion-reduce:transition-none ${couponOpen ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-1 opacity-0'}`}
+                    >
+                      <input
+                        type="text"
+                        value={coupon}
+                        onChange={(e) => setCoupon(e.target.value)}
+                        placeholder="Código"
+                        className={checkoutFieldClass}
+                        autoComplete="off"
+                      />
+                    </div>
                   </div>
-                ) : null}
+                </div>
               </div>
 
               <div className="mt-2 space-y-2">
                 <button
                   type="button"
                   onClick={() => setNoteOpen((o) => !o)}
-                  className="flex w-full items-center justify-between gap-2 rounded-lg border border-dashed border-zinc-200 px-3 py-2.5 text-left text-sm font-medium text-zinc-700 transition hover:border-zinc-300 hover:bg-zinc-50 dark:border-night-600 dark:text-zinc-300 dark:hover:border-night-500 dark:hover:bg-night-800/50"
+                  className="flex w-full items-center justify-between gap-2 rounded-lg border border-dashed border-zinc-200 px-3 py-2.5 text-left text-sm font-medium text-zinc-700 transition-[border-color,background-color] duration-200 hover:border-zinc-300 hover:bg-zinc-50 motion-reduce:transition-none dark:border-night-600 dark:text-zinc-300 dark:hover:border-night-500 dark:hover:bg-night-800/50"
                   aria-expanded={noteOpen}
                 >
                   <span className="flex items-center gap-2">
@@ -376,24 +382,30 @@ export function CartPage() {
                     <span className="font-normal text-zinc-400">(opcional)</span>
                   </span>
                   <FiChevronDown
-                    className={`h-4 w-4 shrink-0 text-zinc-400 transition-transform ${noteOpen ? 'rotate-180' : ''}`}
+                    className={`h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-200 ease-out motion-reduce:transition-none ${noteOpen ? 'rotate-180' : ''}`}
                     aria-hidden
                   />
                 </button>
-                {noteOpen ? (
-                  <div className="rounded-lg border border-zinc-100 bg-zinc-50/40 p-3 dark:border-night-700/60 dark:bg-night-800/25">
-                    <label className="flex flex-col gap-1">
-                      <span className="sr-only">Nota opcional para el pedido</span>
-                      <textarea
-                        value={orderNote}
-                        onChange={(e) => setOrderNote(e.target.value)}
-                        rows={2}
-                        placeholder="Ej. timbre roto, dejar con portero…"
-                        className={`${checkoutFieldClass} resize-none`}
-                      />
-                    </label>
+                <div
+                  className={`grid overflow-hidden motion-safe:transition-[grid-template-rows] motion-safe:duration-300 motion-safe:ease-out motion-reduce:transition-none ${noteOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+                >
+                  <div className="min-h-0">
+                    <div
+                      className={`rounded-lg border border-zinc-100 bg-zinc-50/40 p-3 dark:border-night-700/60 dark:bg-night-800/25 motion-safe:transition-[opacity,transform] motion-safe:duration-300 motion-safe:ease-out motion-reduce:transition-none ${noteOpen ? 'opacity-100 translate-y-0' : 'pointer-events-none -translate-y-1 opacity-0'}`}
+                    >
+                      <label className="flex flex-col gap-1">
+                        <span className="sr-only">Nota opcional para el pedido</span>
+                        <textarea
+                          value={orderNote}
+                          onChange={(e) => setOrderNote(e.target.value)}
+                          rows={2}
+                          placeholder="Ej. timbre roto, dejar con portero…"
+                          className={`${checkoutFieldClass} resize-none`}
+                        />
+                      </label>
+                    </div>
                   </div>
-                ) : null}
+                </div>
               </div>
 
               <div className="mt-6 border-t border-zinc-100 pt-5 dark:border-night-800">

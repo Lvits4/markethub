@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useRef, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '../Button/Button';
 
@@ -18,6 +24,8 @@ export type ModalProps = {
   contentWrapperClassName?: string;
 };
 
+const ANIMATION_MS = 280;
+
 export function Modal({
   open,
   onClose,
@@ -31,6 +39,9 @@ export function Modal({
   contentWrapperClassName = '',
 }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+  const [animating, setAnimating] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   const handleOverlayPointerDown = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
@@ -39,26 +50,52 @@ export function Modal({
     [onClose],
   );
 
+  /* eslint-disable react-hooks/set-state-in-effect -- portal: montaje y cierre diferido para la transición */
   useEffect(() => {
-    if (!open) return;
+    if (open) {
+      setMounted(true);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setVisible(true);
+          setAnimating(true);
+        });
+      });
+    } else if (mounted) {
+      setVisible(false);
+      setAnimating(true);
+    }
+  }, [open, mounted]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  useEffect(() => {
+    if (!animating) return;
+    const timer = setTimeout(() => {
+      setAnimating(false);
+      if (!open) setMounted(false);
+    }, ANIMATION_MS);
+    return () => clearTimeout(timer);
+  }, [animating, open]);
+
+  useEffect(() => {
+    if (!mounted) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = prev;
     };
-  }, [open]);
+  }, [mounted]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!mounted) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+  }, [mounted, onClose]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!visible) return;
     const t = window.setTimeout(() => {
       const root = panelRef.current;
       if (!root) return;
@@ -68,13 +105,18 @@ export function Modal({
       focusable?.focus();
     }, 0);
     return () => window.clearTimeout(t);
-  }, [open]);
+  }, [visible]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   return createPortal(
     <div
-      className="fixed inset-0 z-80 flex cursor-pointer items-end justify-center bg-black/45 p-4 sm:items-center sm:p-6"
+      className={`fixed inset-0 z-80 flex cursor-pointer items-end justify-center p-4 motion-safe:transition-opacity motion-safe:ease-out sm:items-center sm:p-6 ${
+        visible ? 'bg-black/45' : 'bg-black/0'
+      }`}
+      style={{
+        transitionDuration: `${ANIMATION_MS}ms`,
+      }}
       role="presentation"
       onPointerDown={handleOverlayPointerDown}
     >
@@ -83,7 +125,14 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`flex max-h-[min(90vh,720px)] w-full cursor-default flex-col overflow-hidden rounded-t-xl bg-white shadow-xl ring-1 ring-zinc-200/80 dark:bg-night-900 dark:ring-night-700 sm:rounded-xl ${wide ? 'max-w-3xl' : 'max-w-lg'} ${className}`}
+        className={`flex max-h-[min(90vh,720px)] w-full cursor-default flex-col overflow-hidden rounded-t-xl bg-white shadow-xl ring-1 ring-zinc-200/80 motion-safe:transition-[transform,opacity] motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] dark:bg-night-900 dark:ring-night-700 sm:rounded-xl ${wide ? 'max-w-3xl' : 'max-w-lg'} ${className} ${
+          visible
+            ? 'translate-y-0 opacity-100 sm:translate-y-0 sm:scale-100'
+            : 'translate-y-full opacity-0 sm:translate-y-4 sm:scale-[0.97]'
+        }`}
+        style={{
+          transitionDuration: `${ANIMATION_MS}ms`,
+        }}
         onPointerDown={(e) => e.stopPropagation()}
       >
         <div

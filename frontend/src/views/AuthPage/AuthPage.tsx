@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { AuthBrand } from '../../components/AuthBrand/AuthBrand';
 import { AuthHero } from '../../components/AuthHero/AuthHero';
 import { ThemeToggle } from '../../components/ThemeToggle/ThemeToggle';
@@ -10,6 +10,8 @@ import { ThemeToggle } from '../../components/ThemeToggle/ThemeToggle';
  * Desde lg: hero + formulario; si hace falta scroll, en la tarjeta completa.
  */
 export function AuthPage() {
+  const { pathname } = useLocation();
+
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -36,7 +38,10 @@ export function AuthPage() {
             </div>
             <div className="relative z-10 flex min-h-0 w-full min-w-0 max-lg:flex-none flex-1 flex-col overflow-y-visible max-lg:w-fit max-lg:self-center lg:w-full">
               <div className="flex w-full min-w-0 flex-col items-center max-lg:min-h-0 max-lg:justify-start py-4 sm:py-6 lg:min-h-full lg:justify-center lg:py-4">
-                <div className="w-full max-w-sm min-w-0 max-lg:w-fit lg:w-full">
+                <div
+                  key={pathname}
+                  className="route-outlet-auth w-full max-w-sm min-w-0 max-lg:w-fit lg:w-full"
+                >
                   <Outlet />
                 </div>
               </div>

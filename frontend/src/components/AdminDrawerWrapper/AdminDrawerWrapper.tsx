@@ -31,6 +31,7 @@ export function AdminDrawerWrapper({
   const [animating, setAnimating] = useState(false);
   const [visible, setVisible] = useState(false);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- portal: transición del drawer */
   useEffect(() => {
     if (open) {
       setMounted(true);
@@ -44,7 +45,8 @@ export function AdminDrawerWrapper({
       setVisible(false);
       setAnimating(true);
     }
-  }, [open]);
+  }, [open, mounted]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     if (!animating) return;
@@ -87,7 +89,13 @@ export function AdminDrawerWrapper({
       className={`fixed inset-0 z-80 flex cursor-pointer items-stretch justify-end transition-[opacity,background-color] ease-in-out ${overlayTint} ${
         visible ? 'opacity-100' : 'opacity-0'
       }`}
-      style={{ transitionDuration: `${ANIMATION_MS}ms` }}
+      style={{
+        transitionDuration: `${ANIMATION_MS}ms`,
+        transitionTimingFunction:
+          variant === 'market'
+            ? 'cubic-bezier(0.22, 1, 0.36, 1)'
+            : 'ease-in-out',
+      }}
       role="presentation"
       onPointerDown={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -97,10 +105,16 @@ export function AdminDrawerWrapper({
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}
-        className={`flex h-full w-full cursor-default flex-col border-l shadow-2xl transition-transform ease-out ${PANEL_BY_VARIANT[variant]} ${
+        className={`flex h-full w-full cursor-default flex-col border-l shadow-2xl transition-transform motion-reduce:transition-none ${PANEL_BY_VARIANT[variant]} ${
           visible ? 'translate-x-0' : 'translate-x-full'
         }`}
-        style={{ transitionDuration: `${ANIMATION_MS}ms` }}
+        style={{
+          transitionDuration: `${ANIMATION_MS}ms`,
+          transitionTimingFunction:
+            variant === 'market'
+              ? 'cubic-bezier(0.22, 1, 0.36, 1)'
+              : 'ease-out',
+        }}
         onPointerDown={(e) => e.stopPropagation()}
       >
         {children}
