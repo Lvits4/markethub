@@ -1,11 +1,21 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
+export type DrawerVariant = 'admin' | 'market';
+
 type AdminDrawerWrapperProps = {
   open: boolean;
   onClose: () => void;
   ariaLabel: string;
   children: ReactNode;
+  variant?: DrawerVariant;
+};
+
+const PANEL_BY_VARIANT: Record<DrawerVariant, string> = {
+  admin:
+    'max-w-admin-drawer border-slate-200/80 bg-white dark:border-blue-500/15 dark:bg-admin-drawer',
+  market:
+    'max-w-xl border-zinc-200/90 bg-white dark:border-night-700 dark:bg-night-950',
 };
 
 const ANIMATION_MS = 300;
@@ -15,6 +25,7 @@ export function AdminDrawerWrapper({
   onClose,
   ariaLabel,
   children,
+  variant = 'admin',
 }: AdminDrawerWrapperProps) {
   const [mounted, setMounted] = useState(false);
   const [animating, setAnimating] = useState(false);
@@ -64,9 +75,16 @@ export function AdminDrawerWrapper({
 
   if (!mounted) return null;
 
+  const overlayTint =
+    variant === 'market'
+      ? visible
+        ? 'bg-black/40'
+        : 'bg-black/0'
+      : '';
+
   return createPortal(
     <div
-      className={`fixed inset-0 z-[80] flex cursor-pointer items-stretch justify-end transition-opacity duration-[${ANIMATION_MS}ms] ease-in-out ${
+      className={`fixed inset-0 z-80 flex cursor-pointer items-stretch justify-end transition-[opacity,background-color] ease-in-out ${overlayTint} ${
         visible ? 'opacity-100' : 'opacity-0'
       }`}
       style={{ transitionDuration: `${ANIMATION_MS}ms` }}
@@ -79,7 +97,7 @@ export function AdminDrawerWrapper({
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}
-        className={`flex h-full w-full max-w-admin-drawer cursor-default flex-col border-l border-slate-200/80 bg-white shadow-2xl transition-transform ease-out dark:border-blue-500/15 dark:bg-admin-drawer ${
+        className={`flex h-full w-full cursor-default flex-col border-l shadow-2xl transition-transform ease-out ${PANEL_BY_VARIANT[variant]} ${
           visible ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{ transitionDuration: `${ANIMATION_MS}ms` }}

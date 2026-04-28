@@ -289,7 +289,7 @@ export function StorePublicPage() {
                   {store.contactEmail ? (
                     <a
                       href={`mailto:${store.contactEmail}`}
-                      className="inline-flex items-center gap-2 rounded-md bg-zinc-100 px-3 py-2 font-medium text-zinc-800 transition hover:bg-zinc-200 dark:bg-night-800 dark:text-zinc-200 dark:hover:bg-night-700"
+                      className="inline-flex items-center gap-2 rounded-md bg-sky-100 px-3 py-2 font-medium text-sky-900 transition hover:bg-sky-200 dark:bg-sky-950/55 dark:text-sky-200 dark:hover:bg-sky-900/70"
                     >
                       <FiMail className="h-4 w-4 shrink-0" aria-hidden />
                       {store.contactEmail}
@@ -298,7 +298,7 @@ export function StorePublicPage() {
                   {store.contactPhone ? (
                     <a
                       href={`tel:${store.contactPhone.replace(/\s/g, '')}`}
-                      className="inline-flex items-center gap-2 rounded-md bg-zinc-100 px-3 py-2 font-medium text-zinc-800 transition hover:bg-zinc-200 dark:bg-night-800 dark:text-zinc-200 dark:hover:bg-night-700"
+                      className="inline-flex items-center gap-2 rounded-md bg-sky-100 px-3 py-2 font-medium text-sky-900 transition hover:bg-sky-200 dark:bg-sky-950/55 dark:text-sky-200 dark:hover:bg-sky-900/70"
                     >
                       <FiPhone className="h-4 w-4 shrink-0" aria-hidden />
                       {store.contactPhone}

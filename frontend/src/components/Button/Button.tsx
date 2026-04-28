@@ -1,6 +1,12 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-type ButtonVariant = 'primary' | 'outline' | 'ghost' | 'icon' | 'cta';
+type ButtonVariant =
+  | 'primary'
+  | 'outline'
+  | 'ghost'
+  | 'icon'
+  | 'cta'
+  | 'danger';
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
@@ -26,6 +32,8 @@ export function Button({
     icon:
       'rounded-md p-2.5 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-night-800',
     cta: 'admin-cta-solid rounded-md text-sm font-medium',
+    danger:
+      'rounded-md border border-red-300 bg-red-100 px-5 py-3 text-red-900 shadow-sm hover:bg-red-200 hover:border-red-400 dark:border-red-500/45 dark:bg-red-950/55 dark:text-red-200 dark:shadow-[0_1px_2px_rgba(0,0,0,0.2)] dark:hover:border-red-400/55 dark:hover:bg-red-900/70',
   };
 
   return (

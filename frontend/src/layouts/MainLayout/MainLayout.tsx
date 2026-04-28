@@ -1,8 +1,9 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { BottomNav } from '../../components/BottomNav/BottomNav';
 import { MarketHeader } from '../../components/MarketHeader/MarketHeader';
+import { AccountSettingsPanelProvider } from '../../context/AccountSettingsPanelProvider/AccountSettingsPanelProvider';
 
-export function MainLayout() {
+function MainLayoutShell() {
   const { pathname } = useLocation();
 
   return (
@@ -15,5 +16,13 @@ export function MainLayout() {
       </main>
       <BottomNav />
     </div>
+  );
+}
+
+export function MainLayout() {
+  return (
+    <AccountSettingsPanelProvider>
+      <MainLayoutShell />
+    </AccountSettingsPanelProvider>
   );
 }

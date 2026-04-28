@@ -135,7 +135,7 @@ export function OrderDetailPage() {
               type="button"
               onClick={onDelete}
               disabled={deleteOrder.isPending}
-              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm transition hover:bg-red-50 disabled:opacity-60 dark:border-red-900/50 dark:bg-night-900 dark:text-red-400 dark:hover:bg-red-950/40"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2.5 text-sm font-medium text-red-800 shadow-sm transition hover:border-red-300 hover:bg-red-100 disabled:opacity-60 dark:border-red-500/40 dark:bg-red-950/55 dark:text-red-300 dark:hover:border-red-400/60 dark:hover:bg-red-950/80"
             >
               <FiTrash2 className="h-4 w-4" aria-hidden />
               {deleteOrder.isPending ? 'Eliminando…' : 'Eliminar'}

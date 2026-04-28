@@ -222,7 +222,7 @@ export function CartPage() {
                         </span>
                       </p>
                     ) : null}
-                    <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <QuantitySelector
                         value={it.quantity}
                         min={1}
@@ -230,18 +230,19 @@ export function CartPage() {
                         onChange={(n) => void handleQty(it.id, n)}
                         disabled={updateItem.isPending}
                       />
-                      <div className="flex items-center gap-2">
+                      <div className="flex basis-full shrink-0 items-center justify-end gap-2 sm:ml-auto sm:basis-auto">
                         <Button
                           type="button"
-                          variant="outline"
-                          className="shrink-0 px-3 py-2 text-xs font-semibold"
+                          variant="primary"
+                          className="min-h-10 shrink-0 justify-center gap-1.5 px-4! py-2.5! text-sm font-semibold"
                           onClick={() => openCheckoutModal(it.id)}
                         >
                           Comprar ahora
                         </Button>
                         <Button
                           type="button"
-                          className="shrink-0 gap-1.5 bg-red-600! px-3 py-2 text-xs font-semibold text-white! shadow-sm hover:bg-red-700! dark:bg-red-700! dark:hover:bg-red-600!"
+                          variant="danger"
+                          className="min-h-10 shrink-0 justify-center gap-1.5 px-4! py-2.5! text-sm font-semibold"
                           onClick={() => void handleRemove(it.id)}
                           disabled={removeItem.isPending}
                           aria-label="Quitar del carrito"

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FiShoppingCart, FiUser } from 'react-icons/fi';
 import { routePaths } from '../../config/routes';
+import { useAccountSettingsPanel } from '../../context/AccountSettingsPanelProvider/AccountSettingsPanelProvider';
 import { useAuth } from '../../hooks/useAuth';
 import { useCartQuery } from '../../queries/useCartQuery';
 import { MarketHubMark } from '../AuthBrand/AuthBrand';
@@ -33,6 +34,7 @@ function readScrollY(): number {
 }
 
 export function MarketHeader() {
+  const { openPanel } = useAccountSettingsPanel();
   const { isAuthenticated } = useAuth();
   const { data: cart } = useCartQuery();
   const [desktopScrolled, setDesktopScrolled] = useState(false);
@@ -131,13 +133,14 @@ export function MarketHeader() {
           <ThemeToggle className="h-10! w-10! rounded-lg! bg-transparent! text-zinc-700! shadow-none! ring-0! outline-none! transition-colors hover:bg-transparent! hover:text-forest! active:bg-transparent! active:text-forest! dark:bg-transparent! dark:text-white/90! dark:hover:bg-transparent! dark:hover:text-market-dark-accent! dark:active:bg-transparent! dark:active:text-market-dark-accent!" />
 
           {isAuthenticated ? (
-            <NavLink
-              to={routePaths.settings}
+            <button
+              type="button"
               className={desktopAccountIconBtn}
-              aria-label="Mi cuenta"
+              aria-label="Ajustes de cuenta"
+              onClick={openPanel}
             >
               <FiUser className="h-5 w-5" strokeWidth={2} aria-hidden />
-            </NavLink>
+            </button>
           ) : (
             <NavLink
               to={routePaths.register}

@@ -34,7 +34,7 @@ import { FavoritesPage } from '../views/FavoritesPage/FavoritesPage';
 import { LoginPage } from '../views/LoginPage/LoginPage';
 import { ProductDetailPage } from '../views/ProductDetailPage/ProductDetailPage';
 import { RegisterPage } from '../views/RegisterPage/RegisterPage';
-import { SettingsPage } from '../views/SettingsPage/SettingsPage';
+import { SettingsPanelRoute } from '../components/SettingsPanelRoute/SettingsPanelRoute';
 import { ForgotPasswordPage } from '../views/ForgotPasswordPage/ForgotPasswordPage';
 import { ResetPasswordPage } from '../views/ResetPasswordPage/ResetPasswordPage';
 import { OrdersPage } from '../views/OrdersPage/OrdersPage';
@@ -187,7 +187,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
-                <Route path="settings" element={<SettingsPage />} />
+                <Route path="settings" element={<SettingsPanelRoute />} />
                 <Route
                   path="orders"
                   element={

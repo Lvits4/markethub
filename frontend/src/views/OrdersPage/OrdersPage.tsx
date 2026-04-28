@@ -94,7 +94,7 @@ export function OrdersPage() {
             <button
               type="button"
               onClick={() => setClearHistoryModalOpen(true)}
-              className="inline-flex shrink-0 items-center justify-center rounded-md border border-sky-300/70 bg-white px-3 py-2 text-sm font-medium text-sky-800 shadow-sm transition hover:bg-sky-500/10 dark:border-sky-500/35 dark:bg-night-900 dark:text-sky-300 dark:hover:bg-sky-500/15"
+              className="inline-flex shrink-0 items-center justify-center rounded-md border border-sky-200 bg-sky-100 px-3 py-2 text-sm font-medium text-sky-900 shadow-sm transition hover:border-sky-300 hover:bg-sky-200/90 dark:border-sky-600/45 dark:bg-sky-500/20 dark:text-sky-100 dark:hover:border-sky-500/60 dark:hover:bg-sky-500/30"
             >
               Limpiar historial
             </button>
@@ -154,10 +154,10 @@ export function OrdersPage() {
                   type="button"
                   onClick={() => onDeleteOne(o.id)}
                   disabled={deleteOrder.isPending}
-                  className="inline-flex h-11 w-11 shrink-0 items-center justify-center self-center rounded-md text-red-600 transition hover:bg-red-500/10 disabled:opacity-60 dark:text-red-400 dark:hover:bg-red-500/15"
-                  aria-label="Eliminar pedido"
+                  className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-2.5 text-sm font-medium text-red-800 shadow-sm transition hover:border-red-300 hover:bg-red-100 disabled:opacity-60 sm:w-auto sm:self-center dark:border-red-500/40 dark:bg-red-950/55 dark:text-red-300 dark:hover:border-red-400/60 dark:hover:bg-red-950/80"
                 >
-                  <FiTrash2 className="h-5 w-5" aria-hidden />
+                  <FiTrash2 className="h-4 w-4 shrink-0" aria-hidden />
+                  Eliminar
                 </button>
               </div>
             </li>

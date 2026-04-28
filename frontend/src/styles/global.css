@@ -99,18 +99,14 @@
   --color-auth-hero-end: #172554;
   --color-code-blue: #1f6feb;
   --shadow-admin-dropdown: 0 16px 40px -12px rgb(0 0 0 / 0.55);
-  --max-width-admin-drawer: 40rem;
+  --max-width-admin-drawer: 48rem;
   --z-auth-underlay: 1;
   --z-admin-overlay: 80;
   --z-popover-layer: 90;
-  /* Scrollbars tema claro: mismo azul que botones (.admin-cta-solid / --color-admin-primary) */
-  --scrollbar-thumb: var(--color-admin-primary);
-  --scrollbar-thumb-hover: var(--color-admin-primary-hover);
-  --scrollbar-track: color-mix(
-    in srgb,
-    var(--color-surface-cream) 92%,
-    rgb(59 130 246 / 0.1)
-  );
+  /* Scrollbars tema claro: gris neutro (encaja con zinc / superficies sin competir con acentos) */
+  --scrollbar-thumb: #a3a3a3;
+  --scrollbar-thumb-hover: #737373;
+  --scrollbar-track: color-mix(in srgb, var(--color-surface-cream) 88%, #d4d4d8 12%);
 }
 
 @font-face {
@@ -140,9 +136,10 @@ html.dark {
   /* Precios, enlaces y acentos “marca” en oscuro: azul tenue (#458bde), no blue-600 */
   --color-forest: var(--color-market-dark-accent);
   --color-forest-muted: #6ea8ee;
-  --scrollbar-thumb: var(--color-market-dark-surface);
-  --scrollbar-thumb-hover: var(--color-market-dark-surface-hover);
-  --scrollbar-track: var(--color-night-800);
+  /* Scrollbars oscuro: escalón night (sin navy de botones CTA) */
+  --scrollbar-thumb: var(--color-night-600);
+  --scrollbar-thumb-hover: color-mix(in srgb, var(--color-night-600) 78%, white 22%);
+  --scrollbar-track: var(--color-night-900);
 }
 
 html.dark::before {

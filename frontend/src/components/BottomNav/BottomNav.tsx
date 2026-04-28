@@ -8,6 +8,7 @@ import {
   FiShoppingBag,
 } from 'react-icons/fi';
 import { routePaths } from '../../config/routes';
+import { useAccountSettingsPanel } from '../../context/AccountSettingsPanelProvider/AccountSettingsPanelProvider';
 import { useAuth } from '../../hooks/useAuth';
 
 const linkBase =
@@ -26,6 +27,7 @@ const iconProps = {
 };
 
 export function BottomNav() {
+  const { openPanel } = useAccountSettingsPanel();
   const { isAuthenticated } = useAuth();
 
   return (
@@ -82,15 +84,14 @@ export function BottomNav() {
             Pedidos
           </NavLink>
         ) : null}
-        <NavLink
-          to={routePaths.settings}
-          className={({ isActive }) =>
-            `${isActive ? linkActive : linkInactive}`
-          }
+        <button
+          type="button"
+          className={linkInactive}
+          onClick={openPanel}
         >
           <FiSettings {...iconProps} />
           Ajustes
-        </NavLink>
+        </button>
       </div>
     </nav>
   );

@@ -13,13 +13,10 @@ import { uploadFile } from '../../requests/fileRequests';
 
 type AccountSettingsBodyProps = {
   className?: string;
-  /** Menos aire vertical (p. ej. cajón lateral). */
+  /** Layout más denso (p. ej. panel lateral). */
   compact?: boolean;
   onLogoutSuccess?: () => void;
 };
-
-const marketCard =
-  'rounded-xl border border-zinc-200/80 bg-white/90 shadow-sm ring-1 ring-zinc-200/40 transition-[box-shadow,border-color] duration-200 dark:border-night-700 dark:bg-night-900/90 dark:ring-night-800/80';
 
 const sectionLabel =
   'text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400';
@@ -112,25 +109,23 @@ export function AccountSettingsBody({
     void run();
   };
 
-  const shell = compact
-    ? 'space-y-3 rounded-md bg-white p-3 shadow-sm ring-1 ring-zinc-200/80 dark:bg-night-900 dark:ring-night-800'
-    : '';
+  const compactStack = compact ? 'flex flex-col gap-6' : '';
 
   const sectionTop = compact
-    ? 'border-t border-zinc-100 pt-3 dark:border-night-800'
+    ? 'border-t border-zinc-200/60 pt-6 dark:border-night-700/80'
     : '';
 
-  const fieldStack = compact ? 'mt-2 space-y-2' : 'mt-3 space-y-3';
+  const fieldStack = compact ? 'mt-2 space-y-4' : 'mt-3 space-y-3';
   const inputPad = compact
-    ? 'mt-1 w-full rounded-md border border-zinc-200 bg-zinc-50/80 px-3 py-2 text-sm text-zinc-900 outline-hidden focus:border-forest dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100'
+    ? 'mt-1 w-full rounded-md border border-zinc-200 bg-zinc-50/80 px-4 py-3.5 text-base text-zinc-900 outline-hidden focus:border-forest dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100'
     : 'mt-1 w-full rounded-lg border border-zinc-200 bg-zinc-50/80 px-3 py-2.5 text-sm text-zinc-900 outline-hidden transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-night-700 dark:bg-night-800/50 dark:text-zinc-100 dark:focus:border-sky-400 dark:focus:ring-sky-500/25';
 
   const actionsRow = compact
-    ? 'mt-3 flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-2'
+    ? 'mt-6 flex flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-4'
     : 'mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-3';
 
   const actionBtn = compact
-    ? 'h-10 min-h-10 w-full justify-center px-3 sm:min-w-0 sm:flex-1'
+    ? 'h-14 min-h-14 w-full justify-center px-4 text-base sm:min-w-0 sm:flex-1'
     : 'h-11 min-h-11 w-full justify-center px-3 sm:min-w-0 sm:flex-1';
 
   const themeToggleButton = compact ? (
@@ -255,8 +250,8 @@ export function AccountSettingsBody({
         </Button>
         <Button
           type="button"
-          variant="ghost"
-          className={`${actionBtn} border border-red-200/80 text-red-600 hover:bg-red-500/10 dark:border-red-900/45 dark:text-red-400 dark:hover:bg-red-500/15`}
+          variant="danger"
+          className={actionBtn}
           onClick={handleLogout}
         >
           Cerrar sesión
@@ -292,7 +287,7 @@ export function AccountSettingsBody({
 
   if (compact) {
     return (
-      <div className={`${shell} ${className}`.trim()}>
+      <div className={`${compactStack} ${className}`.trim()}>
         {themeBlock}
         <div className={sectionTop}>
           {isAuthenticated && user ? authenticatedProfile : guestBlock}
@@ -302,9 +297,9 @@ export function AccountSettingsBody({
   }
 
   return (
-    <div className={`flex flex-col gap-3 sm:gap-4 ${className}`.trim()}>
-      <section className={`${marketCard} p-3 sm:p-4`}>{themeBlock}</section>
-      <section className={`${marketCard} p-3 sm:p-4`}>
+    <div className={`flex max-w-2xl flex-col gap-8 sm:gap-10 ${className}`.trim()}>
+      <section className="min-w-0">{themeBlock}</section>
+      <section className="min-w-0 border-t border-zinc-200/70 pt-8 dark:border-night-700 sm:pt-10">
         {isAuthenticated && user ? authenticatedProfile : guestBlock}
       </section>
     </div>
