@@ -6,9 +6,9 @@ services:
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_USER: ${DB_USERNAME:-markethub}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-markethub_secret}
-      POSTGRES_DB: ${DB_NAME:-markethub}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - pgdata:/var/lib/postgresql/data
 
