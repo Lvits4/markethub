@@ -2,16 +2,16 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FormSelect } from '../CreateProductForm/FormSelect';
 import { Button } from '../Button/Button';
-import { getErrorMessage } from '../../helpers/mapApiError';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
 import {
   isOrderStatusValue,
   orderStatusLabel,
   ORDER_STATUS_VALUES,
   type OrderStatusValue,
-} from '../../helpers/orderStatus';
-import { useAdminOrderStatus } from '../../hooks/useAdminOrderStatus';
-import { formatPrice } from '../../helpers/formatPrice';
-import type { Order } from '../../types/order';
+} from '../../helpers/orderStatus/orderStatus';
+import { useAdminOrderStatus } from '../../hooks/useAdminOrderStatus/useAdminOrderStatus';
+import { formatPrice } from '../../helpers/formatPrice/formatPrice';
+import type { Order } from '../../types/order/order';
 
 const labelClass = 'text-xs font-medium text-zinc-600 dark:text-zinc-300';
 

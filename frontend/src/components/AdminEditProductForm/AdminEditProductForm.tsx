@@ -5,12 +5,12 @@ import { Button } from '../Button/Button';
 import { FormSelect } from '../CreateProductForm/FormSelect';
 import { ProductImagesField } from '../CreateProductForm/ProductImagesField';
 import { StepperNumberInput } from '../CreateProductForm/StepperNumberInput';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useAuth } from '../../hooks/useAuth';
-import { useUpdateProductMutation } from '../../hooks/useProductSellerMutations';
-import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery';
-import { uploadFile } from '../../requests/fileRequests';
-import type { Product } from '../../types/product';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useUpdateProductMutation } from '../../hooks/useProductSellerMutations/useProductSellerMutations';
+import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery/useCategoriesFlatQuery';
+import { uploadFile } from '../../requests/fileRequests/fileRequests';
+import type { Product } from '../../types/product/product';
 
 const fieldClass =
   'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-hidden transition placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';

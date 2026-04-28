@@ -4,12 +4,12 @@ import { Link } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
 import { useSellerCreateStoreModal } from '../../context/SellerCreateStoreModalProvider/SellerCreateStoreModalProvider';
 import { routePaths } from '../../config/routes';
-import { getErrorMessage } from '../../helpers/mapApiError';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
 import {
   useDeleteStoreMutation,
   useUpdateStoreMutation,
-} from '../../hooks/useStoreMutations';
-import { useMyStoresQuery } from '../../queries/useMyStoresQuery';
+} from '../../hooks/useStoreMutations/useStoreMutations';
+import { useMyStoresQuery } from '../../queries/useMyStoresQuery/useMyStoresQuery';
 
 export function SellerMyStoresPanel() {
   const { data, isLoading, isError } = useMyStoresQuery();

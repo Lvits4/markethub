@@ -40,18 +40,18 @@ import { TableEmptyCell } from '../../components/TableEmptyCell/TableEmptyCell';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminEditStoreForm } from '../../components/AdminEditStoreForm/AdminEditStoreForm';
 import { useSellerCreateStoreModal } from '../../context/SellerCreateStoreModalProvider/SellerCreateStoreModalProvider';
-import { useAuth } from '../../hooks/useAuth';
-import { useDeleteStoreMutation } from '../../hooks/useStoreMutations';
-import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useAdminDeleteStore } from '../../hooks/useAdminDeleteStore';
-import { queryKeys } from '../../helpers/queryKeys';
-import { useAdminStoreDetailQuery } from '../../queries/useAdminStoreDetailQuery';
-import { useAdminStoresQuery } from '../../queries/useAdminStoresQuery';
-import { useMyStoresQuery } from '../../queries/useMyStoresQuery';
-import { useSellerStoreDetailQuery } from '../../queries/useSellerStoreDetailQuery';
-import type { AdminStoreDetail, AdminStoreRow } from '../../types/admin';
-import type { Store } from '../../types/store';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useDeleteStoreMutation } from '../../hooks/useStoreMutations/useStoreMutations';
+import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc/useProtectedImageSrc';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useAdminDeleteStore } from '../../hooks/useAdminDeleteStore/useAdminDeleteStore';
+import { queryKeys } from '../../helpers/queryKeys/queryKeys';
+import { useAdminStoreDetailQuery } from '../../queries/useAdminStoreDetailQuery/useAdminStoreDetailQuery';
+import { useAdminStoresQuery } from '../../queries/useAdminStoresQuery/useAdminStoresQuery';
+import { useMyStoresQuery } from '../../queries/useMyStoresQuery/useMyStoresQuery';
+import { useSellerStoreDetailQuery } from '../../queries/useSellerStoreDetailQuery/useSellerStoreDetailQuery';
+import type { AdminStoreDetail, AdminStoreRow } from '../../types/admin/admin';
+import type { Store } from '../../types/store/store';
 
 function mapMyStoreToAdminRow(s: Store): AdminStoreRow {
   return {
@@ -239,7 +239,7 @@ function StoreDetailsPanel({
           badges={
             <>
               {variant === 'admin' ? (
-                <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300">
+                <span className="rounded-md border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300">
                   {numOrZero(store.commission)}% comisión
                 </span>
               ) : null}

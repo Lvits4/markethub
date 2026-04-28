@@ -36,13 +36,13 @@ import { TablePagination } from '../../components/TablePagination/TablePaginatio
 import {
   TableEmptyCell,
 } from '../../components/TableEmptyCell/TableEmptyCell';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useAuth } from '../../hooks/useAuth';
-import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc';
-import { useStoreApprove, useStoreReject } from '../../hooks/useStoreModeration';
-import { useAdminStoreDetailQuery } from '../../queries/useAdminStoreDetailQuery';
-import { useRejectedStoresQuery } from '../../queries/useRejectedStoresQuery';
-import type { AdminStoreDetail, AdminStoreRow } from '../../types/admin';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc/useProtectedImageSrc';
+import { useStoreApprove, useStoreReject } from '../../hooks/useStoreModeration/useStoreModeration';
+import { useAdminStoreDetailQuery } from '../../queries/useAdminStoreDetailQuery/useAdminStoreDetailQuery';
+import { useRejectedStoresQuery } from '../../queries/useRejectedStoresQuery/useRejectedStoresQuery';
+import type { AdminStoreDetail, AdminStoreRow } from '../../types/admin/admin';
 
 function numOrZero(v: string | number) {
   const n = typeof v === 'string' ? Number.parseFloat(v) : v;
@@ -156,7 +156,7 @@ function StoreDetailsPanel({ store }: { store: AdminStoreDetail }) {
           subtitle={`/${store.slug}`}
           badges={
             <>
-              <span className="rounded border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300">
+              <span className="rounded-md border border-slate-200/80 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300">
                 {numOrZero(store.commission)}% comisión
               </span>
               <AdminStatusBadge tone="warning">

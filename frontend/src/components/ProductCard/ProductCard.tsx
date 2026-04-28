@@ -2,9 +2,9 @@ import type { MouseEvent } from 'react';
 import { FiHeart } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { routePaths } from '../../config/routes';
-import { formatPrice } from '../../helpers/formatPrice';
-import { getPrimaryImageUrl } from '../../helpers/productImageUrl';
-import type { Product } from '../../types/product';
+import { formatPrice } from '../../helpers/formatPrice/formatPrice';
+import { getPrimaryImageUrl } from '../../helpers/productImageUrl/productImageUrl';
+import type { Product } from '../../types/product/product';
 import { Badge } from '../Badge/Badge';
 import { Button } from '../Button/Button';
 

@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { routePaths } from '../../config/routes';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth/useAuth';
 import { CatalogPage } from '../CatalogPage/CatalogPage';
 
 export function CatalogEntry() {

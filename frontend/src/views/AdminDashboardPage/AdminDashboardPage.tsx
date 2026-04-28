@@ -10,9 +10,11 @@ import {
 } from 'recharts';
 import { HiUsers, HiUserGroup, HiBuildingStorefront, HiCube } from 'react-icons/hi2';
 import { FormSelect } from '../../components/CreateProductForm/FormSelect';
-import { formatPrice } from '../../helpers/formatPrice';
-import { useAdminDashboardQuery } from '../../queries/useAdminDashboardQuery';
-import type { AdminRecentSaleRow } from '../../types/admin';
+import { formatPrice } from '../../helpers/formatPrice/formatPrice';
+import { getRechartsTooltipStyles } from '../../helpers/rechartsTooltipStyles/rechartsTooltipStyles';
+import { useTheme } from '../../hooks/useTheme/useTheme';
+import { useAdminDashboardQuery } from '../../queries/useAdminDashboardQuery/useAdminDashboardQuery';
+import type { AdminRecentSaleRow } from '../../types/admin/admin';
 
 const DAY_RANGE_OPTIONS = [
   { value: '7', label: '7 días' },
@@ -89,6 +91,9 @@ function RecentSaleRow({ sale }: { sale: AdminRecentSaleRow }) {
 }
 
 export function AdminDashboardPage() {
+  const { theme } = useTheme();
+  const tooltipStyles = getRechartsTooltipStyles(theme === 'dark');
+
   const [dayRange, setDayRange] = useState<7 | 14 | 30>(() => {
     const saved = localStorage.getItem('adminDashboardDayRange');
     const n = saved ? Number(saved) : 7;
@@ -247,11 +252,8 @@ export function AdminDashboardPage() {
                       const row = payload?.[0]?.payload as { day?: string } | undefined;
                       return row?.day ?? '';
                     }}
-                    contentStyle={{
-                      borderRadius: 6,
-                      border: '1px solid rgb(0 0 0 / 0.08)',
-                      fontSize: 12,
-                    }}
+                    contentStyle={tooltipStyles.contentStyle}
+                    labelStyle={tooltipStyles.labelStyle}
                   />
                   <Bar
                     yAxisId="left"

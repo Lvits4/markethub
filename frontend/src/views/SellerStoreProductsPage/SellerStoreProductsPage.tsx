@@ -2,11 +2,11 @@ import toast from 'react-hot-toast';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
 import { routePaths } from '../../config/routes';
-import { formatPrice } from '../../helpers/formatPrice';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useDeleteProductMutation } from '../../hooks/useProductSellerMutations';
-import { useMyStoresQuery } from '../../queries/useMyStoresQuery';
-import { useProductsByStoreQuery } from '../../queries/useProductsByStoreQuery';
+import { formatPrice } from '../../helpers/formatPrice/formatPrice';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useDeleteProductMutation } from '../../hooks/useProductSellerMutations/useProductSellerMutations';
+import { useMyStoresQuery } from '../../queries/useMyStoresQuery/useMyStoresQuery';
+import { useProductsByStoreQuery } from '../../queries/useProductsByStoreQuery/useProductsByStoreQuery';
 
 function numPrice(v: string | number) {
   const n = typeof v === 'string' ? Number.parseFloat(v) : v;

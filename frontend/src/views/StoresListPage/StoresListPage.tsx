@@ -10,9 +10,9 @@ import { Button } from '../../components/Button/Button';
 import { FormSelect } from '../../components/CreateProductForm/FormSelect';
 import { SearchInput } from '../../components/SearchInput/SearchInput';
 import { routePaths } from '../../config/routes';
-import { publicStorageImageSrc } from '../../helpers/storagePublicUrl';
-import { usePublicStoresQuery } from '../../queries/usePublicStoresQuery';
-import type { Store } from '../../types/store';
+import { publicStorageImageSrc } from '../../helpers/storagePublicUrl/storagePublicUrl';
+import { usePublicStoresQuery } from '../../queries/usePublicStoresQuery/usePublicStoresQuery';
+import type { Store } from '../../types/store/store';
 
 type SortMode = 'name_asc' | 'name_desc';
 

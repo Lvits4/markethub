@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { routePaths } from '../../config/routes';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth/useAuth';
 
 type SellerRouteProps = {
   children: ReactNode;

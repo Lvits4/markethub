@@ -3,8 +3,8 @@ import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthPasswordField } from '../../components/AuthPasswordField/AuthPasswordField';
 import { routePaths } from '../../config/routes';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useRegister } from '../../hooks/useRegister';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useRegister } from '../../hooks/useRegister/useRegister';
 import { registerSchema } from '../../validations/registerSchema';
 
 const inputClass =

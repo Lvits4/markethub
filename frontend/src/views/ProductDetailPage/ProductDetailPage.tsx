@@ -5,18 +5,18 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
 import { QuantitySelector } from '../../components/QuantitySelector/QuantitySelector';
 import { routePaths } from '../../config/routes';
-import { formatPrice } from '../../helpers/formatPrice';
-import { getErrorMessage } from '../../helpers/mapApiError';
+import { formatPrice } from '../../helpers/formatPrice/formatPrice';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
 import {
   getPrimaryImageUrl,
   getSortedProductImages,
-} from '../../helpers/productImageUrl';
-import { publicStorageImageSrc } from '../../helpers/storagePublicUrl';
-import { useAuth } from '../../hooks/useAuth';
-import { useCartMutations } from '../../hooks/useCartMutations';
-import { useFavoriteToggle } from '../../hooks/useFavoriteToggle';
-import { useProductByIdQuery } from '../../queries/useProductByIdQuery';
-import { useFavoriteCheckQuery } from '../../queries/useFavoriteCheckQuery';
+} from '../../helpers/productImageUrl/productImageUrl';
+import { publicStorageImageSrc } from '../../helpers/storagePublicUrl/storagePublicUrl';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useCartMutations } from '../../hooks/useCartMutations/useCartMutations';
+import { useFavoriteToggle } from '../../hooks/useFavoriteToggle/useFavoriteToggle';
+import { useProductByIdQuery } from '../../queries/useProductByIdQuery/useProductByIdQuery';
+import { useFavoriteCheckQuery } from '../../queries/useFavoriteCheckQuery/useFavoriteCheckQuery';
 import { addToCartSchema } from '../../validations/addToCartSchema';
 
 function toPriceNumber(price: string | number): number {

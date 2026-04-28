@@ -16,7 +16,7 @@ import {
   FiUsers,
 } from 'react-icons/fi';
 import type { ThemeMode } from '../../context/ThemeProvider/ThemeProvider';
-import type { AuthUser } from '../../types/user';
+import type { AuthUser } from '../../types/user/user';
 import { routePaths } from '../../config/routes';
 
 type PageMeta = { title: string; icon: ComponentType<{ className?: string; 'aria-hidden'?: boolean }> };
@@ -207,18 +207,18 @@ export function AdminNavbar({
             setNotifOpen(false);
             setUserOpen((v) => !v);
           }}
-          className="flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-zinc-100 dark:hover:bg-night-800"
+          className="flex items-center justify-start gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-zinc-100 dark:hover:bg-night-800"
           aria-expanded={userOpen}
           aria-label="Menú de usuario"
         >
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-(--admin-primary-soft) text-xs font-semibold text-admin-primary">
             {initials}
           </div>
-          <div className="hidden min-w-0 sm:block">
-            <p className="truncate text-sm font-medium text-zinc-700 dark:text-zinc-200">
+          <div className="hidden min-w-0 flex-col items-stretch gap-0 sm:flex">
+            <p className="truncate text-left text-sm font-medium text-zinc-700 dark:text-zinc-200">
               {roleLabel}
             </p>
-            <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="truncate text-left text-xs text-zinc-500 dark:text-zinc-400">
               {user?.email ?? ''}
             </p>
           </div>

@@ -9,9 +9,9 @@ import { Button } from '../../components/Button/Button';
 import { FormSelect } from '../../components/CreateProductForm/FormSelect';
 import { MarketProductCard } from '../../components/MarketProductCard/MarketProductCard';
 import { SearchInput } from '../../components/SearchInput/SearchInput';
-import { useFavoritesQuery } from '../../queries/useFavoritesQuery';
-import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery';
-import type { Product, ProductSortBy } from '../../types/product';
+import { useFavoritesQuery } from '../../queries/useFavoritesQuery/useFavoritesQuery';
+import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery/useCategoriesFlatQuery';
+import type { Product, ProductSortBy } from '../../types/product/product';
 
 const SORT_OPTIONS: { value: ProductSortBy; label: string }[] = [
   { value: 'newest', label: 'Más recientes' },

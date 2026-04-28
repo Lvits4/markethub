@@ -3,8 +3,8 @@ import toast from 'react-hot-toast';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthPasswordField } from '../../components/AuthPasswordField/AuthPasswordField';
 import { routePaths } from '../../config/routes';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { resetPasswordRequest } from '../../requests/authRequests';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { resetPasswordRequest } from '../../requests/authRequests/authRequests';
 
 export function ResetPasswordPage() {
   const [searchParams] = useSearchParams();

@@ -3,13 +3,13 @@ import toast from 'react-hot-toast';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { Button } from '../Button/Button';
 import { LogoUploadField } from '../LogoUploadField/LogoUploadField';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useAuth } from '../../hooks/useAuth';
-import { useAdminPatchCommission } from '../../hooks/useAdminPatchCommission';
-import { useUpdateStoreMutation } from '../../hooks/useStoreMutations';
-import { uploadFile } from '../../requests/fileRequests';
-import type { AdminStoreDetail } from '../../types/admin';
-import type { UpdateStorePayload } from '../../requests/storeRequests';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useAdminPatchCommission } from '../../hooks/useAdminPatchCommission/useAdminPatchCommission';
+import { useUpdateStoreMutation } from '../../hooks/useStoreMutations/useStoreMutations';
+import { uploadFile } from '../../requests/fileRequests/fileRequests';
+import type { AdminStoreDetail } from '../../types/admin/admin';
+import type { UpdateStorePayload } from '../../requests/storeRequests/storeRequests';
 
 const fieldClass =
   'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-hidden transition placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';

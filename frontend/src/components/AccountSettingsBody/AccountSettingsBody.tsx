@@ -4,12 +4,12 @@ import toast from 'react-hot-toast';
 import { Button } from '../Button/Button';
 import { ProductImagesField } from '../CreateProductForm/ProductImagesField';
 import { routePaths } from '../../config/routes';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useAuth } from '../../hooks/useAuth';
-import { useTheme } from '../../hooks/useTheme';
-import { useUpdateProfileMutation } from '../../hooks/useUpdateProfileMutation';
-import { useUserProfileQuery } from '../../queries/useUserProfileQuery';
-import { uploadFile } from '../../requests/fileRequests';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useTheme } from '../../hooks/useTheme/useTheme';
+import { useUpdateProfileMutation } from '../../hooks/useUpdateProfileMutation/useUpdateProfileMutation';
+import { useUserProfileQuery } from '../../queries/useUserProfileQuery/useUserProfileQuery';
+import { uploadFile } from '../../requests/fileRequests/fileRequests';
 
 type AccountSettingsBodyProps = {
   className?: string;

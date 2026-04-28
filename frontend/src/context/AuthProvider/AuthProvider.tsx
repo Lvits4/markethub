@@ -5,7 +5,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { AuthUser, LoginResult } from '../../types/user';
+import type { AuthUser, LoginResult } from '../../types/user/user';
 
 const TOKEN_KEY = 'mh_access_token';
 const USER_KEY = 'mh_user';

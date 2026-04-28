@@ -25,10 +25,10 @@ import {
 import { Modal } from '../../components/Modal/Modal';
 import { AdminCreateCategoryForm } from '../../components/AdminCreateCategoryForm/AdminCreateCategoryForm';
 import { AdminEditCategoryForm } from '../../components/AdminEditCategoryForm/AdminEditCategoryForm';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useDeleteCategoryMutation } from '../../hooks/useAdminCategoryMutations';
-import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery';
-import type { Category } from '../../types/category';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useDeleteCategoryMutation } from '../../hooks/useAdminCategoryMutations/useAdminCategoryMutations';
+import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery/useCategoriesFlatQuery';
+import type { Category } from '../../types/category/category';
 
 type SortKey = 'name' | 'parent' | 'description';
 type SortDir = 'asc' | 'desc';

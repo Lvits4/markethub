@@ -23,11 +23,11 @@ import { TableEmptyCell } from '../../components/TableEmptyCell/TableEmptyCell';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminCreateUserForm } from '../../components/AdminCreateUserForm/AdminCreateUserForm';
 import { AdminEditUserForm } from '../../components/AdminEditUserForm/AdminEditUserForm';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useAdminDeleteUser } from '../../hooks/useAdminDeleteUser';
-import { useAuth } from '../../hooks/useAuth';
-import { useAdminUsersQuery } from '../../queries/useAdminUsersQuery';
-import type { AdminUserRow } from '../../types/admin';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useAdminDeleteUser } from '../../hooks/useAdminDeleteUser/useAdminDeleteUser';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useAdminUsersQuery } from '../../queries/useAdminUsersQuery/useAdminUsersQuery';
+import type { AdminUserRow } from '../../types/admin/admin';
 
 type SortKey = 'name' | 'email' | 'role' | 'active';
 type SortDir = 'asc' | 'desc';

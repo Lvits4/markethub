@@ -13,13 +13,13 @@ import { Button } from '../../components/Button/Button';
 import { Modal } from '../../components/Modal/Modal';
 import { QuantitySelector } from '../../components/QuantitySelector/QuantitySelector';
 import { routePaths } from '../../config/routes';
-import { formatPrice } from '../../helpers/formatPrice';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { getPrimaryImageUrl } from '../../helpers/productImageUrl';
-import { useAuth } from '../../hooks/useAuth';
-import { useCartMutations } from '../../hooks/useCartMutations';
-import { useCreateOrderMutation } from '../../hooks/useCreateOrderMutation';
-import { useCartQuery } from '../../queries/useCartQuery';
+import { formatPrice } from '../../helpers/formatPrice/formatPrice';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { getPrimaryImageUrl } from '../../helpers/productImageUrl/productImageUrl';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useCartMutations } from '../../hooks/useCartMutations/useCartMutations';
+import { useCreateOrderMutation } from '../../hooks/useCreateOrderMutation/useCreateOrderMutation';
+import { useCartQuery } from '../../queries/useCartQuery/useCartQuery';
 import { updateCartItemSchema } from '../../validations/updateCartItemSchema';
 
 function unitPriceNumber(price: string | number | undefined): number {

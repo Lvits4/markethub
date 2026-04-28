@@ -5,12 +5,12 @@ import { Link } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
 import { Modal } from '../../components/Modal/Modal';
 import { routePaths } from '../../config/routes';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { formatPrice } from '../../helpers/formatPrice';
-import { formatOrderStatus } from '../../helpers/orderStatus';
-import { useClearMyOrdersMutation } from '../../hooks/useClearMyOrdersMutation';
-import { useDeleteOrderMutation } from '../../hooks/useDeleteOrderMutation';
-import { useMyOrdersQuery } from '../../queries/useMyOrdersQuery';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { formatPrice } from '../../helpers/formatPrice/formatPrice';
+import { formatOrderStatus } from '../../helpers/orderStatus/orderStatus';
+import { useClearMyOrdersMutation } from '../../hooks/useClearMyOrdersMutation/useClearMyOrdersMutation';
+import { useDeleteOrderMutation } from '../../hooks/useDeleteOrderMutation/useDeleteOrderMutation';
+import { useMyOrdersQuery } from '../../queries/useMyOrdersQuery/useMyOrdersQuery';
 
 function numAmount(v: string | number) {
   const n = typeof v === 'string' ? Number.parseFloat(v) : v;

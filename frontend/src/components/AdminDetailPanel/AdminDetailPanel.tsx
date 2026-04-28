@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { IconType } from 'react-icons';
 
-import type { AdminStoreDetail, AdminStoreDetailStats } from '../../types/admin';
+import type { AdminStoreDetail, AdminStoreDetailStats } from '../../types/admin/admin';
 
 export function getAdminStorePanelStats(
   store: AdminStoreDetail,

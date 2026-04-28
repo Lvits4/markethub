@@ -2,12 +2,12 @@ import type { MouseEvent } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { routePaths } from '../../config/routes';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useAuth } from '../../hooks/useAuth';
-import { useCartMutations } from '../../hooks/useCartMutations';
-import { useFavoriteToggle } from '../../hooks/useFavoriteToggle';
-import { useFavoriteCheckQuery } from '../../queries/useFavoriteCheckQuery';
-import type { Product } from '../../types/product';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useCartMutations } from '../../hooks/useCartMutations/useCartMutations';
+import { useFavoriteToggle } from '../../hooks/useFavoriteToggle/useFavoriteToggle';
+import { useFavoriteCheckQuery } from '../../queries/useFavoriteCheckQuery/useFavoriteCheckQuery';
+import type { Product } from '../../types/product/product';
 import { addToCartSchema } from '../../validations/addToCartSchema';
 import { ProductCard } from '../ProductCard/ProductCard';
 

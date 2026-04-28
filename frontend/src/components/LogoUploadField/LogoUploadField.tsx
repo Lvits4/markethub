@@ -1,9 +1,9 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import toast from 'react-hot-toast';
 import { FiImage, FiUpload, FiX } from 'react-icons/fi';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useAuth } from '../../hooks/useAuth';
-import { uploadFile } from '../../requests/fileRequests';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { uploadFile } from '../../requests/fileRequests/fileRequests';
 
 const labelClass = 'text-xs font-medium text-zinc-600 dark:text-zinc-300';
 

@@ -15,8 +15,10 @@ import {
   HiCube,
   HiExclamationTriangle,
 } from 'react-icons/hi2';
-import { formatPrice } from '../../helpers/formatPrice';
-import { useSellerDashboardQuery } from '../../queries/useSellerDashboardQuery';
+import { formatPrice } from '../../helpers/formatPrice/formatPrice';
+import { getRechartsTooltipStyles } from '../../helpers/rechartsTooltipStyles/rechartsTooltipStyles';
+import { useTheme } from '../../hooks/useTheme/useTheme';
+import { useSellerDashboardQuery } from '../../queries/useSellerDashboardQuery/useSellerDashboardQuery';
 
 const KPI_STYLES = [
   { accent: 'border-l-blue-500 dark:border-l-blue-400', icon: 'text-blue-500 dark:text-blue-400' },
@@ -57,31 +59,28 @@ function KpiCard({
   );
 }
 
-function truncateLabel(name: string, max = 14) {
-  const t = name.trim();
-  if (t.length <= max) return t;
-  return `${t.slice(0, max - 1)}…`;
-}
-
 export function SellerDashboardPage() {
-const [lowStockThreshold, setLowStockThreshold] = useState<number>(() => {
-  const saved = localStorage.getItem('sellerLowStockThreshold');
-  const n = saved ? Number(saved) : 5;
-  return n > 0 && Number.isFinite(n) ? n : 5;
-});
-const [thresholdInput, setThresholdInput] = useState(String(lowStockThreshold));
+  const { theme } = useTheme();
+  const tooltipStyles = getRechartsTooltipStyles(theme === 'dark');
 
-const { data, isLoading, isError } = useSellerDashboardQuery(lowStockThreshold);
+  const [lowStockThreshold, setLowStockThreshold] = useState<number>(() => {
+    const saved = localStorage.getItem('sellerLowStockThreshold');
+    const n = saved ? Number(saved) : 5;
+    return n > 0 && Number.isFinite(n) ? n : 5;
+  });
+  const [thresholdInput, setThresholdInput] = useState(String(lowStockThreshold));
 
-const commitThreshold = (v: string) => {
-  const n = Number(v);
-  if (n > 0 && Number.isFinite(n)) {
-    setLowStockThreshold(n);
-    localStorage.setItem('sellerLowStockThreshold', String(n));
-  } else {
-    setThresholdInput(String(lowStockThreshold));
-  }
-};
+  const { data, isLoading, isError } = useSellerDashboardQuery(lowStockThreshold);
+
+  const commitThreshold = (v: string) => {
+    const n = Number(v);
+    if (n > 0 && Number.isFinite(n)) {
+      setLowStockThreshold(n);
+      localStorage.setItem('sellerLowStockThreshold', String(n));
+    } else {
+      setThresholdInput(String(lowStockThreshold));
+    }
+  };
 
   const dailyOrdersChart = useMemo(() => {
     if (!data?.dailyOrders) return [];
@@ -99,15 +98,6 @@ const commitThreshold = (v: string) => {
       mesCorto: row.month.replace(/^(\d{4})-(\d{2})$/, '$2/$1'),
       ingresos: Number.parseFloat(String(row.totalRevenue)) || 0,
       pedidos: Number.parseInt(String(row.totalOrders), 10) || 0,
-    }));
-  }, [data]);
-
-  const topStoresChart = useMemo(() => {
-    if (!data?.topStoresByEarnings) return [];
-    return data.topStoresByEarnings.slice(0, 6).map((row) => ({
-      nombre: truncateLabel(row.storeName, 16),
-      nombreCompleto: row.storeName,
-      ganancia: row.sellerEarnings,
     }));
   }, [data]);
 
@@ -238,11 +228,8 @@ const commitThreshold = (v: string) => {
                   />
                   <Tooltip
                     cursor={false}
-                    contentStyle={{
-                      borderRadius: 6,
-                      border: '1px solid rgb(0 0 0 / 0.08)',
-                      fontSize: 12,
-                    }}
+                    contentStyle={tooltipStyles.contentStyle}
+                    labelStyle={tooltipStyles.labelStyle}
                   />
                   <Bar
                     dataKey="pedidos"
@@ -322,11 +309,8 @@ const commitThreshold = (v: string) => {
                       const row = payload?.[0]?.payload as { month?: string } | undefined;
                       return row?.month ?? '';
                     }}
-                    contentStyle={{
-                      borderRadius: 6,
-                      border: '1px solid rgb(0 0 0 / 0.08)',
-                      fontSize: 12,
-                    }}
+                    contentStyle={tooltipStyles.contentStyle}
+                    labelStyle={tooltipStyles.labelStyle}
                   />
                   <Bar
                     yAxisId="left"
@@ -352,78 +336,6 @@ const commitThreshold = (v: string) => {
           </div>
         </section>
       </div>
-
-      {topStoresChart.length > 0 && (
-        <section className="flex max-lg:min-h-[220px] flex-col rounded-md border border-(--admin-border) bg-(--admin-card) p-3 shadow-sm dark:shadow-none lg:min-h-0">
-          <div className="mb-2 min-w-0">
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
-              Mis tiendas por ganancia
-            </h2>
-            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-              Ganancias netas del vendedor por tienda
-            </p>
-          </div>
-          <div
-            className="flex min-h-[180px] w-full min-w-0 flex-1 lg:h-[240px] lg:min-h-[240px] lg:flex-none"
-            role="img"
-            aria-label="Gráfico de ganancias por tienda"
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                layout="vertical"
-                data={topStoresChart}
-                margin={{ top: 2, right: 8, left: 4, bottom: 2 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  horizontal={false}
-                  stroke="rgb(0 0 0 / 0.06)"
-                  className="dark:stroke-night-700"
-                />
-                <XAxis
-                  type="number"
-                  tick={{ fontSize: 10, fill: '#71717a' }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(v) =>
-                    v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)
-                  }
-                />
-                <YAxis
-                  type="category"
-                  dataKey="nombre"
-                  width={92}
-                  tick={{ fontSize: 10, fill: '#71717a' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip
-                  cursor={false}
-                  formatter={(value: number) => formatPrice(value)}
-                  labelFormatter={(_, payload) => {
-                    const row = payload?.[0]?.payload as
-                      | { nombreCompleto?: string }
-                      | undefined;
-                    return row?.nombreCompleto ?? '';
-                  }}
-                  contentStyle={{
-                    borderRadius: 6,
-                    border: '1px solid rgb(0 0 0 / 0.08)',
-                    fontSize: 12,
-                  }}
-                />
-                <Bar
-                  dataKey="ganancia"
-                  name="Ganancia"
-                  fill="var(--admin-primary, #2563eb)"
-                  radius={[0, 4, 4, 0]}
-                  maxBarSize={14}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
-      )}
     </div>
   );
 }

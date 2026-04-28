@@ -2,8 +2,8 @@ import { useState, type FormEvent } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { routePaths } from '../../config/routes';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { forgotPasswordRequest } from '../../requests/authRequests';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { forgotPasswordRequest } from '../../requests/authRequests/authRequests';
 
 const inputClass =
   'mt-1 w-full rounded-md border border-zinc-200/90 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 outline-hidden transition placeholder:text-zinc-400 focus:border-auth-primary focus:bg-white focus:ring-2 focus:ring-auth-primary/18 dark:border-night-600 dark:bg-night-950/80 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:bg-night-950';

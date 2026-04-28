@@ -5,15 +5,15 @@ import { Button } from '../../components/Button/Button';
 import { FormSelect } from '../../components/CreateProductForm/FormSelect';
 import { ProductImagesField } from '../../components/CreateProductForm/ProductImagesField';
 import { routePaths } from '../../config/routes';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useAuth } from '../../hooks/useAuth';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useAuth } from '../../hooks/useAuth/useAuth';
 import {
   useCreateProductMutation,
   useUpdateProductMutation,
-} from '../../hooks/useProductSellerMutations';
-import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery';
-import { useProductByIdQuery } from '../../queries/useProductByIdQuery';
-import { uploadFile } from '../../requests/fileRequests';
+} from '../../hooks/useProductSellerMutations/useProductSellerMutations';
+import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery/useCategoriesFlatQuery';
+import { useProductByIdQuery } from '../../queries/useProductByIdQuery/useProductByIdQuery';
+import { uploadFile } from '../../requests/fileRequests/fileRequests';
 
 export function SellerProductFormPage() {
   const { productId } = useParams<{ productId: string }>();

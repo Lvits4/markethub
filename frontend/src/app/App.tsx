@@ -3,7 +3,7 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from '../context/AuthProvider/AuthProvider';
 import { ThemeProvider } from '../context/ThemeProvider/ThemeProvider';
-import { useTheme } from '../hooks/useTheme';
+import { useTheme } from '../hooks/useTheme/useTheme';
 import { AuthPage } from '../views/AuthPage/AuthPage';
 import { MainLayout } from '../layouts/MainLayout/MainLayout';
 import { AdminOnlyRoute } from '../components/AdminOnlyRoute/AdminOnlyRoute';

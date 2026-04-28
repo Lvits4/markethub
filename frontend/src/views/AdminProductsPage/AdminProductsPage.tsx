@@ -38,20 +38,20 @@ import { TableEmptyCell } from '../../components/TableEmptyCell/TableEmptyCell';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminEditProductForm } from '../../components/AdminEditProductForm/AdminEditProductForm';
 import { CreateProductForm } from '../../components/CreateProductForm/CreateProductForm';
-import { useAuth } from '../../hooks/useAuth';
-import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc';
-import { formatPrice } from '../../helpers/formatPrice';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc/useProtectedImageSrc';
+import { formatPrice } from '../../helpers/formatPrice/formatPrice';
 import {
   galleryProductImages,
   primaryProductImageUrl,
-} from '../../helpers/productPrimaryImage';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useDeleteProductMutation } from '../../hooks/useProductSellerMutations';
-import { useAdminProductDetailQuery } from '../../queries/useAdminProductDetailQuery';
-import { useAdminProductsQuery } from '../../queries/useAdminProductsQuery';
-import { useSellerProductsQuery } from '../../queries/useSellerProductsQuery';
-import type { AdminProductRow } from '../../types/admin';
-import type { Product } from '../../types/product';
+} from '../../helpers/productPrimaryImage/productPrimaryImage';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useDeleteProductMutation } from '../../hooks/useProductSellerMutations/useProductSellerMutations';
+import { useAdminProductDetailQuery } from '../../queries/useAdminProductDetailQuery/useAdminProductDetailQuery';
+import { useAdminProductsQuery } from '../../queries/useAdminProductsQuery/useAdminProductsQuery';
+import { useSellerProductsQuery } from '../../queries/useSellerProductsQuery/useSellerProductsQuery';
+import type { AdminProductRow } from '../../types/admin/admin';
+import type { Product } from '../../types/product/product';
 
 function numOrZero(v: string | number) {
   const n = typeof v === 'string' ? Number.parseFloat(v) : v;

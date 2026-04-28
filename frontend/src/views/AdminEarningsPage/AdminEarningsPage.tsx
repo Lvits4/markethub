@@ -16,12 +16,12 @@ import {
 import { TablePagination } from '../../components/TablePagination/TablePagination';
 import { FilterPopover } from '../../components/FilterPopover/FilterPopover';
 import type { FilterField } from '../../components/FilterPopover/FilterPopover';
-import { formatPrice } from '../../helpers/formatPrice';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { queryKeys } from '../../helpers/queryKeys';
-import { useAdminEarningsReportQuery } from '../../queries/useAdminEarningsReportQuery';
-import { patchAdminStoreCommission } from '../../requests/adminRequests';
-import type { AdminEarningsRow } from '../../types/admin';
+import { formatPrice } from '../../helpers/formatPrice/formatPrice';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { queryKeys } from '../../helpers/queryKeys/queryKeys';
+import { useAdminEarningsReportQuery } from '../../queries/useAdminEarningsReportQuery/useAdminEarningsReportQuery';
+import { patchAdminStoreCommission } from '../../requests/adminRequests/adminRequests';
+import type { AdminEarningsRow } from '../../types/admin/admin';
 
 type SortKey = 'store' | 'commission' | 'revenue' | 'sellerEarnings' | 'adminEarnings';
 type SortDir = 'asc' | 'desc';

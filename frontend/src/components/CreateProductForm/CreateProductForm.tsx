@@ -5,13 +5,13 @@ import { Button } from '../Button/Button';
 import { FormSelect } from './FormSelect';
 import { ProductImagesField } from './ProductImagesField';
 import { StepperNumberInput } from './StepperNumberInput';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useAuth } from '../../hooks/useAuth';
-import { useCreateProductMutation } from '../../hooks/useProductSellerMutations';
-import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery';
-import { useAdminStoresQuery } from '../../queries/useAdminStoresQuery';
-import { useMyStoresQuery } from '../../queries/useMyStoresQuery';
-import { uploadFile } from '../../requests/fileRequests';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useCreateProductMutation } from '../../hooks/useProductSellerMutations/useProductSellerMutations';
+import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery/useCategoriesFlatQuery';
+import { useAdminStoresQuery } from '../../queries/useAdminStoresQuery/useAdminStoresQuery';
+import { useMyStoresQuery } from '../../queries/useMyStoresQuery/useMyStoresQuery';
+import { uploadFile } from '../../requests/fileRequests/fileRequests';
 
 const fieldClass =
   'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-hidden transition placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';

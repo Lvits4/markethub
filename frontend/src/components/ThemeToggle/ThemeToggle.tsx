@@ -1,5 +1,5 @@
 import { FiMoon, FiSun } from 'react-icons/fi';
-import { useTheme } from '../../hooks/useTheme';
+import { useTheme } from '../../hooks/useTheme/useTheme';
 
 type ThemeToggleProps = {
   className?: string;

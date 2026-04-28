@@ -2,9 +2,9 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FormSelect } from '../CreateProductForm/FormSelect';
 import { Button } from '../Button/Button';
-import { getErrorMessage } from '../../helpers/mapApiError';
-import { useCreateCategoryMutation } from '../../hooks/useAdminCategoryMutations';
-import type { Category } from '../../types/category';
+import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { useCreateCategoryMutation } from '../../hooks/useAdminCategoryMutations/useAdminCategoryMutations';
+import type { Category } from '../../types/category/category';
 
 const fieldClass =
   'mt-0.5 w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-hidden transition placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/20 dark:border-night-700 dark:bg-night-950 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20';

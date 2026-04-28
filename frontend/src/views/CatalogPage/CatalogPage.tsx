@@ -10,10 +10,10 @@ import { FormSelect } from '../../components/CreateProductForm/FormSelect';
 import { MarketProductCard } from '../../components/MarketProductCard/MarketProductCard';
 import { SearchInput } from '../../components/SearchInput/SearchInput';
 import { marketingCopy } from '../../data/marketingCopy';
-import { useAccumulatedProductList } from '../../hooks/useAccumulatedProductList';
-import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery';
-import { useProductsListQuery } from '../../queries/useProductsListQuery';
-import type { ProductSortBy } from '../../types/product';
+import { useAccumulatedProductList } from '../../hooks/useAccumulatedProductList/useAccumulatedProductList';
+import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery/useCategoriesFlatQuery';
+import { useProductsListQuery } from '../../queries/useProductsListQuery/useProductsListQuery';
+import type { ProductSortBy } from '../../types/product/product';
 
 const SORT_OPTIONS: { value: ProductSortBy; label: string }[] = [
   { value: 'newest', label: 'Más recientes' },

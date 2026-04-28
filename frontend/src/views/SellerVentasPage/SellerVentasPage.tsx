@@ -14,9 +14,9 @@ import {
 import { TablePagination } from '../../components/TablePagination/TablePagination';
 import { FilterPopover } from '../../components/FilterPopover/FilterPopover';
 import type { FilterField } from '../../components/FilterPopover/FilterPopover';
-import { formatPrice } from '../../helpers/formatPrice';
-import { useSellerVentasQuery } from '../../queries/useSellerVentasQuery';
-import type { SellerVentasRow } from '../../types/admin';
+import { formatPrice } from '../../helpers/formatPrice/formatPrice';
+import { useSellerVentasQuery } from '../../queries/useSellerVentasQuery/useSellerVentasQuery';
+import type { SellerVentasRow } from '../../types/admin/admin';
 
 type SortKey = 'store' | 'revenue' | 'commission' | 'sellerEarnings' | 'adminEarnings' | 'orders' | 'products';
 type SortDir = 'asc' | 'desc';

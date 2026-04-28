@@ -3,8 +3,8 @@ import { NavLink } from 'react-router-dom';
 import { FiShoppingCart, FiUser } from 'react-icons/fi';
 import { routePaths } from '../../config/routes';
 import { useAccountSettingsPanel } from '../../context/AccountSettingsPanelProvider/AccountSettingsPanelProvider';
-import { useAuth } from '../../hooks/useAuth';
-import { useCartQuery } from '../../queries/useCartQuery';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useCartQuery } from '../../queries/useCartQuery/useCartQuery';
 import { MarketHubMark } from '../AuthBrand/AuthBrand';
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
 

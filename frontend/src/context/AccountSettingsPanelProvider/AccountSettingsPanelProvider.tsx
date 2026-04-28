@@ -11,6 +11,7 @@ import { MarketAccountSettingsDrawer } from '../../components/MarketAccountSetti
 type AccountSettingsPanelContextValue = {
   openPanel: () => void;
   closePanel: () => void;
+  isOpen: boolean;
 };
 
 const AccountSettingsPanelContext =
@@ -27,8 +28,8 @@ export function AccountSettingsPanelProvider({
   const closePanel = useCallback(() => setOpen(false), []);
 
   const value = useMemo(
-    () => ({ openPanel, closePanel }),
-    [openPanel, closePanel],
+    () => ({ openPanel, closePanel, isOpen: open }),
+    [open, openPanel, closePanel],
   );
 
   return (

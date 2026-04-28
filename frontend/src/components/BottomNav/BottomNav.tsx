@@ -1,97 +1,123 @@
+import type { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  FiHeart,
-  FiHome,
-  FiLayers,
-  FiPackage,
-  FiSettings,
-  FiShoppingBag,
-} from 'react-icons/fi';
+  TbBuildingStore,
+  TbHeart,
+  TbHome,
+  TbPackage,
+  TbShoppingCart,
+  TbUserFilled,
+} from 'react-icons/tb';
 import { routePaths } from '../../config/routes';
 import { useAccountSettingsPanel } from '../../context/AccountSettingsPanelProvider/AccountSettingsPanelProvider';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../hooks/useAuth/useAuth';
 
-const linkBase =
-  'flex min-w-0 flex-1 flex-col items-center gap-0.5 py-1.5 text-[9px] font-medium leading-tight transition sm:text-[10px]';
+const iconClass =
+  'h-[22px] w-[22px] shrink-0 stroke-[1.6] transition-[color,transform]';
 
-/** Inactivos: blanco suave; activos: blanco pleno + semibold */
-const linkInactive =
-  `${linkBase} text-white/72 hover:text-white/88 dark:text-white/50 dark:hover:text-white/72`;
+function navItemClass(active: boolean) {
+  return [
+    'flex h-11 w-11 shrink-0 items-center justify-center rounded-md transition-[background-color,color,transform]',
+    'active:scale-[0.92]',
+    'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-forest/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
+    'dark:focus-visible:ring-market-dark-accent/50 dark:focus-visible:ring-offset-zinc-900',
+    active
+      ? 'bg-forest text-white dark:bg-market-dark-accent dark:text-night-950'
+      : 'text-zinc-500 hover:bg-zinc-200/55 hover:text-zinc-800 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white',
+  ].join(' ');
+}
 
-const linkActive = `${linkBase} font-semibold text-white dark:text-white`;
-
-const iconProps = {
-  className: 'h-5 w-5 shrink-0' as const,
-  strokeWidth: 2.25 as const,
-  'aria-hidden': true as const,
-};
+function NavCell({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex min-w-0 flex-1 items-center justify-center">
+      {children}
+    </div>
+  );
+}
 
 export function BottomNav() {
-  const { openPanel } = useAccountSettingsPanel();
+  const { openPanel, isOpen } = useAccountSettingsPanel();
   const { isAuthenticated } = useAuth();
 
   return (
     <nav
-      className="fixed right-0 bottom-0 left-0 z-40 mx-auto max-w-lg px-4 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))] lg:hidden"
+      className="pointer-events-none fixed right-0 bottom-0 left-0 z-40 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 lg:hidden"
       aria-label="Principal"
     >
-      <div className="flex items-stretch justify-between rounded-md bg-forest px-1.5 py-2 shadow-market backdrop-blur-md dark:bg-market-dark-surface dark:ring-1 dark:ring-market-dark-accent/22 dark:backdrop-blur-xl">
-        <NavLink
-          to={routePaths.catalog}
-          end
-          className={({ isActive }) =>
-            `${isActive ? linkActive : linkInactive}`
-          }
+      <div className="pointer-events-auto mx-auto max-w-sm">
+        <div
+          className="flex h-14 items-center rounded-md border border-zinc-200/50 bg-white/45 px-1.5 shadow-[0_12px_40px_-10px_rgb(0_0_0/0.14),0_4px_16px_-6px_rgb(0_0_0/0.06)] shadow-zinc-900/5 backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 dark:bg-zinc-900/45 dark:shadow-[0_12px_40px_-8px_rgb(0_0_0/0.5),0_4px_14px_-4px_rgb(0_0_0/0.2)] dark:backdrop-blur-xl dark:backdrop-saturate-150"
+          role="toolbar"
         >
-          <FiHome {...iconProps} />
-          Inicio
-        </NavLink>
-        <NavLink
-          to={routePaths.stores}
-          className={({ isActive }) =>
-            `${isActive ? linkActive : linkInactive}`
-          }
-        >
-          <FiLayers {...iconProps} />
-          Tiendas
-        </NavLink>
-        <NavLink
-          to={routePaths.favorites}
-          className={({ isActive }) =>
-            `${isActive ? linkActive : linkInactive}`
-          }
-        >
-          <FiHeart {...iconProps} />
-          Favoritos
-        </NavLink>
-        <NavLink
-          to={routePaths.cart}
-          className={({ isActive }) =>
-            `${isActive ? linkActive : linkInactive}`
-          }
-        >
-          <FiShoppingBag {...iconProps} />
-          Carrito
-        </NavLink>
-        {isAuthenticated ? (
-          <NavLink
-            to={routePaths.orders}
-            className={({ isActive }) =>
-              `${isActive ? linkActive : linkInactive}`
-            }
-          >
-            <FiPackage {...iconProps} />
-            Pedidos
-          </NavLink>
-        ) : null}
-        <button
-          type="button"
-          className={linkInactive}
-          onClick={openPanel}
-        >
-          <FiSettings {...iconProps} />
-          Ajustes
-        </button>
+          <NavCell>
+            <NavLink
+              to={routePaths.catalog}
+              end
+              aria-label="Inicio"
+              title="Inicio"
+              className={({ isActive }) => navItemClass(isActive)}
+            >
+              <TbHome className={iconClass} aria-hidden />
+            </NavLink>
+          </NavCell>
+          <NavCell>
+            <NavLink
+              to={routePaths.stores}
+              aria-label="Tiendas"
+              title="Tiendas"
+              className={({ isActive }) => navItemClass(isActive)}
+            >
+              <TbBuildingStore className={iconClass} aria-hidden />
+            </NavLink>
+          </NavCell>
+          <NavCell>
+            <NavLink
+              to={routePaths.cart}
+              aria-label="Carrito"
+              title="Carrito"
+              className={({ isActive }) => navItemClass(isActive)}
+            >
+              <TbShoppingCart className={iconClass} aria-hidden />
+            </NavLink>
+          </NavCell>
+          <NavCell>
+            <NavLink
+              to={routePaths.favorites}
+              aria-label="Favoritos"
+              title="Favoritos"
+              className={({ isActive }) => navItemClass(isActive)}
+            >
+              <TbHeart className={iconClass} aria-hidden />
+            </NavLink>
+          </NavCell>
+          {isAuthenticated ? (
+            <NavCell>
+              <NavLink
+                to={routePaths.orders}
+                aria-label="Pedidos"
+                title="Pedidos"
+                className={({ isActive }) => navItemClass(isActive)}
+              >
+                <TbPackage className={iconClass} aria-hidden />
+              </NavLink>
+            </NavCell>
+          ) : null}
+          <NavCell>
+            <button
+              type="button"
+              className={navItemClass(isOpen)}
+              aria-label="Ajustes de cuenta"
+              title="Ajustes"
+              aria-expanded={isOpen}
+              onClick={openPanel}
+            >
+              <TbUserFilled
+                className="h-[22px] w-[22px] shrink-0"
+                aria-hidden
+              />
+            </button>
+          </NavCell>
+        </div>
       </div>
     </nav>
   );

@@ -14,10 +14,10 @@ import {
 } from 'react-icons/fi';
 import { AdminAccountSettingsDrawer } from '../../components/AdminAccountSettingsDrawer/AdminAccountSettingsDrawer';
 import { AdminNavbar } from '../../components/AdminNavbar/AdminNavbar';
-import { useTheme } from '../../hooks/useTheme';
+import { useTheme } from '../../hooks/useTheme/useTheme';
 import { routePaths } from '../../config/routes';
-import { useAuth } from '../../hooks/useAuth';
-import { useRejectedStoresQuery } from '../../queries/useRejectedStoresQuery';
+import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useRejectedStoresQuery } from '../../queries/useRejectedStoresQuery/useRejectedStoresQuery';
 
 type NavItemProps = {
   to: string;
