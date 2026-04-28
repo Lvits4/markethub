@@ -25,6 +25,7 @@ import {
 import { Modal } from '../../components/Modal/Modal';
 import { AdminCreateCategoryForm } from '../../components/AdminCreateCategoryForm/AdminCreateCategoryForm';
 import { AdminEditCategoryForm } from '../../components/AdminEditCategoryForm/AdminEditCategoryForm';
+import { adminEditIconButtonClass } from '../../helpers/adminEditIconButtonClass/adminEditIconButtonClass';
 import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
 import { useDeleteCategoryMutation } from '../../hooks/useAdminCategoryMutations/useAdminCategoryMutations';
 import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery/useCategoriesFlatQuery';
@@ -416,7 +417,7 @@ export function AdminCategoriesPage() {
               <Button
                   type="button"
                   variant="icon"
-                  className="text-yellow-600! hover:bg-yellow-500/15 dark:text-amber-300! dark:hover:bg-blue-500/12"
+                  className={adminEditIconButtonClass}
                   aria-label={`Editar ${c.name}`}
                   disabled={busy}
                   onClick={() => setEditCategory(c)}

@@ -133,7 +133,7 @@ export class OrdersService {
   async findByStoreId(storeId: string): Promise<Order[]> {
     return this.ordersRepository.find({
       where: { storeId },
-      relations: ['items', 'items.product', 'user'],
+      relations: ['items', 'items.product', 'user', 'store'],
       order: { createdAt: 'DESC' },
     });
   }
@@ -144,7 +144,7 @@ export class OrdersService {
     }
     return this.ordersRepository.find({
       where: { storeId: In(storeIds) },
-      relations: ['items', 'items.product', 'user'],
+      relations: ['items', 'items.product', 'user', 'store'],
       order: { createdAt: 'DESC' },
     });
   }

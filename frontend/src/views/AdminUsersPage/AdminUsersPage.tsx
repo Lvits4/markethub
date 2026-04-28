@@ -23,6 +23,7 @@ import { TableEmptyCell } from '../../components/TableEmptyCell/TableEmptyCell';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminCreateUserForm } from '../../components/AdminCreateUserForm/AdminCreateUserForm';
 import { AdminEditUserForm } from '../../components/AdminEditUserForm/AdminEditUserForm';
+import { adminEditIconButtonClass } from '../../helpers/adminEditIconButtonClass/adminEditIconButtonClass';
 import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
 import { useAdminDeleteUser } from '../../hooks/useAdminDeleteUser/useAdminDeleteUser';
 import { useAuth } from '../../hooks/useAuth/useAuth';
@@ -419,7 +420,7 @@ export function AdminUsersPage() {
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="text-yellow-600! hover:bg-yellow-500/15 dark:text-sky-300! dark:hover:bg-blue-500/12"
+                                className={adminEditIconButtonClass}
                                 aria-label={`Editar ${u.email}`}
                                 disabled={busy}
                                 onClick={() => setEditUserId(u.id)}

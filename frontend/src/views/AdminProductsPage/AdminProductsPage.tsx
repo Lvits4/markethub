@@ -40,6 +40,7 @@ import { AdminEditProductForm } from '../../components/AdminEditProductForm/Admi
 import { CreateProductForm } from '../../components/CreateProductForm/CreateProductForm';
 import { useAuth } from '../../hooks/useAuth/useAuth';
 import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc/useProtectedImageSrc';
+import { adminEditIconButtonClass } from '../../helpers/adminEditIconButtonClass/adminEditIconButtonClass';
 import { formatPrice } from '../../helpers/formatPrice/formatPrice';
 import {
   galleryProductImages,
@@ -611,7 +612,7 @@ label="Nombre"
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="text-yellow-600! hover:bg-yellow-500/15 dark:text-sky-300! dark:hover:bg-blue-500/12"
+                                className={adminEditIconButtonClass}
                                 aria-label={`Editar ${p.name}`}
                                 onClick={() => {
                                   setMode('edit');

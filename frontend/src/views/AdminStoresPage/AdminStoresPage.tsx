@@ -43,6 +43,7 @@ import { useSellerCreateStoreModal } from '../../context/SellerCreateStoreModalP
 import { useAuth } from '../../hooks/useAuth/useAuth';
 import { useDeleteStoreMutation } from '../../hooks/useStoreMutations/useStoreMutations';
 import { useProtectedImageSrc } from '../../hooks/useProtectedImageSrc/useProtectedImageSrc';
+import { adminEditIconButtonClass } from '../../helpers/adminEditIconButtonClass/adminEditIconButtonClass';
 import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
 import { useAdminDeleteStore } from '../../hooks/useAdminDeleteStore/useAdminDeleteStore';
 import { queryKeys } from '../../helpers/queryKeys/queryKeys';
@@ -761,7 +762,7 @@ label="Cliente"
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="text-yellow-600! hover:bg-yellow-500/15 dark:text-sky-300! dark:hover:bg-blue-500/12"
+                                className={adminEditIconButtonClass}
                                 aria-label={`Editar ${s.name}`}
                                 onClick={() => {
                                   setMode('edit');

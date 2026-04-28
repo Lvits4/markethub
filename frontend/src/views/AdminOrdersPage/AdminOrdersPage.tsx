@@ -43,6 +43,7 @@ import { TablePagination } from '../../components/TablePagination/TablePaginatio
 import { TableEmptyCell } from '../../components/TableEmptyCell/TableEmptyCell';
 import { Modal } from '../../components/Modal/Modal';
 import { AdminEditOrderForm } from '../../components/AdminEditOrderForm/AdminEditOrderForm';
+import { adminEditIconButtonClass } from '../../helpers/adminEditIconButtonClass/adminEditIconButtonClass';
 import { formatOrderStatus } from '../../helpers/orderStatus/orderStatus';
 import { formatPrice } from '../../helpers/formatPrice/formatPrice';
 import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
@@ -162,7 +163,13 @@ function matchesSearch(o: AdminOrderRow, q: string): boolean {
   return chunks.some((c) => (c ?? '').toLowerCase().includes(n));
 }
 
-function OrderDetailsPanel({ order }: { order: Order }) {
+function OrderDetailsPanel({
+  order,
+  showStatTiles = true,
+}: {
+  order: Order;
+  showStatTiles?: boolean;
+}) {
   const [detailTab, setDetailTab] = useState<'envio' | 'lineas'>('envio');
   const items = order.items ?? [];
   const lineCount = items.length;
@@ -188,23 +195,29 @@ function OrderDetailsPanel({ order }: { order: Order }) {
           }
         />
 
-        <AdminDetailStatsGrid>
-          <AdminDetailStatTile
-            label="Total"
-            value={formatPrice(numAmount(order.totalAmount))}
-            hint="pedido"
-          />
-          <AdminDetailStatTile
-            label="Líneas"
-            value={lineCount}
-            hint={lineCount === 1 ? '1 artículo' : `${lineCount} artículos`}
-          />
-          <AdminDetailStatTile
-            label="Cliente"
-            value={clientLabel.length > 18 ? `${clientLabel.slice(0, 16)}…` : clientLabel}
-            hint="comprador"
-          />
-        </AdminDetailStatsGrid>
+        {showStatTiles ? (
+          <AdminDetailStatsGrid>
+            <AdminDetailStatTile
+              label="Total"
+              value={formatPrice(numAmount(order.totalAmount))}
+              hint="pedido"
+            />
+            <AdminDetailStatTile
+              label="Líneas"
+              value={lineCount}
+              hint={lineCount === 1 ? '1 artículo' : `${lineCount} artículos`}
+            />
+            <AdminDetailStatTile
+              label="Cliente"
+              value={
+                clientLabel.length > 18
+                  ? `${clientLabel.slice(0, 16)}…`
+                  : clientLabel
+              }
+              hint="comprador"
+            />
+          </AdminDetailStatsGrid>
+        ) : null}
 
         <AdminDetailHeroSplit
           image={
@@ -313,6 +326,7 @@ function OrderDetailsDrawer({
   order,
   onDeleteOrder,
   deletePending,
+  showStatTiles = true,
 }: {
   open: boolean;
   onClose: () => void;
@@ -321,6 +335,7 @@ function OrderDetailsDrawer({
   order?: Order;
   onDeleteOrder?: (orderId: string) => void;
   deletePending?: boolean;
+  showStatTiles?: boolean;
 }) {
   return (
     <AdminDrawerWrapper open={open} onClose={onClose} ariaLabel="Detalle de pedido">
@@ -350,7 +365,7 @@ function OrderDetailsDrawer({
             No se pudo cargar el detalle del pedido.
           </p>
         ) : order ? (
-          <OrderDetailsPanel order={order} />
+          <OrderDetailsPanel order={order} showStatTiles={showStatTiles} />
         ) : (
           <p className="px-4 py-4 text-sm text-slate-500">
             No hay datos del pedido.
@@ -706,7 +721,7 @@ export function AdminOrdersPage() {
                               <Button
                                 type="button"
                                 variant="icon"
-                                className="text-yellow-600! hover:bg-yellow-500/15 dark:text-sky-300! dark:hover:bg-blue-500/12"
+                                className={adminEditIconButtonClass}
                                 aria-label={`Editar pedido ${o.id.slice(0, 8)}`}
                                 onClick={() => {
                                   setMode('edit');
@@ -715,16 +730,18 @@ export function AdminOrdersPage() {
                               >
                                 <FiEdit2 className="h-4 w-4" aria-hidden />
                               </Button>
-                              <Button
-                                type="button"
-                                variant="icon"
-                                className="text-red-600! hover:bg-red-500/10 dark:text-red-400! dark:hover:bg-red-500/15"
-                                aria-label={`Eliminar pedido ${o.id.slice(0, 8)}`}
-                                disabled={deleteOrderMut.isPending}
-                                onClick={() => openDeleteOrderModal(o.id)}
-                              >
-                                <FiTrash2 className="h-4 w-4" aria-hidden />
-                              </Button>
+                              {!isSeller ? (
+                                <Button
+                                  type="button"
+                                  variant="icon"
+                                  className="text-red-600! hover:bg-red-500/10 dark:text-red-400! dark:hover:bg-red-500/15"
+                                  aria-label={`Eliminar pedido ${o.id.slice(0, 8)}`}
+                                  disabled={deleteOrderMut.isPending}
+                                  onClick={() => openDeleteOrderModal(o.id)}
+                                >
+                                  <FiTrash2 className="h-4 w-4" aria-hidden />
+                                </Button>
+                              ) : null}
                             </div>
                           </td>
                         </tr>
@@ -790,12 +807,13 @@ export function AdminOrdersPage() {
             isLoading={orderDetailQuery.isLoading}
             isError={orderDetailQuery.isError}
             order={orderDetailQuery.data}
-            onDeleteOrder={openDeleteOrderModal}
+            onDeleteOrder={isSeller ? undefined : openDeleteOrderModal}
             deletePending={deleteOrderMut.isPending}
+            showStatTiles={!isSeller}
           />
 
           <Modal
-            open={orderToDelete != null}
+            open={!isSeller && orderToDelete != null}
             onClose={closeDeleteOrderModal}
             title="Confirmar eliminación"
           >
