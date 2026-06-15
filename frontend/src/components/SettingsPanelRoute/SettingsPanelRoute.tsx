@@ -10,7 +10,7 @@ export function SettingsPanelRoute() {
 
   useEffect(() => {
     openPanel();
-    navigate(routePaths.catalog, { replace: true });
+    navigate(routePaths.browse, { replace: true });
   }, [navigate, openPanel]);
 
   return null;

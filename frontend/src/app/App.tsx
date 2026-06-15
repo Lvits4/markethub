@@ -18,6 +18,7 @@ import { AdminEarningsPage } from '../views/AdminEarningsPage/AdminEarningsPage'
 import { AdminModerationPage } from '../views/AdminModerationPage/AdminModerationPage';
 
 import { AdminStoresPage } from '../views/AdminStoresPage/AdminStoresPage';
+import { AdminProductsPage } from '../views/AdminProductsPage/AdminProductsPage';
 import { AdminUsersPage } from '../views/AdminUsersPage/AdminUsersPage';
 import { SellerLayout } from '../layouts/SellerLayout/SellerLayout';
 import { SellerDashboardPage } from '../views/SellerDashboardPage/SellerDashboardPage';
@@ -112,6 +113,14 @@ export default function App() {
                   }
                 />
               <Route path="stores" element={<AdminStoresPage />} />
+              <Route
+                path="products"
+                element={
+                  <AdminOnlyRoute>
+                    <AdminProductsPage />
+                  </AdminOnlyRoute>
+                }
+              />
               <Route
                 path="earnings"
                 element={

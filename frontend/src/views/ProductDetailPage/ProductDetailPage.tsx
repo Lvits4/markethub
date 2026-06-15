@@ -82,6 +82,14 @@ export function ProductDetailPage() {
 
   const handleBuy = () => void addToCart();
 
+  const goBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate(routePaths.browse);
+    }
+  };
+
   const handleFavorite = async () => {
     if (!isAuthenticated) {
       toast.error('Inicia sesión para favoritos');
@@ -122,12 +130,12 @@ export function ProductDetailPage() {
         className="mb-4 flex flex-wrap items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 sm:text-sm"
         aria-label="Migas de pan"
       >
-        <Link to={routePaths.catalog} className="hover:text-forest dark:hover:text-forest-muted">
+        <Link to={routePaths.browse} className="hover:text-forest dark:hover:text-forest-muted">
           Inicio
         </Link>
         <span aria-hidden>/</span>
         <Link
-          to={routePaths.catalog}
+          to={routePaths.browse}
           className="hover:text-forest dark:hover:text-forest-muted"
         >
           Catálogo
@@ -141,13 +149,14 @@ export function ProductDetailPage() {
       <div className="grid gap-8 lg:grid-cols-[minmax(0,0.78fr)_min(100%,420px)] lg:items-start lg:gap-10">
         <div>
           <div className="relative aspect-[4/4.8] w-full overflow-hidden rounded-md bg-zinc-100 shadow-market ring-1 ring-zinc-200/60 dark:bg-night-800 dark:shadow-market-dark dark:ring-night-700/50 sm:aspect-[4/5.1] lg:aspect-[4/4.55] lg:max-h-[430px]">
-            <Link
-              to={routePaths.catalog}
-              className="absolute left-3 top-3 z-10 rounded-md bg-white/95 p-2.5 text-zinc-900 shadow-sm backdrop-blur-sm dark:bg-night-900/95 dark:text-zinc-100"
-              aria-label="Volver al catálogo"
+            <button
+              type="button"
+              onClick={goBack}
+              className="absolute left-3 top-3 z-10 cursor-pointer rounded-md bg-white/95 p-2.5 text-zinc-900 shadow-sm backdrop-blur-sm dark:bg-night-900/95 dark:text-zinc-100"
+              aria-label="Volver a la vista anterior"
             >
               <FiArrowLeft className="h-5 w-5" />
-            </Link>
+            </button>
             <button
               type="button"
               onClick={() => void handleFavorite()}

@@ -49,7 +49,6 @@ import {
 import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
 import { useDeleteProductMutation } from '../../hooks/useProductSellerMutations/useProductSellerMutations';
 import { useAdminProductDetailQuery } from '../../queries/useAdminProductDetailQuery/useAdminProductDetailQuery';
-import { useAdminProductsQuery } from '../../queries/useAdminProductsQuery/useAdminProductsQuery';
 import { useSellerProductsQuery } from '../../queries/useSellerProductsQuery/useSellerProductsQuery';
 import type { AdminProductRow } from '../../types/admin/admin';
 import type { Product } from '../../types/product/product';
@@ -342,13 +341,10 @@ function SortHeader({
 }
 
 export function AdminProductsPage() {
-  const { user } = useAuth();
-  const isSeller = user?.role === 'SELLER';
-  const adminProductsQ = useAdminProductsQuery();
-  const sellerProductsQ = useSellerProductsQuery();
-  const data = isSeller ? sellerProductsQ.data : adminProductsQ.data;
-  const isLoading = isSeller ? sellerProductsQ.isLoading : adminProductsQ.isLoading;
-  const isError = isSeller ? sellerProductsQ.isError : adminProductsQ.isError;
+  const productsQ = useSellerProductsQuery();
+  const data = productsQ.data;
+  const isLoading = productsQ.isLoading;
+  const isError = productsQ.isError;
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<SortDir>('asc');

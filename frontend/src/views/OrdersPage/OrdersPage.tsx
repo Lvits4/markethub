@@ -66,7 +66,7 @@ export function OrdersPage() {
         aria-label="Navegación"
       >
         <Link
-          to={routePaths.catalog}
+          to={routePaths.browse}
           className="inline-flex items-center gap-1.5 rounded-md py-1.5 pl-1 pr-2 text-sm font-medium text-zinc-700 transition hover:text-sky-600 dark:text-zinc-300 dark:hover:text-sky-400"
         >
           <FiArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
@@ -112,7 +112,7 @@ export function OrdersPage() {
         <p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
           Aún no tienes pedidos.{' '}
           <Link
-            to={routePaths.catalog}
+            to={routePaths.browse}
             className="font-semibold text-sky-600 dark:text-sky-400"
           >
             Ir al catálogo

@@ -9,7 +9,6 @@ import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
 import { useAuth } from '../../hooks/useAuth/useAuth';
 import { useCreateProductMutation } from '../../hooks/useProductSellerMutations/useProductSellerMutations';
 import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery/useCategoriesFlatQuery';
-import { useAdminStoresQuery } from '../../queries/useAdminStoresQuery/useAdminStoresQuery';
 import { useMyStoresQuery } from '../../queries/useMyStoresQuery/useMyStoresQuery';
 import { uploadFile } from '../../requests/fileRequests/fileRequests';
 
@@ -43,11 +42,9 @@ export function CreateProductForm({
   onSuccess,
   onCancel,
 }: CreateProductFormProps) {
-  const { token, user } = useAuth();
-  const isSeller = user?.role === 'SELLER';
-  const adminStoresQ = useAdminStoresQuery();
+  const { token } = useAuth();
   const myStoresQ = useMyStoresQuery();
-  const stores = isSeller ? myStoresQ.data : adminStoresQ.data;
+  const stores = myStoresQ.data;
   const { data: categories } = useCategoriesFlatQuery();
 
   const [step, setStep] = useState(0);

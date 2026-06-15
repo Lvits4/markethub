@@ -145,27 +145,10 @@ export class StoresService {
 
   /**
    * Resuelve en qué tienda crear un producto: una sola tienda del usuario si no envían storeId;
-   * con varias tiendas, storeId es obligatorio. Un admin puede indicar cualquier tienda con storeId.
+   * con varias tiendas, storeId es obligatorio. Solo tiendas propias del usuario (admin o seller).
    */
   async resolveStoreForCreate(user: User, storeId?: string): Promise<Store> {
     const myStores = await this.findStoresByUserId(user.id);
-
-    if (user.role === Role.ADMIN) {
-      if (storeId) {
-        return this.findById(storeId);
-      }
-      if (myStores.length === 1) {
-        return myStores[0];
-      }
-      if (myStores.length === 0) {
-        throw new BadRequestException(
-          'Indica storeId de la tienda o crea una tienda asociada a tu cuenta',
-        );
-      }
-      throw new BadRequestException(
-        'Tienes varias tiendas; indica storeId en el body para crear el producto',
-      );
-    }
 
     if (myStores.length === 0) {
       throw new NotFoundException('No tienes una tienda registrada');

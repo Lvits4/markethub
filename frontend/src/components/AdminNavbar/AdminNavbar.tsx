@@ -25,6 +25,7 @@ const PAGE_META: Record<string, PageMeta> = {
   [routePaths.admin]: { title: 'Panel', icon: FiGrid },
   [routePaths.adminModeration]: { title: 'Moderación', icon: FiShield },
   [routePaths.adminStores]: { title: 'Tiendas', icon: FiShoppingBag },
+  [routePaths.adminProducts]: { title: 'Productos', icon: FiPackage },
   [routePaths.adminEarnings]: { title: 'Ganancias', icon: FiDollarSign },
   [routePaths.adminUsers]: { title: 'Usuarios', icon: FiUsers },
   [routePaths.adminCategories]: { title: 'Categorías', icon: FiTag },
@@ -40,6 +41,7 @@ function getPageMeta(pathname: string): PageMeta {
   if (PAGE_META[pathname]) return PAGE_META[pathname];
   if (pathname.startsWith(routePaths.adminModeration)) return PAGE_META[routePaths.adminModeration];
   if (pathname.startsWith(routePaths.adminStores)) return PAGE_META[routePaths.adminStores];
+  if (pathname.startsWith(routePaths.adminProducts)) return PAGE_META[routePaths.adminProducts];
   if (pathname.startsWith(routePaths.adminEarnings)) return PAGE_META[routePaths.adminEarnings];
   if (pathname.startsWith(routePaths.adminUsers)) return PAGE_META[routePaths.adminUsers];
   if (pathname.startsWith(routePaths.adminCategories)) return PAGE_META[routePaths.adminCategories];

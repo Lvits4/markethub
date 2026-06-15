@@ -35,5 +35,8 @@ lerna-debug.log*
 # Uploads
 /uploads
 
+# Postgres (Docker bind mount)
+/data
+
 # Temp
 *.tsbuildinfo

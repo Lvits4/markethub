@@ -1,24 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="M">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="MarketHub">
   <defs>
-    <filter id="f" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="1.2" result="b"/>
-      <feFlood flood-color="#7eb3f0" flood-opacity="0.75" result="c"/>
-      <feComposite in="c" in2="b" operator="in" result="g"/>
-      <feMerge>
-        <feMergeNode in="g"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+    <filter id="mark-shadow" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#3b82f6" flood-opacity="0.35" />
+      <feDropShadow dx="0" dy="1" stdDeviation="1.25" flood-color="#000000" flood-opacity="0.12" />
     </filter>
   </defs>
-  <circle cx="16" cy="16" r="13" fill="#4a90e2" filter="url(#f)"/>
+  <circle cx="16" cy="16" r="14" fill="#3b82f6" filter="url(#mark-shadow)" />
   <text
     x="16"
-    y="16"
+    y="16.5"
     text-anchor="middle"
     dominant-baseline="central"
     fill="#ffffff"
-    font-family="system-ui, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif"
-    font-size="15"
-    font-weight="600"
+    font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+    font-size="14"
+    font-weight="700"
   >M</text>
 </svg>

@@ -161,7 +161,7 @@ export function CartPage() {
         <p className="mt-10 text-center text-sm text-zinc-500">
           Tu carrito está vacío.{' '}
           <Link
-            to={routePaths.catalog}
+            to={routePaths.browse}
             className="font-semibold text-forest"
           >
             Ir al catálogo
@@ -201,7 +201,7 @@ export function CartPage() {
                       to={
                         product
                           ? routePaths.productDetail(product.id)
-                          : routePaths.catalog
+                          : routePaths.browse
                       }
                       className="line-clamp-2 font-semibold text-zinc-900 dark:text-zinc-50"
                     >

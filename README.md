@@ -34,7 +34,7 @@ cp .env.example .env
 docker compose up -d
 ```
 
-Esto levanta Postgres 16 (puerto **5432**) con usuario, contraseña y base definidos en `.env` (por defecto `markethub` / `markethub_secret` / `markethub`).
+Esto levanta Postgres 16 (puerto **5432**) con usuario, contraseña y base definidos en `.env` (por defecto `markethub` / `markethub_secret` / `markethub`). Usa el volumen Docker `pgdata`, cuyos datos se guardan en `backend/data/postgres/` dentro del proyecto (no en el almacén global de Docker).
 
 Si ya tienes Postgres instalado, crea la base y el usuario equivalentes y ajusta `DB_*` en `backend/.env`.
 
@@ -123,5 +123,14 @@ Los detalles de cada pantalla están en el código bajo `frontend/src/views/` y 
 ## Solución de problemas
 
 - **El frontend no carga datos**: comprueba que el backend esté en marcha y que `VITE_API_BASE_URL` coincida con el origen real del API.
-- **Error de conexión a la base**: verifica que Postgres esté activo (`docker compose ps` en `backend/`) y que `DB_*` en `.env` coincida con el contenedor o tu instancia local.
+- **Error de conexión a la base** (`password authentication failed for user "markethub"`, reintentos de `TypeOrmModule`): suele ocurrir cuando la carpeta de datos se inicializó con credenciales distintas a las de `backend/.env` (Postgres solo aplica `POSTGRES_USER` / `POSTGRES_PASSWORD` la primera vez). Comprueba que Postgres esté activo (`docker compose ps` en `backend/`) y que `DB_*` en `.env` coincida con el contenedor. Si el error persiste en desarrollo, usa el bloque **Borrar todos los datos de Postgres** más abajo.
+- **Borrar todos los datos de Postgres** (reset completo en desarrollo): los datos viven en `backend/data/postgres/`. `docker compose down -v` **no** los borra (solo quita el registro del volumen en Docker). Para vaciar la base de verdad:
+
+  ```bash
+  cd backend
+  docker compose down
+  docker run --rm -v "$(pwd)/data:/data" postgres:16-alpine sh -c "rm -rf /data/postgres && mkdir -p /data/postgres" #vacia los datos
+  docker compose up -d
+  npm run start:dev
+  ```
 - **CORS**: el backend tiene `enableCors()`; si despliegas en otros dominios, puede requerirse configuración explícita de orígenes.

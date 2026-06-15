@@ -51,7 +51,7 @@ export function BottomNav() {
         >
           <NavCell>
             <NavLink
-              to={routePaths.catalog}
+              to={routePaths.browse}
               end
               aria-label="Inicio"
               title="Inicio"

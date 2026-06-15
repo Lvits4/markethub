@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { FiShoppingCart, FiUser } from 'react-icons/fi';
+import { FiGrid, FiShoppingCart, FiUser } from 'react-icons/fi';
 import { routePaths } from '../../config/routes';
 import { useAccountSettingsPanel } from '../../context/AccountSettingsPanelProvider/AccountSettingsPanelProvider';
 import { useAuth } from '../../hooks/useAuth/useAuth';
@@ -33,9 +33,16 @@ function readScrollY(): number {
   );
 }
 
+function panelPathForRole(role: string | undefined): string | null {
+  if (role === 'ADMIN') return routePaths.admin;
+  if (role === 'SELLER') return routePaths.seller;
+  return null;
+}
+
 export function MarketHeader() {
   const { openPanel } = useAccountSettingsPanel();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const panelPath = panelPathForRole(user?.role);
   const { data: cart } = useCartQuery();
   const [desktopScrolled, setDesktopScrolled] = useState(false);
 
@@ -60,7 +67,7 @@ export function MarketHeader() {
     <header className={headerClassName}>
       <div className="relative mx-auto flex h-full w-full max-w-6xl items-center px-4 lg:px-6">
         <NavLink
-          to={routePaths.catalog}
+          to={routePaths.browse}
           end
           className="flex shrink-0 items-center gap-2 text-lg font-bold tracking-tight text-forest dark:text-market-dark-accent"
         >
@@ -76,7 +83,7 @@ export function MarketHeader() {
           aria-label="Principal escritorio"
         >
           <NavLink
-            to={routePaths.catalog}
+            to={routePaths.browse}
             end
             className={({ isActive }) =>
               isActive ? desktopLinkActive : desktopLinkIdle
@@ -115,6 +122,17 @@ export function MarketHeader() {
         <div className="min-w-0 flex-1" aria-hidden />
 
         <div className="flex shrink-0 items-center gap-0.5 sm:gap-1 lg:gap-2">
+          {panelPath ? (
+            <NavLink
+              to={panelPath}
+              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-zinc-700 transition hover:text-forest lg:px-3 dark:text-white/90 dark:hover:text-market-dark-accent"
+              aria-label="Ir al panel de administración"
+              title="Ir al panel"
+            >
+              <FiGrid className="h-4 w-4 shrink-0 lg:h-[18px] lg:w-[18px]" aria-hidden />
+              <span className="hidden lg:inline">Ir al panel</span>
+            </NavLink>
+          ) : null}
           <div className="hidden items-center gap-0.5 pr-2 lg:flex">
             <NavLink
               to={routePaths.cart}

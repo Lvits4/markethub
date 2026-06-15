@@ -7,6 +7,7 @@ import {
   FiDollarSign,
   FiExternalLink,
   FiGrid,
+  FiPackage,
   FiShield,
   FiShoppingBag,
   FiTag,
@@ -160,6 +161,14 @@ export function AdminLayout() {
               label="Tiendas"
               collapsed={collapsed}
             />
+            {isAdmin ? (
+              <SidebarNavItem
+                to={routePaths.adminProducts}
+                icon={FiPackage}
+                label="Productos"
+                collapsed={collapsed}
+              />
+            ) : null}
             {isAdmin ? (
               <SidebarNavItem
                 to={routePaths.adminEarnings}
