@@ -2,6 +2,7 @@ import { useRef, useState, type ChangeEvent } from 'react';
 import toast from 'react-hot-toast';
 import { FiImage, FiUpload, FiX } from 'react-icons/fi';
 import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
+import { validateImageFileSize } from '../../helpers/validateImageFile/validateImageFile';
 import { useAuth } from '../../hooks/useAuth/useAuth';
 import { uploadFile } from '../../requests/fileRequests/fileRequests';
 
@@ -50,6 +51,11 @@ export function LogoUploadField({
       toast.error('El archivo debe ser una imagen');
       return;
     }
+    const sizeError = validateImageFileSize(file);
+    if (sizeError) {
+      toast.error(sizeError);
+      return;
+    }
     setUploading(true);
     onUploadingChange?.(true);
     try {
@@ -72,6 +78,11 @@ export function LogoUploadField({
       toast.error('El archivo debe ser una imagen');
       return;
     }
+    const sizeError = validateImageFileSize(file);
+    if (sizeError) {
+      toast.error(sizeError);
+      return;
+    }
     if (!uploadOnSelect) {
       onFileChange?.(file);
       return;
@@ -83,6 +94,11 @@ export function LogoUploadField({
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       toast.error('El archivo debe ser una imagen');
+      return;
+    }
+    const sizeError = validateImageFileSize(file);
+    if (sizeError) {
+      toast.error(sizeError);
       return;
     }
     if (!uploadOnSelect) {

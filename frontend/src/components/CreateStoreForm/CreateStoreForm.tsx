@@ -6,6 +6,7 @@ import { LogoUploadField } from '../LogoUploadField/LogoUploadField';
 import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
 import { useAuth } from '../../hooks/useAuth/useAuth';
 import { useCreateStoreMutation } from '../../hooks/useStoreMutations/useStoreMutations';
+import { buildUploadFolder } from '../../helpers/buildUploadFolder/buildUploadFolder';
 import { uploadFile } from '../../requests/fileRequests/fileRequests';
 import type { CreateStorePayload } from '../../requests/storeRequests/storeRequests';
 
@@ -122,7 +123,11 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
       }
       setLogoUploading(true);
       try {
-        const uploadRes = await uploadFile(token, selectedLogoFile, 'stores');
+        const uploadRes = await uploadFile(
+          token,
+          selectedLogoFile,
+          buildUploadFolder('stores', n),
+        );
         logoUrl = uploadRes.url;
         setLogo(uploadRes.url);
       } catch (err) {
@@ -220,6 +225,11 @@ export function CreateStoreForm({ onSuccess, onCancel }: CreateStoreFormProps) {
                 value={logo}
                 onChange={setLogo}
                 disabled={createMut.isPending}
+                uploadFolder={
+                  name.trim()
+                    ? buildUploadFolder('stores', name.trim())
+                    : 'stores'
+                }
                 uploadOnSelect={false}
                 onFileChange={setSelectedLogoFile}
                 selectedFile={selectedLogoFile}

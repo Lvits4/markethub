@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { Product } from '../products/entities/product.entity';
 import { Category } from './entities/category.entity';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
+import { FilesService } from '../files/files.service';
 
 @Injectable()
 export class CategoriesService {
@@ -16,6 +17,7 @@ export class CategoriesService {
     private readonly categoriesRepository: Repository<Category>,
     @InjectRepository(Product)
     private readonly productsRepository: Repository<Product>,
+    private readonly filesService: FilesService,
   ) {}
 
   async create(dto: CreateCategoryDto): Promise<Category> {
@@ -72,8 +74,19 @@ export class CategoriesService {
       }
     }
 
+    const oldImage = category.image;
     Object.assign(category, dto);
-    return this.categoriesRepository.save(category);
+    const saved = await this.categoriesRepository.save(category);
+
+    if (dto.image !== undefined) {
+      const oldNorm = this.filesService.normalizeStoragePath(oldImage);
+      const newNorm = this.filesService.normalizeStoragePath(dto.image ?? '');
+      if (oldNorm && oldNorm !== newNorm) {
+        await this.filesService.deleteStoredFileSafe(oldImage);
+      }
+    }
+
+    return saved;
   }
 
   async remove(id: string): Promise<void> {
@@ -81,6 +94,7 @@ export class CategoriesService {
     if (!category) {
       throw new NotFoundException('Categoría no encontrada');
     }
+    const imagePath = category.image;
     await this.categoriesRepository.update({ parentId: id }, { parentId: null });
     await this.productsRepository
       .createQueryBuilder()
@@ -89,5 +103,6 @@ export class CategoriesService {
       .where('category_id = :id', { id })
       .execute();
     await this.categoriesRepository.delete({ id });
+    await this.filesService.deleteStoredFileSafe(imagePath);
   }
 }

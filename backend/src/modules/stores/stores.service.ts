@@ -18,6 +18,7 @@ import { Favorite } from '../favorites/entities/favorite.entity';
 import { Order } from '../orders/entities/order.entity';
 import { OrderItem } from '../orders/entities/order-item.entity';
 import { Payment } from '../payments/entities/payment.entity';
+import { FilesService } from '../files/files.service';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -32,6 +33,7 @@ export class StoresService {
     @InjectRepository(Order)
     private readonly ordersRepository: Repository<Order>,
     private readonly dataSource: DataSource,
+    private readonly filesService: FilesService,
   ) {}
 
   async create(dto: CreateStoreDto, user: User): Promise<Store> {
@@ -184,8 +186,42 @@ export class StoresService {
       (store as any).slug = slug;
     }
 
+    const oldLogo = store.logo;
+
     Object.assign(store, dto);
-    return this.storesRepository.save(store);
+    const saved = await this.storesRepository.save(store);
+
+    if (dto.logo !== undefined) {
+      const oldNorm = this.filesService.normalizeStoragePath(oldLogo);
+      const newNorm = this.filesService.normalizeStoragePath(dto.logo ?? '');
+      if (oldNorm && oldNorm !== newNorm) {
+        await this.filesService.deleteStoredFileSafe(oldLogo);
+      }
+    }
+
+    return saved;
+  }
+
+  /** Rutas de ficheros en uploads/ asociados a una tienda y sus productos. */
+  async collectStoreMediaPaths(storeId: string): Promise<string[]> {
+    const store = await this.storesRepository.findOne({ where: { id: storeId } });
+    if (!store) return [];
+
+    const paths: string[] = [];
+    if (store.logo) paths.push(store.logo);
+    if (store.banner) paths.push(store.banner);
+
+    const products = await this.productsRepository.find({
+      where: { storeId },
+      relations: ['images'],
+    });
+    for (const product of products) {
+      for (const image of product.images ?? []) {
+        if (image.url) paths.push(image.url);
+      }
+    }
+
+    return paths;
   }
 
   /**
@@ -227,9 +263,13 @@ export class StoresService {
       throw new ForbiddenException('No tienes permiso para eliminar esta tienda');
     }
 
+    const mediaPaths = await this.collectStoreMediaPaths(id);
+
     await this.dataSource.transaction(async (em) => {
       await this.removeStoreInTransaction(em, id);
     });
+
+    await this.filesService.deleteStoredFilesSafe(mediaPaths);
   }
 
   async approve(id: string): Promise<Store> {

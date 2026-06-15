@@ -66,7 +66,7 @@ function formatDayLabel(day: string) {
 }
 
 function RecentSaleRow({ sale }: { sale: AdminRecentSaleRow }) {
-  const d = new Date(sale.createdAt);
+  const d = new Date(sale.soldAt);
   const dateStr = d.toLocaleDateString('es', {
     day: '2-digit',
     month: 'short',
@@ -181,8 +181,8 @@ export function AdminDashboardPage() {
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-none lg:flex-row lg:items-stretch">
-        <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-(--admin-border) bg-(--admin-card) p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:items-start">
+        <section className="flex max-lg:min-h-[260px] min-w-0 flex-1 flex-col rounded-md border border-(--admin-border) bg-(--admin-card) p-3 shadow-sm dark:shadow-none lg:min-h-0">
           <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
             <div className="min-w-0">
               <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
@@ -281,8 +281,8 @@ export function AdminDashboardPage() {
           </div>
         </section>
 
-        <section className="flex max-lg:min-h-[260px] flex-1 flex-col rounded-md border border-(--admin-border) bg-(--admin-card) p-3 shadow-sm dark:shadow-none lg:min-h-0 lg:min-w-0">
-          <div className="mb-2 min-w-0">
+        <section className="flex min-w-0 flex-1 flex-col rounded-md border border-(--admin-border) bg-(--admin-card) p-3 shadow-sm dark:shadow-none lg:max-w-md lg:shrink-0">
+          <div className="mb-2 min-w-0 shrink-0">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
               Historial de ventas recientes
             </h2>
@@ -290,7 +290,7 @@ export function AdminDashboardPage() {
               Últimos 10 pedidos (sin cancelados)
             </p>
           </div>
-          <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+          <div className="market-scroll flex min-h-[200px] max-h-[min(360px,45vh)] flex-col gap-2 overflow-y-auto overscroll-contain lg:h-[300px] lg:max-h-[300px] lg:min-h-[300px]">
             {data.recentSales.length > 0 ? (
               data.recentSales.map((sale) => (
                 <RecentSaleRow key={sale.orderId} sale={sale} />

@@ -12,7 +12,9 @@ import {
   useUpdateProductMutation,
 } from '../../hooks/useProductSellerMutations/useProductSellerMutations';
 import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery/useCategoriesFlatQuery';
+import { useMyStoresQuery } from '../../queries/useMyStoresQuery/useMyStoresQuery';
 import { useProductByIdQuery } from '../../queries/useProductByIdQuery/useProductByIdQuery';
+import { buildUploadFolder } from '../../helpers/buildUploadFolder/buildUploadFolder';
 import { uploadFile } from '../../requests/fileRequests/fileRequests';
 
 export function SellerProductFormPage() {
@@ -27,6 +29,7 @@ export function SellerProductFormPage() {
   const { data: existing, isLoading: loadingProduct } = useProductByIdQuery(
     isEdit ? productId : undefined,
   );
+  const myStoresQ = useMyStoresQuery();
 
   const effectiveStoreId = isEdit ? existing?.storeId : storeIdParam;
   const createMut = useCreateProductMutation(
@@ -68,10 +71,20 @@ export function SellerProductFormPage() {
       toast.error('Inicia sesión para subir archivos');
       return;
     }
+    const sid = isEdit ? existing?.storeId : storeIdParam;
+    const storeName =
+      existing?.store?.name ??
+      (Array.isArray(myStoresQ.data)
+        ? myStoresQ.data.find((s) => s.id === sid)?.name
+        : undefined) ??
+      '';
+    const productUploadFolder = buildUploadFolder('products', name.trim() || 'producto', {
+      parentName: storeName || undefined,
+    });
     setUploading(true);
     try {
       for (const file of picked) {
-        const res = await uploadFile(token, file, 'products');
+        const res = await uploadFile(token, file, productUploadFolder);
         setImageUrls((prev) => [...prev, res.url]);
       }
       toast.success(

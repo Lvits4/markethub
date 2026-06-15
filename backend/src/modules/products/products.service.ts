@@ -14,6 +14,7 @@ import { OrderItem } from '../orders/entities/order-item.entity';
 import { CreateProductDto, FilterProductDto, ProductSortBy, UpdateProductDto } from './dto';
 import { User } from '../users/entities/user.entity';
 import { StoresService } from '../stores/stores.service';
+import { FilesService } from '../files/files.service';
 import { Role } from '../../common/enums';
 import { PaginatedResponseDto } from '../../common/dto';
 
@@ -27,6 +28,7 @@ export class ProductsService {
     @InjectRepository(ProductImage)
     private readonly productImagesRepository: Repository<ProductImage>,
     private readonly storesService: StoresService,
+    private readonly filesService: FilesService,
   ) {}
 
   async create(dto: CreateProductDto, user: User): Promise<Product> {
@@ -117,11 +119,28 @@ export class ProductsService {
     }
 
     if (dto.images) {
+      const previousImages = product.images ?? [];
+      const canonical = (url: string) =>
+        this.filesService.normalizeStoragePath(url) ?? url.trim();
+      const nextUrls = new Set(
+        dto.images
+          .map((img) => img.url)
+          .filter((url): url is string => Boolean(url))
+          .map(canonical),
+      );
+      const replacedUrls = previousImages
+        .map((img) => img.url)
+        .filter(
+          (url): url is string =>
+            Boolean(url) && !nextUrls.has(canonical(url)),
+        );
+
       await this.productImagesRepository.delete({ productId: id });
       const images = dto.images.map((img) =>
         this.productImagesRepository.create({ ...img, productId: id }),
       );
       await this.productImagesRepository.save(images);
+      await this.filesService.deleteStoredFilesSafe(replacedUrls);
       // findById cargó `images` en memoria; ya se borraron/recrearon en BD. Si
       // guardamos el product con cascade, TypeORM intenta sincronizar filas
       // huérfanas y puede fallar con 500.
@@ -146,6 +165,8 @@ export class ProductsService {
       throw new ForbiddenException('No tienes permiso para eliminar este producto');
     }
 
+    const imageUrls = (product.images ?? []).map((img) => img.url);
+
     await this.dataSource.transaction(async (manager) => {
       const inOrders = await manager.count(OrderItem, { where: { productId: id } });
       if (inOrders > 0) {
@@ -159,6 +180,8 @@ export class ProductsService {
       await manager.delete(ProductImage, { productId: id });
       await manager.delete(Product, { id });
     });
+
+    await this.filesService.deleteStoredFilesSafe(imageUrls);
   }
 
   private applyFilters(qb: SelectQueryBuilder<Product>, filters: FilterProductDto): void {

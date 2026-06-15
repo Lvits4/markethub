@@ -7,7 +7,7 @@ import { FilesController } from './files.controller';
   imports: [
     StorageModule.forRoot({
       rootPath: process.env.STORAGE_ROOT_PATH || './uploads',
-      maxFileSize: process.env.STORAGE_MAX_FILE_SIZE || '10mb',
+      maxFileSize: process.env.STORAGE_MAX_FILE_SIZE || '20mb',
       allowedMimeTypes: (process.env.STORAGE_ALLOWED_MIME_TYPES || 'image/*').split(','),
     }),
   ],

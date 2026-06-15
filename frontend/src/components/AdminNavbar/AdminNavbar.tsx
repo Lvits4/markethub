@@ -136,7 +136,7 @@ export function AdminNavbar({
   return (
     <header className="admin-top-bar sticky top-0 z-30 flex h-14 shrink-0 items-center justify-center border-b border-(--admin-border) bg-white/72 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.75)] backdrop-blur-2xl backdrop-saturate-150 supports-backdrop-filter:bg-white/52 dark:bg-transparent dark:shadow-none dark:backdrop-blur-none supports-backdrop-filter:dark:bg-transparent">
       <div className="flex h-full w-[min(100%,1360px)] items-center justify-between gap-4 px-5 md:px-8">
-        <h1 className="flex min-w-0 items-center gap-2 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+        <h1 className="flex min-w-0 items-center gap-2 text-lg font-semibold text-page-title dark:text-zinc-50">
           <PageIcon className="h-5 w-5 shrink-0" aria-hidden />
           {pageTitle.title}
         </h1>

@@ -35,7 +35,7 @@ export class FilesController {
       type: 'object',
       properties: {
         file: { type: 'string', format: 'binary' },
-        folder: { type: 'string', example: 'products' },
+        folder: { type: 'string', example: 'stores/sacha' },
       },
     },
   })
@@ -58,7 +58,7 @@ export class FilesController {
           type: 'array',
           items: { type: 'string', format: 'binary' },
         },
-        folder: { type: 'string', example: 'products' },
+        folder: { type: 'string', example: 'stores/sacha' },
       },
     },
   })

@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
 import { FiImage, FiUpload, FiX } from 'react-icons/fi';
+import toast from 'react-hot-toast';
+import { validateImageFileSize } from '../../helpers/validateImageFile/validateImageFile';
 
 const DEFAULT_HINT =
   'PNG, JPG, WebP… Se subirán al guardar el formulario.';
@@ -31,7 +33,17 @@ export type ProductImagesFieldProps = {
 };
 
 function filterImageFiles(list: FileList | File[]): File[] {
-  return [...list].filter((f) => f.type.startsWith('image/'));
+  const valid: File[] = [];
+  for (const f of list) {
+    if (!f.type.startsWith('image/')) continue;
+    const sizeError = validateImageFileSize(f);
+    if (sizeError) {
+      toast.error(sizeError);
+      continue;
+    }
+    valid.push(f);
+  }
+  return valid;
 }
 
 export function ProductImagesField({

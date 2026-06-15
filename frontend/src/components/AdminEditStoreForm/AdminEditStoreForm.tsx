@@ -7,6 +7,7 @@ import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
 import { useAuth } from '../../hooks/useAuth/useAuth';
 import { useAdminPatchCommission } from '../../hooks/useAdminPatchCommission/useAdminPatchCommission';
 import { useUpdateStoreMutation } from '../../hooks/useStoreMutations/useStoreMutations';
+import { buildUploadFolder } from '../../helpers/buildUploadFolder/buildUploadFolder';
 import { uploadFile } from '../../requests/fileRequests/fileRequests';
 import type { AdminStoreDetail } from '../../types/admin/admin';
 import type { UpdateStorePayload } from '../../requests/storeRequests/storeRequests';
@@ -163,7 +164,11 @@ export function AdminEditStoreForm({
       }
       setLogoUploading(true);
       try {
-        const uploadRes = await uploadFile(token, selectedLogoFile, 'stores');
+        const uploadRes = await uploadFile(
+          token,
+          selectedLogoFile,
+          buildUploadFolder('stores', n),
+        );
         logoUrl = uploadRes.url;
         setLogo(uploadRes.url);
       } catch (err) {
@@ -333,6 +338,11 @@ export function AdminEditStoreForm({
                 value={logo}
                 onChange={setLogo}
                 disabled={busy}
+                uploadFolder={
+                  name.trim()
+                    ? buildUploadFolder('stores', name.trim())
+                    : buildUploadFolder('stores', store.name)
+                }
                 uploadOnSelect={false}
                 onFileChange={setSelectedLogoFile}
                 selectedFile={selectedLogoFile}

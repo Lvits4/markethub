@@ -5,11 +5,13 @@ import { ProductImage } from './entities/product-image.entity';
 import { ProductsService } from './products.service';
 import { ProductsController } from './products.controller';
 import { StoresModule } from '../stores/stores.module';
+import { FilesModule } from '../files/files.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Product, ProductImage]),
     StoresModule,
+    FilesModule,
   ],
   controllers: [ProductsController],
   providers: [ProductsService],

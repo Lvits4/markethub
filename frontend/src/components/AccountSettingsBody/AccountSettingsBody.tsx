@@ -9,6 +9,7 @@ import { useAuth } from '../../hooks/useAuth/useAuth';
 import { useTheme } from '../../hooks/useTheme/useTheme';
 import { useUpdateProfileMutation } from '../../hooks/useUpdateProfileMutation/useUpdateProfileMutation';
 import { useUserProfileQuery } from '../../queries/useUserProfileQuery/useUserProfileQuery';
+import { buildUploadFolder } from '../../helpers/buildUploadFolder/buildUploadFolder';
 import { uploadFile } from '../../requests/fileRequests/fileRequests';
 
 type AccountSettingsBodyProps = {
@@ -79,7 +80,13 @@ export function AccountSettingsBody({
         }
         setUploadingAvatar(true);
         try {
-          const res = await uploadFile(token, avatarFiles[0], 'general');
+          const displayName =
+            `${fn} ${ln}`.trim() ||
+            profile?.email?.split('@')[0] ||
+            user?.email?.split('@')[0] ||
+            'usuario';
+          const avatarFolder = buildUploadFolder('general', displayName);
+          const res = await uploadFile(token, avatarFiles[0], avatarFolder);
           avatarUrl = res.url;
         } catch (e) {
           toast.error(getErrorMessage(e));

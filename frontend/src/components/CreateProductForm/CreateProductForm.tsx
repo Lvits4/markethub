@@ -10,6 +10,7 @@ import { useAuth } from '../../hooks/useAuth/useAuth';
 import { useCreateProductMutation } from '../../hooks/useProductSellerMutations/useProductSellerMutations';
 import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery/useCategoriesFlatQuery';
 import { useMyStoresQuery } from '../../queries/useMyStoresQuery/useMyStoresQuery';
+import { buildUploadFolder } from '../../helpers/buildUploadFolder/buildUploadFolder';
 import { uploadFile } from '../../requests/fileRequests/fileRequests';
 
 const fieldClass =
@@ -132,6 +133,13 @@ export function CreateProductForm({
     const pr = Number.parseFloat(price.replace(',', '.'));
     const st = Number.parseInt(stock, 10);
 
+    const storeName =
+      (Array.isArray(stores) ? stores : []).find((s) => s.id === storeId)
+        ?.name ?? '';
+    const productUploadFolder = buildUploadFolder('products', n, {
+      parentName: storeName || undefined,
+    });
+
     let imagePayload: { url: string; sortOrder: number }[] | undefined =
       undefined;
 
@@ -144,7 +152,7 @@ export function CreateProductForm({
       const urls: string[] = [];
       try {
         for (const file of imageFiles) {
-          const res = await uploadFile(token, file, 'products');
+          const res = await uploadFile(token, file, productUploadFolder);
           urls.push(res.url);
         }
       } catch (err) {

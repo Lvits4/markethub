@@ -9,6 +9,7 @@ import { getErrorMessage } from '../../helpers/mapApiError/mapApiError';
 import { useAuth } from '../../hooks/useAuth/useAuth';
 import { useUpdateProductMutation } from '../../hooks/useProductSellerMutations/useProductSellerMutations';
 import { useCategoriesFlatQuery } from '../../queries/useCategoriesFlatQuery/useCategoriesFlatQuery';
+import { buildUploadFolder } from '../../helpers/buildUploadFolder/buildUploadFolder';
 import { uploadFile } from '../../requests/fileRequests/fileRequests';
 import type { Product } from '../../types/product/product';
 
@@ -113,6 +114,11 @@ export function AdminEditProductForm({
     const pr = Number.parseFloat(price.replace(',', '.'));
     const st = Number.parseInt(stock, 10);
 
+    const storeName = product.store?.name ?? '';
+    const productUploadFolder = buildUploadFolder('products', n, {
+      parentName: storeName || undefined,
+    });
+
     const finalUrls = [...remoteImageUrls];
 
     if (newImageFiles.length > 0) {
@@ -123,7 +129,7 @@ export function AdminEditProductForm({
       setIsUploadingImages(true);
       try {
         for (const file of newImageFiles) {
-          const res = await uploadFile(token, file, 'products');
+          const res = await uploadFile(token, file, productUploadFolder);
           finalUrls.push(res.url);
         }
       } catch (err) {

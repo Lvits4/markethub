@@ -57,7 +57,7 @@ export function RegisterPage() {
 
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-bold tracking-tight text-balance text-zinc-900 sm:text-3xl dark:text-zinc-50">
+      <h1 className="text-2xl font-bold tracking-tight text-balance text-page-title sm:text-3xl dark:text-zinc-50">
         Crear tu cuenta
       </h1>
       <p className="mt-1 text-[15px] leading-snug text-pretty text-zinc-500 dark:text-zinc-400">

@@ -7,12 +7,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FilesService } from '../files/files.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    private readonly filesService: FilesService,
   ) {}
 
   async count(): Promise<number> {
@@ -42,8 +44,19 @@ export class UsersService {
 
   async update(id: string, dto: UpdateUserDto): Promise<User> {
     const user = await this.findById(id);
+    const oldAvatar = user.avatar;
     Object.assign(user, dto);
-    return this.usersRepository.save(user);
+    const saved = await this.usersRepository.save(user);
+
+    if (dto.avatar !== undefined) {
+      const oldNorm = this.filesService.normalizeStoragePath(oldAvatar);
+      const newNorm = this.filesService.normalizeStoragePath(dto.avatar ?? '');
+      if (oldNorm && oldNorm !== newNorm) {
+        await this.filesService.deleteStoredFileSafe(oldAvatar);
+      }
+    }
+
+    return saved;
   }
 
   async updatePassword(id: string, hashedPassword: string): Promise<void> {

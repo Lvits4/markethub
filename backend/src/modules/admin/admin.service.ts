@@ -17,6 +17,7 @@ import { Cart } from '../cart/entities/cart.entity';
 import { CartItem } from '../cart/entities/cart-item.entity';
 import { Favorite } from '../favorites/entities/favorite.entity';
 import { StoresService } from '../stores/stores.service';
+import { FilesService } from '../files/files.service';
 import { AdminCreateUserDto, AdminUpdateUserDto } from './dto';
 import { OrderStatus, PaymentStatus, Role } from '../../common/enums';
 
@@ -35,6 +36,7 @@ export class AdminService {
     private readonly paymentsRepository: Repository<Payment>,
     private readonly dataSource: DataSource,
     private readonly storesService: StoresService,
+    private readonly filesService: FilesService,
   ) {}
 
   async getDashboardStats(days = 7) {
@@ -112,7 +114,7 @@ export class AdminService {
       .select('order.id', 'orderId')
       .addSelect('order.total_amount', 'totalAmount')
       .addSelect('order.status', 'status')
-      .addSelect('order.created_at', 'createdAt')
+      .addSelect('order.created_at', 'soldAt')
       .addSelect('store.name', 'storeName')
       .addSelect("buyer.first_name || ' ' || buyer.last_name", 'buyerName')
       .addSelect('buyer.email', 'buyerEmail')
@@ -299,6 +301,16 @@ export class AdminService {
       }
     }
 
+    const stores = await this.storesRepository.find({
+      where: { userId },
+      select: ['id'],
+    });
+    const mediaPaths: string[] = [];
+    if (target.avatar) mediaPaths.push(target.avatar);
+    for (const store of stores) {
+      mediaPaths.push(...(await this.storesService.collectStoreMediaPaths(store.id)));
+    }
+
     await this.dataSource.transaction(async (em) => {
       const ordersAsCustomer = await em.find(Order, {
         where: { userId },
@@ -329,6 +341,8 @@ export class AdminService {
 
       await em.delete(User, { id: userId });
     });
+
+    await this.filesService.deleteStoredFilesSafe(mediaPaths);
   }
 
   async getAllStores() {

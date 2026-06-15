@@ -156,7 +156,7 @@ export function CatalogPage() {
     <div className="mx-auto max-w-6xl px-4 pt-6 sm:pt-8">
       <header className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-page-title dark:text-zinc-50 sm:text-3xl">
             {marketingCopy.catalogTitle}
           </h1>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">

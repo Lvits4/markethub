@@ -122,7 +122,7 @@ export function OrderDetailPage() {
         <div className="flex flex-col gap-2">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
-              <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-2xl">
+              <h1 className="text-xl font-bold tracking-tight text-page-title dark:text-zinc-50 sm:text-2xl">
                 Pedido
               </h1>
               {order.store?.name ? (

@@ -272,7 +272,7 @@ export function StorePublicPage() {
             )}
           </div>
           <div className="min-w-0 px-4 py-5 sm:px-6 sm:py-6">
-            <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-2xl">
+            <h1 className="text-xl font-bold tracking-tight text-page-title dark:text-zinc-50 sm:text-2xl">
               {store.name}
             </h1>
             {store.description ? (

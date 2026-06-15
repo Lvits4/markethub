@@ -26,4 +26,5 @@ export const swaggerConfig = new DocumentBuilder()
   .addTag('Favorites', 'Lista de favoritos')
   .addTag('Files', 'Gestión de archivos')
   .addTag('Admin', 'Panel de administración')
+  .addTag('Seed', 'Datos de prueba (solo desarrollo)')
   .build();

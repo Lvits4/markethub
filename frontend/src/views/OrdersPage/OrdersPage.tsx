@@ -83,7 +83,7 @@ export function OrdersPage() {
       <div className="flex w-full flex-col gap-4 lg:gap-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div className="min-w-0">
-            <h1 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-2xl">
+            <h1 className="text-xl font-bold tracking-tight text-page-title dark:text-zinc-50 sm:text-2xl">
               Mis pedidos
             </h1>
             <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">

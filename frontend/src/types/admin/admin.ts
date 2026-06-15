@@ -8,7 +8,7 @@ export type AdminRecentSaleRow = {
   orderId: string;
   totalAmount: string;
   status: string;
-  createdAt: string;
+  soldAt: string;
   storeName: string | null;
   buyerName: string | null;
   buyerEmail: string | null;
