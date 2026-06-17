@@ -846,6 +846,15 @@ html:has(.admin-shell) #root {
   min-height: 12.5rem;
   max-height: 20rem;
   flex-shrink: 0;
+  padding-right: 0.25rem;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.dashboard-activity-area::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 @media (min-width: 1024px) {

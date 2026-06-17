@@ -191,7 +191,7 @@ function RecentSaleItem({ sale }: { sale: AdminRecentSaleRow }) {
           {buyerLine}
         </OverflowTooltip>
       </div>
-      <div className="min-w-0 shrink-0 text-right">
+      <div className="min-w-0 shrink-0 pr-1 text-right sm:pr-1.5">
         <OverflowTooltip
           as="p"
           tooltip={formatPrice(Number(sale.totalAmount) || 0)}
@@ -532,7 +532,7 @@ export function AdminDashboardPage() {
               Últimos 10 pedidos
             </OverflowTooltip>
           </div>
-          <div className="dashboard-activity-area market-scroll overflow-y-auto overscroll-contain pr-0.5">
+          <div className="dashboard-activity-area overflow-y-auto overscroll-contain">
             {data.recentSales.length > 0 ? (
               data.recentSales.map((sale) => (
                 <RecentSaleItem key={sale.orderId} sale={sale} />
