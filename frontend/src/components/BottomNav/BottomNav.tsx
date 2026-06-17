@@ -22,8 +22,8 @@ function navItemClass(active: boolean) {
     'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-forest/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white',
     'dark:focus-visible:ring-market-dark-accent/50 dark:focus-visible:ring-offset-zinc-900',
     active
-      ? 'bg-forest text-white dark:bg-market-dark-accent dark:text-night-950'
-      : 'text-zinc-500 hover:bg-zinc-200/55 hover:text-zinc-800 dark:text-white/55 dark:hover:bg-white/10 dark:hover:text-white',
+      ? 'bg-forest text-white dark:bg-market-dark-surface dark:text-white'
+      : 'text-zinc-500 hover:bg-zinc-200/55 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-white/6 dark:hover:text-zinc-100',
   ].join(' ');
 }
 
@@ -46,7 +46,7 @@ export function BottomNav() {
     >
       <div className="pointer-events-auto mx-auto max-w-sm">
         <div
-          className="flex h-14 items-center rounded-md border border-zinc-200/50 bg-white/45 px-1.5 shadow-[0_12px_40px_-10px_rgb(0_0_0/0.14),0_4px_16px_-6px_rgb(0_0_0/0.06)] shadow-zinc-900/5 backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 dark:bg-zinc-900/45 dark:shadow-[0_12px_40px_-8px_rgb(0_0_0/0.5),0_4px_14px_-4px_rgb(0_0_0/0.2)] dark:backdrop-blur-xl dark:backdrop-saturate-150"
+          className="flex h-14 items-center rounded-md border border-zinc-200/50 bg-white/45 px-1.5 shadow-[0_12px_40px_-10px_rgb(0_0_0/0.14),0_4px_16px_-6px_rgb(0_0_0/0.06)] shadow-zinc-900/5 backdrop-blur-xl backdrop-saturate-150 dark:border-white/6 dark:bg-night-900/95 dark:shadow-none dark:backdrop-blur-none"
           role="toolbar"
         >
           <NavCell>

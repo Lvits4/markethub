@@ -2,7 +2,6 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import {
   FiChevronDown,
-  FiImage,
   FiMessageCircle,
   FiPackage,
   FiTag,
@@ -11,6 +10,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
 import { Modal } from '../../components/Modal/Modal';
+import { ProductImage } from '../../components/ProductImage/ProductImage';
 import { QuantitySelector } from '../../components/QuantitySelector/QuantitySelector';
 import { routePaths } from '../../config/routes';
 import { formatPrice } from '../../helpers/formatPrice/formatPrice';
@@ -179,22 +179,10 @@ export function CartPage() {
                   className="flex gap-4 rounded-md bg-white p-4 shadow-market ring-1 ring-zinc-200/70 dark:bg-night-900 dark:shadow-market-dark dark:ring-night-800 sm:p-5"
                 >
                   <div className="h-24 w-24 shrink-0 overflow-hidden rounded-md bg-zinc-100 dark:bg-night-800 sm:h-28 sm:w-28">
-                    {img ? (
-                      <img
-                        src={img}
-                        alt={product?.name ?? ''}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div
-                        className="flex h-full w-full flex-col items-center justify-center gap-1 px-1 text-center text-[10px] font-medium text-zinc-400 dark:text-zinc-500"
-                        aria-hidden
-                      >
-                        <FiImage className="h-7 w-7 opacity-70" />
-                        <span className="leading-tight">Sin imagen</span>
-                      </div>
-                    )}
+                    <ProductImage
+                      src={img}
+                      alt={product?.name ?? 'Producto'}
+                    />
                   </div>
                   <div className="flex min-w-0 flex-1 flex-col gap-2">
                     <Link

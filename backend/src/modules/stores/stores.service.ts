@@ -235,24 +235,25 @@ export class StoresService {
     });
     const productIds = products.map((p) => p.id);
 
-    if (productIds.length > 0) {
-      await em.delete(CartItem, { productId: In(productIds) });
-      await em.delete(Favorite, { productId: In(productIds) });
-      await em.delete(ProductImage, { productId: In(productIds) });
-      await em.delete(Product, { storeId });
-    }
-
     const orders = await em.find(Order, {
       where: { storeId },
       select: ['id'],
     });
     const orderIds = orders.map((o) => o.id);
 
+    // Pedidos antes que productos: order_items referencia product_id sin CASCADE.
     if (orderIds.length > 0) {
       await em.delete(Payment, { orderId: In(orderIds) });
       await em.delete(OrderItem, { orderId: In(orderIds) });
+      await em.delete(Order, { storeId });
     }
-    await em.delete(Order, { storeId });
+
+    if (productIds.length > 0) {
+      await em.delete(CartItem, { productId: In(productIds) });
+      await em.delete(Favorite, { productId: In(productIds) });
+      await em.delete(ProductImage, { productId: In(productIds) });
+      await em.delete(Product, { storeId });
+    }
 
     await em.delete(Store, { id: storeId });
   }

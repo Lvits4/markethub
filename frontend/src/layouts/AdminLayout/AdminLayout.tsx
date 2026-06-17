@@ -1,4 +1,4 @@
-import { useState, type ComponentType } from 'react';
+import { useEffect, useState, type ComponentType } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import {
@@ -18,6 +18,7 @@ import { AdminNavbar } from '../../components/AdminNavbar/AdminNavbar';
 import { useTheme } from '../../hooks/useTheme/useTheme';
 import { routePaths } from '../../config/routes';
 import { useAuth } from '../../hooks/useAuth/useAuth';
+import { useAdminSidebar } from '../../hooks/useAdminSidebar/useAdminSidebar';
 import { useRejectedStoresQuery } from '../../queries/useRejectedStoresQuery/useRejectedStoresQuery';
 
 type NavItemProps = {
@@ -76,10 +77,22 @@ export function AdminLayout() {
   const navigate = useNavigate();
   const { pathname: adminOutletPath } = useLocation();
   const { theme, toggleTheme } = useTheme();
-  const [collapsed, setCollapsed] = useState(false);
+  const {
+    collapsed,
+    isMobile,
+    mobileOpen,
+    showCollapseToggle,
+    toggleCollapsed,
+    openMobile,
+    closeMobile,
+  } = useAdminSidebar();
   const [accountSettingsOpen, setAccountSettingsOpen] = useState(false);
   const { data: rejectedStores } = useRejectedStoresQuery();
   const pendingCount = rejectedStores?.length ?? 0;
+
+  useEffect(() => {
+    closeMobile();
+  }, [adminOutletPath, closeMobile]);
 
   const handleLogout = () => {
     logout();
@@ -90,9 +103,23 @@ export function AdminLayout() {
   return (
     <>
       <div className="admin-shell flex h-dvh max-h-dvh min-h-0 overflow-hidden bg-(--admin-page-bg) text-zinc-800 dark:text-zinc-100">
+        {isMobile && mobileOpen ? (
+          <button
+            type="button"
+            className="fixed inset-0 z-40 bg-black/45 md:hidden"
+            aria-label="Cerrar menú de navegación"
+            onClick={closeMobile}
+          />
+        ) : null}
         <aside
-          className={`admin-sidebar-rail flex min-h-0 shrink-0 flex-col overflow-x-hidden border-r border-(--admin-border) bg-(--admin-card) transition-[width] duration-200 ease-out ${collapsed ? 'w-[72px]' : 'w-[248px]'}`}
+          className={[
+            'admin-sidebar-rail flex min-h-0 flex-col overflow-x-hidden border-r border-(--admin-border) bg-(--admin-card) transition-[width,transform] duration-200 ease-out',
+            isMobile
+              ? `fixed inset-y-0 left-0 z-50 w-[min(100%,280px)] shrink-0 shadow-xl ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`
+              : `shrink-0 ${collapsed ? 'w-[72px]' : 'w-[248px]'}`,
+          ].join(' ')}
           aria-label="Navegación del panel"
+          aria-hidden={isMobile && !mobileOpen}
         >
           <div
             className={`flex shrink-0 border-b border-(--admin-border) ${collapsed ? 'flex-col items-center gap-1.5 py-2.5' : 'h-14 items-center justify-between gap-2 px-3'}`}
@@ -124,8 +151,8 @@ export function AdminLayout() {
             </div>
             <button
               type="button"
-              onClick={() => setCollapsed((c) => !c)}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-night-800"
+              onClick={toggleCollapsed}
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-night-800 ${showCollapseToggle ? '' : 'hidden'}`}
               aria-expanded={!collapsed}
               aria-label={collapsed ? 'Expandir menú' : 'Contraer menú'}
             >
@@ -222,9 +249,10 @@ export function AdminLayout() {
             toggleTheme={toggleTheme}
             onAccountSettingsOpen={() => setAccountSettingsOpen(true)}
             onLogout={handleLogout}
+            onMenuClick={isMobile ? openMobile : undefined}
           />
-          <main className="admin-main-area flex min-h-0 flex-1 flex-col items-center overflow-hidden py-5 md:py-8">
-            <div className="flex min-h-0 w-[min(100%,1360px)] flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain px-5 md:px-8 [scrollbar-gutter:stable]">
+          <main className="admin-main-area flex min-h-0 flex-1 flex-col items-center overflow-hidden py-4 sm:py-5 md:py-8">
+            <div className="flex min-h-0 w-[min(100%,1360px)] flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain px-3 sm:px-5 md:px-8 [scrollbar-gutter:stable]">
               <div
                 key={adminOutletPath}
                 className="route-outlet-fade flex min-h-0 min-w-0 flex-1 flex-col"

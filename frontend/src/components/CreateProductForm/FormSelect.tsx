@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { FiChevronDown } from 'react-icons/fi';
+import { FiCheck, FiChevronDown } from 'react-icons/fi';
 
 export type FormSelectOption = { value: string; label: string };
 
@@ -57,10 +57,9 @@ const fieldTriggerErrorClass =
 const fieldTriggerDisabledClass =
   'cursor-not-allowed opacity-60';
 
-const compactTriggerBaseClass =
-  'flex min-h-0 min-w-[7.5rem] items-center justify-between gap-2 rounded-md border border-(--admin-border) bg-(--admin-card) px-2.5 py-1.5 text-left text-xs font-medium text-zinc-800 shadow-sm outline-hidden ring-admin-primary/0 transition hover:border-zinc-300 focus-visible:ring-2 dark:text-zinc-100 dark:hover:border-night-600';
+const compactTriggerBaseClass = 'dashboard-range-select__trigger';
 
-const compactTriggerDisabledClass = 'cursor-not-allowed opacity-60';
+const compactTriggerDisabledClass = '';
 
 const fieldListPanelClass =
   'fixed z-[90] flex flex-col overflow-hidden overscroll-contain rounded-md border border-zinc-200/90 bg-white shadow-lg ring-1 ring-black/5 dark:border-blue-500/15 dark:bg-admin-dropdown dark:shadow-admin-dropdown dark:ring-sky-500/10';
@@ -69,10 +68,9 @@ const fieldListUlClass =
   'market-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain py-1';
 
 const compactListPanelClass =
-  'fixed z-[90] flex min-w-full flex-col overflow-hidden overscroll-contain rounded-md border border-(--admin-border) bg-(--admin-card) shadow-lg ring-1 ring-black/5 dark:ring-white/10';
+  'dashboard-range-select__panel fixed z-[90]';
 
-const compactListUlClass =
-  'market-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain py-0.5';
+const compactListUlClass = 'dashboard-range-select__list market-scroll';
 
 const listSearchInputClass =
   'w-full rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-2 text-sm text-zinc-900 outline-hidden placeholder:text-zinc-400 focus:border-forest focus:ring-2 focus:ring-forest/20 dark:border-night-600 dark:bg-night-900 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-code-blue dark:focus:ring-code-blue/25';
@@ -243,7 +241,9 @@ export function FormSelect({
   const panelBoxClass = `${isCompact ? compactListPanelClass : fieldListPanelClass}${listClassName ? ` ${listClassName}` : ''}`;
   const ulScrollClass = isCompact ? compactListUlClass : fieldListUlClass;
 
-  const chevronClass = isCompact ? 'h-3.5 w-3.5' : 'h-4 w-4';
+  const chevronClass = isCompact
+    ? 'dashboard-range-select__chevron'
+    : 'h-4 w-4';
 
   const panelPositionStyle =
     coords?.placement === 'below'
@@ -298,8 +298,8 @@ export function FormSelect({
                   const isSelected = opt.value === value;
                   const optionClass = isCompact
                     ? isSelected
-                      ? 'cursor-pointer px-3 py-1.5 text-left text-xs font-semibold text-admin-primary bg-(--admin-primary-soft) dark:text-market-dark-accent'
-                      : 'cursor-pointer px-3 py-1.5 text-left text-xs text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-night-800/80'
+                      ? 'dashboard-range-select__option dashboard-range-select__option--selected'
+                      : 'dashboard-range-select__option'
                     : isSelected
                       ? 'mx-1 cursor-pointer rounded-md px-3 py-2.5 text-sm font-medium bg-blue-50 text-blue-900 dark:bg-sky-500/15 dark:text-sky-100'
                       : 'mx-1 cursor-pointer rounded-md px-3 py-2.5 text-sm text-zinc-800 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-white/6';
@@ -312,7 +312,13 @@ export function FormSelect({
                       onPointerDown={(e) => e.preventDefault()}
                       onClick={() => handlePick(opt.value)}
                     >
-                      {opt.label}
+                      <span className="min-w-0 truncate">{opt.label}</span>
+                      {isCompact ? (
+                        <FiCheck
+                          className="dashboard-range-select__option-check"
+                          aria-hidden
+                        />
+                      ) : null}
                     </li>
                   );
                 })
@@ -326,7 +332,11 @@ export function FormSelect({
   return (
     <div
       ref={rootRef}
-      className={isCompact ? 'relative w-auto shrink-0' : 'relative w-full'}
+      className={
+        isCompact
+          ? 'dashboard-range-select relative w-auto shrink-0'
+          : 'relative w-full'
+      }
     >
       <button
         ref={triggerRef}
@@ -347,10 +357,7 @@ export function FormSelect({
         >
           {displayLabel}
         </span>
-        <FiChevronDown
-          className={`${chevronClass} shrink-0 text-zinc-500 transition-transform dark:text-zinc-400 ${open ? 'rotate-180' : ''}`}
-          aria-hidden
-        />
+        <FiChevronDown className={chevronClass} aria-hidden />
       </button>
       {listPortal}
     </div>

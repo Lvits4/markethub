@@ -13,12 +13,14 @@ export function useAdminDeleteStore() {
       return deleteAdminStore(token, storeId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.adminStores });
-queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard() });
-    queryClient.invalidateQueries({ queryKey: queryKeys.storesRejected });
-    queryClient.invalidateQueries({ queryKey: queryKeys.myStores });
-    queryClient.invalidateQueries({ queryKey: queryKeys.sellerDashboard() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.sellerProducts });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.adminStores });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.adminProducts });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard() });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.storesRejected });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.myStores });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.sellerDashboard() });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.sellerProducts });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.products() });
     },
   });
 }

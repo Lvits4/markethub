@@ -38,7 +38,7 @@ export class Product {
   @Column({ name: 'store_id', type: 'uuid' })
   storeId: string;
 
-  @ManyToOne(() => Store)
+  @ManyToOne(() => Store, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'store_id' })
   store: Store;
 

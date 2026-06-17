@@ -63,11 +63,13 @@ export function useDeleteStoreMutation() {
       void qc.invalidateQueries({ queryKey: queryKeys.myStores });
       void qc.invalidateQueries({ queryKey: queryKeys.publicStores });
       void qc.invalidateQueries({ queryKey: queryKeys.adminStores });
+      void qc.invalidateQueries({ queryKey: queryKeys.adminProducts });
       void qc.invalidateQueries({ queryKey: queryKeys.sellerDashboard() });
       void qc.invalidateQueries({ queryKey: queryKeys.sellerProducts });
       void qc.invalidateQueries({ queryKey: queryKeys.sellerSalesReport });
       void qc.invalidateQueries({ queryKey: queryKeys.adminPlatformReport });
       void qc.invalidateQueries({ queryKey: queryKeys.ordersStore });
+      void qc.invalidateQueries({ queryKey: queryKeys.products() });
     },
   });
 }

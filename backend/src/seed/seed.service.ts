@@ -6,6 +6,10 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import * as fs from 'fs';
+import * as http from 'http';
+import * as https from 'https';
+import * as path from 'path';
 import { DataSource, EntityManager, In, Like, Repository } from 'typeorm';
 import { Role, OrderStatus, PaymentStatus } from '../common/enums';
 import { User } from '../modules/users/entities/user.entity';
@@ -42,6 +46,7 @@ export interface SeedResult {
     approvedStores: number;
     pendingStores: number;
     products: number;
+    prunedProducts?: number;
     favorites: number;
     carts: number;
     orders: number;
@@ -92,6 +97,11 @@ export class SeedService {
     const approvedStores: Store[] = [];
     const pendingStores: Store[] = [];
     const products: Product[] = [];
+    let favoritesCount = 0;
+    let cartsCount = 0;
+    let ordersCount = 0;
+    let finalProductCount = 0;
+    let prunedProducts = 0;
 
     await this.dataSource.transaction(async (em) => {
       for (const cat of SEED_CATEGORIES) {
@@ -134,6 +144,7 @@ export class SeedService {
           description: storeData.description,
           shippingPolicy: storeData.shippingPolicy,
           returnPolicy: storeData.returnPolicy,
+          logo: storeData.logo,
           slug,
           userId: seller.id,
           contactEmail: seller.email,
@@ -172,7 +183,7 @@ export class SeedService {
 
           const image = em.create(ProductImage, {
             productId: savedProduct.id,
-            url: `https://picsum.photos/seed/${slug}/400/400`,
+            url: def.imageUrl,
             altText: def.name,
             sortOrder: 0,
           });
@@ -190,6 +201,7 @@ export class SeedService {
             productId: product.id,
           });
           await em.save(favorite);
+          favoritesCount += 1;
         }
       }
 
@@ -197,6 +209,7 @@ export class SeedService {
         const customer = customers[i];
         const cart = em.create(Cart, { userId: customer.id });
         const savedCart = await em.save(cart);
+        cartsCount += 1;
 
         const cartProducts = products.slice(i * 2, i * 2 + 2);
         for (const product of cartProducts) {
@@ -209,49 +222,79 @@ export class SeedService {
         }
       }
 
-      for (let i = 0; i < 3; i++) {
-        const customer = customers[i];
-        const store = approvedStores[i];
-        const storeProducts = products.filter((p) => p.storeId === store.id);
-        const orderProducts = storeProducts.slice(0, 2);
+      const orderStatuses = [
+        OrderStatus.CONFIRMED,
+        OrderStatus.DELIVERED,
+        OrderStatus.CONFIRMED,
+        OrderStatus.SHIPPED,
+        OrderStatus.DELIVERED,
+      ];
 
-        let total = 0;
-        for (const p of orderProducts) {
-          total += Number(p.price);
-        }
+      for (let daysAgo = 29; daysAgo >= 0; daysAgo--) {
+        const ordersThisDay = 1 + (daysAgo % 3);
+        for (let j = 0; j < ordersThisDay; j++) {
+          const orderIndex = ordersCount;
+          const customer = customers[orderIndex % customers.length];
+          const store = approvedStores[orderIndex % approvedStores.length];
+          const storeProducts = products.filter((p) => p.storeId === store.id);
+          if (storeProducts.length === 0) continue;
 
-        const order = em.create(Order, {
-          userId: customer.id,
-          storeId: store.id,
-          totalAmount: total,
-          shippingAddress: `Calle Ejemplo ${i + 1}, Madrid, 2800${i}`,
-          status: OrderStatus.CONFIRMED,
-        });
-        const savedOrder = await em.save(order);
+          const itemCount = 1 + (orderIndex % 2);
+          const orderProducts = storeProducts.slice(0, itemCount);
+          let total = 0;
+          for (const p of orderProducts) {
+            total += Number(p.price) * (1 + (orderIndex % 2));
+          }
 
-        for (const p of orderProducts) {
-          const item = em.create(OrderItem, {
-            orderId: savedOrder.id,
-            productId: p.id,
-            quantity: 1,
-            unitPrice: p.price,
+          const createdAt = new Date();
+          createdAt.setDate(createdAt.getDate() - daysAgo);
+          createdAt.setHours(9 + j * 4, (orderIndex * 11) % 60, 0, 0);
+
+          const status = orderStatuses[orderIndex % orderStatuses.length];
+
+          const order = em.create(Order, {
+            userId: customer.id,
+            storeId: store.id,
+            totalAmount: total,
+            shippingAddress: `Calle Ejemplo ${(orderIndex % 20) + 1}, Madrid, 2800${orderIndex % 10}`,
+            status,
+            createdAt,
+            updatedAt: createdAt,
           });
-          await em.save(item);
-        }
+          const savedOrder = await em.save(order);
+          ordersCount += 1;
 
-        const payment = em.create(Payment, {
-          orderId: savedOrder.id,
-          amount: total,
-          method: 'mock',
-          status: PaymentStatus.COMPLETED,
-          transactionId: `SEED-TXN-${i + 1}`,
-        });
-        await em.save(payment);
+          for (const p of orderProducts) {
+            const qty = 1 + (orderIndex % 2);
+            const item = em.create(OrderItem, {
+              orderId: savedOrder.id,
+              productId: p.id,
+              quantity: qty,
+              unitPrice: p.price,
+            });
+            await em.save(item);
+          }
+
+          const payment = em.create(Payment, {
+            orderId: savedOrder.id,
+            amount: total,
+            method: 'mock',
+            status: PaymentStatus.COMPLETED,
+            transactionId: `SEED-TXN-${orderIndex + 1}`,
+          });
+          await em.save(payment);
+        }
       }
+
+      prunedProducts = await this.pruneProductsWithoutValidImages(em);
+      finalProductCount = await em.count(Product);
     });
 
     return {
-      message: 'Base de datos poblada correctamente',
+      message:
+        prunedProducts > 0
+          ? `Base de datos poblada correctamente (${prunedProducts} producto(s) sin imagen válida eliminados)`
+          : 'Base de datos poblada correctamente',
       password: SEED_PASSWORD,
       counts: {
         users: 20,
@@ -259,16 +302,116 @@ export class SeedService {
         stores: stores.length,
         approvedStores: approvedStores.length,
         pendingStores: pendingStores.length,
-        products: products.length,
-        favorites: 15,
-        carts: 3,
-        orders: 3,
+        products: finalProductCount,
+        prunedProducts,
+        favorites: favoritesCount,
+        carts: cartsCount,
+        orders: ordersCount,
       },
       credentials: {
         customers: customers.map((u) => u.email),
         sellers: sellers.map((u) => u.email),
       },
     };
+  }
+
+  async pruneProductsWithoutValidImagesPublic(): Promise<{ removed: number; remaining: number }> {
+    if (this.configService.get<string>('NODE_ENV') !== 'development') {
+      throw new ForbiddenException('Solo disponible en desarrollo');
+    }
+    let removed = 0;
+    let remaining = 0;
+    await this.dataSource.transaction(async (em) => {
+      removed = await this.pruneProductsWithoutValidImages(em);
+      remaining = await em.count(Product);
+    });
+    return { removed, remaining };
+  }
+
+  private storageRoot(): string {
+    return path.resolve(
+      this.configService.get<string>('STORAGE_ROOT_PATH') ||
+        process.env.STORAGE_ROOT_PATH ||
+        './uploads',
+    );
+  }
+
+  private checkRemoteImageUrl(url: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      const lib = url.startsWith('https') ? https : http;
+      const req = lib.request(url, { method: 'HEAD' }, (res) => {
+        res.resume();
+        resolve(res.statusCode === 200);
+      });
+      req.on('error', () => resolve(false));
+      req.setTimeout(8000, () => {
+        req.destroy();
+        resolve(false);
+      });
+      req.end();
+    });
+  }
+
+  private async isProductImageValid(url: string | undefined | null): Promise<boolean> {
+    const trimmed = (url ?? '').trim();
+    if (!trimmed) return false;
+    if (/^https?:\/\//i.test(trimmed)) {
+      return this.checkRemoteImageUrl(trimmed);
+    }
+    const filePath = path.join(this.storageRoot(), trimmed.replace(/^\/+/, ''));
+    return fs.existsSync(filePath);
+  }
+
+  /** Elimina productos sin imagen o con URL/archivo de imagen inválido. */
+  private async pruneProductsWithoutValidImages(em: EntityManager): Promise<number> {
+    const products = await em.find(Product, { relations: ['images'] });
+    let removed = 0;
+
+    for (const product of products) {
+      const primary = [...(product.images ?? [])].sort(
+        (a, b) => a.sortOrder - b.sortOrder,
+      )[0];
+      const valid = await this.isProductImageValid(primary?.url);
+      if (!valid) {
+        await this.removeProductAndReferences(em, product.id);
+        removed += 1;
+      }
+    }
+
+    return removed;
+  }
+
+  private async removeProductAndReferences(
+    em: EntityManager,
+    productId: string,
+  ): Promise<void> {
+    await em.delete(CartItem, { productId });
+    await em.delete(Favorite, { productId });
+
+    const orderItems = await em.find(OrderItem, { where: { productId } });
+    const orderIds = [...new Set(orderItems.map((item) => item.orderId))];
+    await em.delete(OrderItem, { productId });
+
+    for (const orderId of orderIds) {
+      const remaining = await em.find(OrderItem, { where: { orderId } });
+      if (remaining.length === 0) {
+        await em.delete(Payment, { orderId });
+        await em.delete(Order, { id: orderId });
+      } else {
+        const total = remaining.reduce(
+          (sum, item) => sum + Number(item.unitPrice) * item.quantity,
+          0,
+        );
+        await em.update(Order, { id: orderId }, { totalAmount: total });
+        const payment = await em.findOne(Payment, { where: { orderId } });
+        if (payment) {
+          await em.update(Payment, { id: payment.id }, { amount: total });
+        }
+      }
+    }
+
+    await em.delete(ProductImage, { productId });
+    await em.delete(Product, { id: productId });
   }
 
   private async cleanupSeedData(): Promise<void> {

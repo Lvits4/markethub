@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { FiArrowLeft, FiHeart } from 'react-icons/fi';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
+import { ProductImage } from '../../components/ProductImage/ProductImage';
 import { QuantitySelector } from '../../components/QuantitySelector/QuantitySelector';
 import { routePaths } from '../../config/routes';
 import { formatPrice } from '../../helpers/formatPrice/formatPrice';
@@ -167,17 +168,11 @@ export function ProductDetailPage() {
                 className={`h-5 w-5 ${isFav ? 'fill-forest text-forest' : ''}`}
               />
             </button>
-            {mainImageUrl ? (
-              <img
-                src={mainImageUrl}
-                alt={product.name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center text-zinc-400">
-                Sin imagen
-              </div>
-            )}
+            <ProductImage
+              src={mainImageUrl}
+              alt={product.name}
+              showFallbackLabel={false}
+            />
           </div>
 
           {images.length > 1 ? (
@@ -193,10 +188,10 @@ export function ProductDetailPage() {
                       : 'ring-transparent opacity-80 hover:opacity-100'
                   }`}
                 >
-                  <img
+                  <ProductImage
                     src={publicStorageImageSrc(img.url)}
                     alt={img.altText ?? product.name}
-                    className="h-full w-full object-cover"
+                    showFallbackLabel={false}
                   />
                 </button>
               ))}

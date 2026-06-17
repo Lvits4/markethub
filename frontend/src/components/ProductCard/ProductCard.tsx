@@ -7,6 +7,7 @@ import { getPrimaryImageUrl } from '../../helpers/productImageUrl/productImageUr
 import type { Product } from '../../types/product/product';
 import { Badge } from '../Badge/Badge';
 import { Button } from '../Button/Button';
+import { ProductImage } from '../ProductImage/ProductImage';
 
 type ProductCardProps = {
   product: Product;
@@ -35,18 +36,11 @@ export function ProductCard({
         to={routePaths.productDetail(product.id)}
         className="relative aspect-square w-full overflow-hidden bg-zinc-100 dark:bg-night-800"
       >
-        {img ? (
-          <img
-            src={img}
-            alt={product.name}
-            className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
-            loading="lazy"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-sm text-zinc-400">
-            Sin imagen
-          </div>
-        )}
+        <ProductImage
+          src={img}
+          alt={product.name}
+          className="transition duration-300 group-hover:scale-[1.02]"
+        />
         {badgeLabel ? <Badge label={badgeLabel} /> : null}
       </Link>
       {onToggleFavorite ? (

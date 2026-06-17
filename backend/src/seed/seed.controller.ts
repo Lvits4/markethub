@@ -26,4 +26,15 @@ export class SeedController {
     const shouldForce = force === 'true' || force === '1';
     return this.seedService.run(shouldForce);
   }
+
+  @Public()
+  @Post('prune-products-without-images')
+  @ApiOperation({
+    summary: 'Eliminar productos sin imagen válida',
+    description:
+      'Borra productos que no tienen imagen, tienen URL vacía, archivo local inexistente o URL remota rota. Solo desarrollo.',
+  })
+  pruneProductsWithoutImages() {
+    return this.seedService.pruneProductsWithoutValidImagesPublic();
+  }
 }
